@@ -2,9 +2,6 @@
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
-	import '../app.css';
-	import { ClerkProvider } from 'svelte-clerk';
-
 	interface LayoutProps {
 		data: LayoutData;
 		children: Snippet;
@@ -13,6 +10,6 @@
 	let { data, children }: LayoutProps = $props();
 </script>
 
-<ClerkProvider>
+<div class="flex items-center justify-center w-full min-h-screen">
 	{@render children()}
-</ClerkProvider>
+</div>
