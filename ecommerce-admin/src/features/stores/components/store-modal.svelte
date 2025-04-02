@@ -2,11 +2,18 @@
 	let open = $state(false);
 
 	export const isOpen = () => open;
-	export const openStoreModal = () => (open = true);
-	export const closeStoreModal = () => (open = false);
+
+	export function openStoreModal() {
+		open = true;
+	}
+
+	export function closeStoreModal() {
+		open = false;
+	}
 </script>
 
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
@@ -35,6 +42,10 @@
 	$effect(() => {
 		if ($createStoreMutation.isSuccess) {
 			toast.success('Store created');
+			const { data } = $createStoreMutation.data;
+			const { id } = data.store;
+			// TODO: rework this
+			window.location.assign(`/${id}`);
 		}
 	});
 </script>
