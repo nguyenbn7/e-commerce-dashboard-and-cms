@@ -7,29 +7,36 @@
 </script>
 
 <script lang="ts">
-	import Modal from './modal.svelte';
-	import { Input } from '../ui/input';
-	import { Button } from '../ui/button';
-	import { FormControl, FormField, FormFieldErrors, FormLabel } from '../ui/form';
+	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/button';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import { Modal } from '$lib/components/modal';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
-	import { setupSchema } from './schemas';
+	import { setupSchema } from '../schemas';
+	import { useCreateStore } from '../api/use-create-store';
 	import Loader from '@lucide/svelte/icons/loader';
+	import { toast } from 'svelte-sonner';
 
-	let isPending = $state(false);
+	const createStoreMutation = useCreateStore();
 
 	const form = superForm(defaults(zod(setupSchema)), {
 		SPA: true,
 		validators: zod(setupSchema),
 		onUpdate({ form }) {
 			if (form.valid) {
-				// TODO: Call an external API with form.data, await the result and update form
-				console.log(form.data);
+				$createStoreMutation.mutate(form.data);
 			}
 		}
 	});
 
 	const { form: formData, enhance } = form;
+
+	$effect(() => {
+		if ($createStoreMutation.isSuccess) {
+			toast.success('Store created');
+		}
+	});
 </script>
 
 <Modal
@@ -47,7 +54,7 @@
 							{...props}
 							class="mt-5"
 							placeholder="E-commerce"
-							disabled={isPending}
+							disabled={$createStoreMutation.isPending}
 							bind:value={$formData.name}
 						/>
 					{/snippet}
@@ -57,13 +64,18 @@
 			</FormField>
 
 			<div class="pt-6 space-x-2 flex items-center justify-end w-full">
-				<Button type="button" variant="outline" onclick={closeStoreModal} disabled={isPending}>
+				<Button
+					type="button"
+					variant="outline"
+					onclick={closeStoreModal}
+					disabled={$createStoreMutation.isPending}
+				>
 					Cancel
 				</Button>
 
-				<Button type="submit" disabled={isPending}>
+				<Button type="submit" disabled={$createStoreMutation.isPending}>
 					Continue
-					{#if isPending}
+					{#if $createStoreMutation.isPending}
 						<Loader size={16} class="animate-spin ml-1 text-primary-foreground" />
 					{/if}
 				</Button>

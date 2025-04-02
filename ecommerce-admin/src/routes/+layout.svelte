@@ -4,7 +4,9 @@
 
 	import '../app.css';
 	import { ClerkProvider } from 'svelte-clerk';
-	import { StoreModal } from '$lib/components/modal';
+	import { StoreModal } from '$features/stores/components';
+	import { Toaster } from '$lib/components/ui/sonner';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -14,7 +16,11 @@
 	let { data, children }: LayoutProps = $props();
 </script>
 
-<ClerkProvider>
-	<StoreModal />
-	{@render children()}
-</ClerkProvider>
+<Toaster richColors position="top-right" closeButton theme="light" />
+
+<QueryClientProvider>
+	<ClerkProvider>
+		<StoreModal />
+		{@render children()}
+	</ClerkProvider>
+</QueryClientProvider>
