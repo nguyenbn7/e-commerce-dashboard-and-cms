@@ -4,6 +4,7 @@
 
 	import '../app.css';
 	import { ClerkProvider } from 'svelte-clerk';
+	import { StoreModal } from '$lib/components/modal';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -14,5 +15,6 @@
 </script>
 
 <ClerkProvider>
+	<StoreModal />
 	{@render children()}
 </ClerkProvider>
