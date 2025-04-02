@@ -13,7 +13,6 @@
 </script>
 
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
@@ -44,8 +43,8 @@
 			toast.success('Store created');
 			const { data } = $createStoreMutation.data;
 			const { id } = data.store;
-			// TODO: rework this
 			window.location.assign(`/${id}`);
+			closeStoreModal();
 		}
 	});
 </script>

@@ -1,15 +1,19 @@
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { clerkClient } from 'svelte-clerk/server';
+import prisma from '$lib/server/prisma';
 
 export const load = (async ({ locals }) => {
 	const { userId } = locals.auth;
 
 	if (!userId) redirect(307, '/sign-in');
 
-	const user = await clerkClient.users.getUser(userId);
+	const store = await prisma.store.findFirst({
+		where: {
+			userId
+		}
+	});
 
-	return {
-		user: JSON.parse(JSON.stringify(user))
-	};
+	if (store) redirect(308, `/${store.id}`);
+
+	return {};
 }) satisfies PageServerLoad;
