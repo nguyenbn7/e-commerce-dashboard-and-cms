@@ -11,9 +11,25 @@
 	import { Input } from '../ui/input';
 	import { Button } from '../ui/button';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '../ui/form';
+	import { defaults, superForm } from 'sveltekit-superforms';
+	import { zod } from 'sveltekit-superforms/adapters';
+	import { setupSchema } from './schemas';
 	import Loader from '@lucide/svelte/icons/loader';
 
 	let isPending = $state(false);
+
+	const form = superForm(defaults(zod(setupSchema)), {
+		SPA: true,
+		validators: zod(setupSchema),
+		onUpdate({ form }) {
+			if (form.valid) {
+				// TODO: Call an external API with form.data, await the result and update form
+				console.log(form.data);
+			}
+		}
+	});
+
+	const { form: formData, enhance } = form;
 </script>
 
 <Modal
@@ -22,19 +38,26 @@
 	description="Add a new store to manage products and categories"
 >
 	<div class="py-2 pb-4">
-		TODO:
-		<!-- <form method="post" action="/?">
+		<form method="post" use:enhance>
 			<FormField {form} name="name">
-				<FormLabel>Name</FormLabel>
 				<FormControl>
 					{#snippet children({ props })}
-						<Input placeholder="E-commerce" {...props} disabled={isPending} />
+						<FormLabel>Name</FormLabel>
+						<Input
+							{...props}
+							class="mt-5"
+							placeholder="E-commerce"
+							disabled={isPending}
+							bind:value={$formData.name}
+						/>
 					{/snippet}
 				</FormControl>
+
 				<FormFieldErrors />
 			</FormField>
+
 			<div class="pt-6 space-x-2 flex items-center justify-end w-full">
-				<Button type="button" variant="outline" onclick={() => (open = false)} disabled={isPending}>
+				<Button type="button" variant="outline" onclick={closeStoreModal} disabled={isPending}>
 					Cancel
 				</Button>
 
@@ -45,6 +68,6 @@
 					{/if}
 				</Button>
 			</div>
-		</form> -->
+		</form>
 	</div>
 </Modal>
