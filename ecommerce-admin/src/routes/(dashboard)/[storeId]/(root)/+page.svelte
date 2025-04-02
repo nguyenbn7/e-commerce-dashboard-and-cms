@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Metadata } from '$lib/components/metadata';
 	import type { PageData } from './$types';
+
+	import { Metadata } from '$lib/components/metadata';
 
 	interface PageProps {
 		data: PageData;
