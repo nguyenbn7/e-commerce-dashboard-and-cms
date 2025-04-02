@@ -5,7 +5,7 @@ import { clerkClient } from 'svelte-clerk/server';
 export const load = (async ({ locals }) => {
 	const { userId } = locals.auth;
 
-	if (!userId) return redirect(307, '/sign-in');
+	if (!userId) redirect(307, '/sign-in');
 
 	const user = await clerkClient.users.getUser(userId);
 
