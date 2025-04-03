@@ -16,3 +16,20 @@ export async function createStore(userId: string, data: { name: string }) {
 		}
 	});
 }
+
+export async function getFirstStore(userId: string) {
+	return prisma.store.findFirst({
+		where: {
+			userId
+		}
+	});
+}
+
+export async function findStoreById(userId: string, storeId: number) {
+	return prisma.store.findFirst({
+		where: {
+			id: storeId,
+			userId
+		}
+	});
+}
