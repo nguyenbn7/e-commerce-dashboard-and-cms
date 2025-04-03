@@ -1,14 +1,15 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Metadata } from '$lib/components/metadata';
-	import { SettingsForm } from '$features/settings/components';
-	import Trash from '@lucide/svelte/icons/trash';
+	import { ApiAlert } from '$lib/components/alert';
 	import { ConfirmDialog, getConfirmation } from '$lib/components/confirm-dialog';
+	import { SettingsForm } from '$features/settings/components';
 	import { useDeleteStore } from '$features/stores/api/use-delete-store';
-	import { goto } from '$app/navigation';
+	import Trash from '@lucide/svelte/icons/trash';
 	import { page } from '$app/state';
 
 	interface PageProps {
@@ -78,6 +79,13 @@
 			onError={() => {
 				toast.error('Something went wrong');
 			}}
+		/>
+
+		<Separator />
+
+		<ApiAlert
+			title="PUBLIC_API_URL"
+			description={`${page.url.origin}/api/${page.params.storeId}`}
 		/>
 	</div>
 </div>
