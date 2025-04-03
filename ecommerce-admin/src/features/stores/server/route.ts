@@ -2,10 +2,10 @@ import { CLERK_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 import { Hono } from 'hono';
 import { clerkMiddleware } from '@hono/clerk-auth';
-import { clerkMiddlewareAuthenticated } from '$lib/server/hono.middleware';
 import { zValidator } from '@hono/zod-validator';
+import { clerkMiddlewareAuthenticated } from '$lib/server/hono.middleware';
 import { setupSchema } from '../schemas';
-import prisma from '$lib/server/prisma';
+import { createStore, getStores } from './repository';
 
 const app = new Hono()
 	.use(
@@ -14,11 +14,7 @@ const app = new Hono()
 	.get('/', clerkMiddlewareAuthenticated(), async (c) => {
 		const userId = c.get('userId');
 
-		const stores = await prisma.store.findMany({
-			where: {
-				userId
-			}
-		});
+		const stores = await getStores(userId);
 
 		return c.json({
 			status: 'success',
@@ -32,12 +28,7 @@ const app = new Hono()
 
 		const { name } = c.req.valid('json');
 
-		const store = await prisma.store.create({
-			data: {
-				name,
-				userId
-			}
-		});
+		const store = await createStore(userId, { name });
 
 		return c.json({
 			status: 'success',

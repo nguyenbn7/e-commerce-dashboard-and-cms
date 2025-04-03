@@ -3,8 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { cn } from '$lib/utils';
-	import { Button } from './ui/button';
-	import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+	import { Button } from '$lib/components/ui/button';
+	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
 	import {
 		Command,
 		CommandEmpty,
@@ -13,8 +13,7 @@
 		CommandItem,
 		CommandList,
 		CommandSeparator
-	} from './ui/command';
-	import { openStoreModal } from '$features/stores/components';
+	} from '$lib/components/ui/command';
 	import Check from '@lucide/svelte/icons/check';
 	import StoreIcon from '@lucide/svelte/icons/store';
 	import PlusCircle from '@lucide/svelte/icons/plus-circle';
@@ -23,9 +22,10 @@
 	interface Props {
 		class?: string | null;
 		stores: Store[];
+		handleClickCreateButton: () => void;
 	}
 
-	let { class: className, stores }: Props = $props();
+	let { class: className, stores, handleClickCreateButton }: Props = $props();
 
 	let storeOptions = $derived(
 		stores.map((item) => ({
@@ -96,7 +96,7 @@
 					<CommandItem
 						onSelect={() => {
 							open = false;
-							openStoreModal();
+							handleClickCreateButton();
 						}}
 					>
 						<PlusCircle size={20} class="mr-2" />

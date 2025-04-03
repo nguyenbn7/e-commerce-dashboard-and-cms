@@ -6,7 +6,12 @@ type Response = InferResponseType<(typeof client.api.stores)['$post']>;
 type Request = InferRequestType<(typeof client.api.stores)['$post']>['json'];
 type ResponseError = { status: string; error: { code: number; message: string } };
 
-export function useCreateStore() {
+export type UseCreateStoreOptions = {
+	onSuccess?: (data: Response, variables: Request, context: unknown) => Promise<unknown> | unknown;
+	onError?: (error: Error, variables: Request, context: unknown) => Promise<unknown> | unknown;
+};
+
+export function useCreateStore({ onSuccess, onError }: UseCreateStoreOptions) {
 	const mutation = createMutation<Response, Error, Request>({
 		mutationFn: async (json) => {
 			const response = await client.api.stores.$post({ json });
@@ -18,7 +23,9 @@ export function useCreateStore() {
 			}
 
 			return response.json();
-		}
+		},
+		onSuccess,
+		onError
 	});
 
 	return mutation;

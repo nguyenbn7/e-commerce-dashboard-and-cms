@@ -5,13 +5,13 @@
 
 	let { class: className }: HTMLAttributes<HTMLElement> = $props();
 
-	const routes = [
+	const routes = $derived([
 		{
 			href: `/${page.params.storeId}/settings`,
 			label: 'Settings',
 			active: page.url.pathname === `/${page.params.storeId}/settings`
 		}
-	];
+	]);
 </script>
 
 <nav class={cn('flex items-center space-x-4 lg:space-x-6', className)}>

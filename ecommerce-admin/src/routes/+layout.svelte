@@ -4,7 +4,6 @@
 
 	import '../app.css';
 	import { ClerkProvider } from 'svelte-clerk';
-	import { StoreModal } from '$features/stores/components';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 
@@ -20,7 +19,6 @@
 
 <QueryClientProvider>
 	<ClerkProvider>
-		<StoreModal />
 		{@render children()}
 	</ClerkProvider>
 </QueryClientProvider>

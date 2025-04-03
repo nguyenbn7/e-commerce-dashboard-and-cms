@@ -1,22 +1,20 @@
 <script lang="ts">
+	import type { Store } from '$features/stores/api/use-get-stores';
 	import { UserButton } from 'svelte-clerk';
-	import { onMount } from 'svelte';
 	import MainNav from './main-nav.svelte';
-	import StoreSwicher from './store-swicher.svelte';
-	import { useGetStores } from '$features/stores/api/use-get-stores';
+	import { StoreSwitcher } from '$features/stores/components';
 
-	let getStoresQuery: undefined | ReturnType<typeof useGetStores> = $state();
+	interface Props {
+		handleClickCreateButton: () => void;
+		stores: Store[];
+	}
 
-	onMount(() => {
-		getStoresQuery = useGetStores();
-	});
-
-	let stores = $derived($getStoresQuery?.data?.data.stores ?? []);
+	let { handleClickCreateButton, stores }: Props = $props();
 </script>
 
 <div class="border-b">
 	<div class="flex h-16 items-center px-4">
-		<StoreSwicher {stores} />
+		<StoreSwitcher {stores} {handleClickCreateButton} />
 
 		<MainNav class="mx-6" />
 

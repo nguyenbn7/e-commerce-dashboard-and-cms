@@ -1,30 +1,21 @@
-<script lang="ts" module>
-	let open = $state(false);
-
-	export const isOpen = () => open;
-
-	export function openStoreModal() {
-		open = true;
-	}
-
-	export function closeStoreModal() {
-		open = false;
-	}
-</script>
-
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
-	import { Modal } from '$lib/components/modal';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { Modal } from '$lib/components/modal';
 	import { setupSchema } from '../schemas';
-	import { useCreateStore } from '../api/use-create-store';
+	import { useCreateStore, type UseCreateStoreOptions } from '../api/use-create-store';
 	import Loader from '@lucide/svelte/icons/loader';
-	import { toast } from 'svelte-sonner';
 
-	const createStoreMutation = useCreateStore();
+	interface Props {
+		open?: boolean;
+	}
+
+	let { open = $bindable(false), onSuccess, onError }: Props & UseCreateStoreOptions = $props();
+
+	const createStoreMutation = useCreateStore({ onSuccess, onError });
 
 	const form = superForm(defaults(zod(setupSchema)), {
 		SPA: true,
@@ -37,16 +28,6 @@
 	});
 
 	const { form: formData, enhance } = form;
-
-	$effect(() => {
-		if ($createStoreMutation.isSuccess) {
-			toast.success('Store created');
-			const { data } = $createStoreMutation.data;
-			const { id } = data.store;
-			window.location.assign(`/${id}`);
-			closeStoreModal();
-		}
-	});
 </script>
 
 <Modal
@@ -77,7 +58,7 @@
 				<Button
 					type="button"
 					variant="outline"
-					onclick={closeStoreModal}
+					onclick={() => (open = false)}
 					disabled={$createStoreMutation.isPending}
 				>
 					Cancel
