@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Metadata } from '$lib/components/metadata';
@@ -30,6 +31,17 @@
 
 		<Separator />
 
-		<SettingsForm form={data.form} />
+		<SettingsForm
+			form={data.form}
+			onUpdated={async ({ form }) => {
+				if (form.valid) {
+					toast.success('Store updated');
+					window.location.reload();
+				}
+			}}
+			onError={() => {
+				toast.error('Something went wrong');
+			}}
+		/>
 	</div>
 </div>

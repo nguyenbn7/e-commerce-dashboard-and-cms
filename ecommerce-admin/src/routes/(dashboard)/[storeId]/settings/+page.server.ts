@@ -3,6 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { settingsFormSchema } from '$features/settings/schemas';
+import { updateStore } from '$features/stores/server/repository';
 
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
@@ -24,6 +25,10 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form });
 
-		console.log(form.data, params.storeId);
+		const { name } = form.data;
+
+		await updateStore(userId, Number(params.storeId), { name });
+
+		return { form };
 	}
 } satisfies Actions;

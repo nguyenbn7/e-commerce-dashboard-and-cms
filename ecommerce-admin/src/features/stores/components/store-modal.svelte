@@ -18,6 +18,7 @@
 	const createStoreMutation = useCreateStore({ onSuccess, onError });
 
 	const form = superForm(defaults(zod(setupSchema)), {
+		id: `stores_${Math.floor(Math.random() * Date.now()).toString(16)}`,
 		SPA: true,
 		validators: zod(setupSchema),
 		onUpdate({ form }) {

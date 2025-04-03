@@ -33,3 +33,15 @@ export async function findStoreById(userId: string, storeId: number) {
 		}
 	});
 }
+
+export async function updateStore(userId: string, storeId: number, data: { name: string }) {
+	return prisma.store.update({
+		where: {
+			id: storeId,
+			userId
+		},
+		data: {
+			name: data.name
+		}
+	})
+}
