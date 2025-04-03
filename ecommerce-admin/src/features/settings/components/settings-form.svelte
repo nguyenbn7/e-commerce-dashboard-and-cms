@@ -15,6 +15,7 @@
 	interface Props {
 		form: SuperValidated<SettingsFormValues, any, SettingsFormValues>;
 		action?: string | undefined | null;
+		disabled?: boolean;
 		onUpdated?: (event: {
 			form: Readonly<SuperValidated<SettingsFormValues, any, SettingsFormValues>>;
 		}) => MaybePromise<unknown | void>;
@@ -47,7 +48,14 @@
 			  }) => MaybePromise<unknown | void>);
 	}
 
-	let { form: sForm, action, onUpdated, onError, onUpdate }: Props = $props();
+	let {
+		form: sForm,
+		action,
+		onUpdated,
+		onError,
+		onUpdate,
+		disabled: externalDisabled = false
+	}: Props = $props();
 
 	const form = superForm(sForm, {
 		validators: zodClient(settingsFormSchema),
@@ -56,7 +64,9 @@
 		onError
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, delayed } = form;
+
+	let disabled = $derived($delayed || externalDisabled);
 </script>
 
 <form method="post" {action} class="space-y-8 w-full" use:enhance>
@@ -68,7 +78,7 @@
 
 					<Input
 						{...props}
-						disabled={false}
+						{disabled}
 						placeholder="Store name"
 						class="mt-2"
 						bind:value={$formData.name}
@@ -80,5 +90,5 @@
 		</FormField>
 	</div>
 
-	<FormButton disabled={false} class="ml-auto">Save Changes</FormButton>
+	<FormButton {disabled} class="ml-auto">Save Changes</FormButton>
 </form>

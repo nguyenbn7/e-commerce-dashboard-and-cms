@@ -43,5 +43,14 @@ export async function updateStore(userId: string, storeId: number, data: { name:
 		data: {
 			name: data.name
 		}
-	})
+	});
+}
+
+export async function deleteStore(userId: string, storeId: number) {
+	return prisma.store.delete({
+		where: {
+			id: storeId,
+			userId
+		}
+	});
 }

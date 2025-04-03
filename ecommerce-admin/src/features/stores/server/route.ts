@@ -4,8 +4,8 @@ import { Hono } from 'hono';
 import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
 import { clerkMiddlewareAuthenticated } from '$lib/server/hono.middleware';
-import { setupSchema } from '../schemas';
-import { createStore, getStores } from './repository';
+import { setupSchema, storeIdSchema } from '../schemas';
+import { createStore, deleteStore, getStores } from './repository';
 
 const app = new Hono()
 	.use(
@@ -35,6 +35,17 @@ const app = new Hono()
 			data: {
 				store
 			}
+		});
+	})
+	.delete('/:id', clerkMiddlewareAuthenticated(), zValidator('param', storeIdSchema), async (c) => {
+		const { id: storeId } = c.req.valid('param');
+		const userId = c.get('userId');
+
+		await deleteStore(userId, storeId);
+
+		return c.json({
+			status: 'success',
+			data: null
 		});
 	});
 

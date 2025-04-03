@@ -7,6 +7,11 @@
 
 	const routes = $derived([
 		{
+			href: `/${page.params.storeId}`,
+			label: 'Overview',
+			active: page.url.pathname === `/${page.params.storeId}`
+		},
+		{
 			href: `/${page.params.storeId}/settings`,
 			label: 'Settings',
 			active: page.url.pathname === `/${page.params.storeId}/settings`
