@@ -7,7 +7,7 @@
 	import { Metadata } from '$lib/components/metadata';
 	import { ApiAlert } from '$lib/components/alert';
 	import { confirmFromDialog } from '$lib/components/confirm-dialog';
-	import { SettingsForm } from '$features/settings/components';
+	import { SettingsForm } from '$features/stores/components';
 	import { useDeleteStore } from '$features/stores/api/use-delete-store';
 	import Trash from '@lucide/svelte/icons/trash';
 

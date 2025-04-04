@@ -12,15 +12,15 @@
 	import { Input } from '$lib/components/ui/input';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
+	type FormValues = SuperValidated<SettingsFormValues, any, SettingsFormValues>;
+
 	interface Props {
-		form: SuperValidated<SettingsFormValues, any, SettingsFormValues>;
+		form: FormValues;
 		action?: string | undefined | null;
 		disabled?: boolean;
-		onUpdated?: (event: {
-			form: Readonly<SuperValidated<SettingsFormValues, any, SettingsFormValues>>;
-		}) => MaybePromise<unknown | void>;
+		onUpdated?: (event: { form: Readonly<FormValues> }) => MaybePromise<unknown | void>;
 		onUpdate?: (event: {
-			form: SuperValidated<SettingsFormValues, any, SettingsFormValues>;
+			form: FormValues;
 			formElement: HTMLFormElement;
 			cancel: () => void;
 			result: Required<

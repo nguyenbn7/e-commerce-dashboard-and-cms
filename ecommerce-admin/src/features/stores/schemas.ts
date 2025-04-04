@@ -7,3 +7,9 @@ export const setupSchema = z.object({
 export const storeIdSchema = z.object({
 	id: z.coerce.number()
 });
+
+export const settingsFormSchema = z.object({
+	name: z.string().min(1, 'Required')
+});
+
+export type SettingsFormValues = z.infer<typeof settingsFormSchema>;
