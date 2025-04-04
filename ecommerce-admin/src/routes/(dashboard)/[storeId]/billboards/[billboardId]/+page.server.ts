@@ -1,9 +1,11 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { storeIdSchema } from '$features/stores/schemas';
 import { billboardFormSchema, billboardIdSchema } from '$features/billboards/schemas';
-import { getBillboard } from '$features/billboards/server/repository';
-import { redirect } from '@sveltejs/kit';
+import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { getBillboard, updateBillboard } from '$features/billboards/server/repository';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
@@ -12,17 +14,51 @@ export const load = (async ({ parent, params }) => {
 
 	const result = billboardIdSchema.safeParse({ id: id });
 
-	if (!result.success) redirect(307, `/${store.id}/billboards/create`);
+	if (!result.success) redirect(307, `/${store.id}/billboards`);
 
 	const { id: billboardId } = result.data;
 
 	const billboard = await getBillboard(billboardId, store.id);
 
-	if (!billboard) redirect(307, `/${store.id}/billboards/create`);
+	if (!billboard) redirect(307, `/${store.id}/billboards`);
 
 	const form = await superValidate(zod(billboardFormSchema), {
 		defaults: billboard
 	});
 
-	return { form };
+	return { form, billboard };
 }) satisfies PageServerLoad;
+
+export const actions: Actions = {
+	default: async ({ request, locals, params }) => {
+		const { userId } = locals.auth;
+
+		if (!userId) redirect(307, '/sign-in');
+
+		const checkStoreIdResult = storeIdSchema.safeParse({ id: params.storeId });
+
+		if (!checkStoreIdResult.success) redirect(307, '/');
+
+		const { id: storeId } = checkStoreIdResult.data;
+
+		const form = await superValidate(request, zod(billboardFormSchema));
+		if (!form.valid) return fail(400, { form });
+
+		const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
+
+		// TODO: add message
+		if (!storeByUserId) return fail(403, { form });
+
+		const checkBillboardIdResult = billboardIdSchema.safeParse({ id: params.billboardId });
+
+		if (!checkBillboardIdResult.success) redirect(308, `/${storeId}/billboards`);
+
+		const { id: billboardId } = checkBillboardIdResult.data;
+
+		const { label, imageUrl } = form.data;
+
+		await updateBillboard(storeId, billboardId, { label, imageUrl });
+
+		return { form };
+	}
+};

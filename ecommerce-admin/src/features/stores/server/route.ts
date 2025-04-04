@@ -4,8 +4,10 @@ import { Hono } from 'hono';
 import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
 import { clerkMiddlewareAuthenticated } from '$lib/server/hono.middleware';
-import { setupSchema, storeIdSchema } from '../schemas';
-import { createStore, deleteStore, getStores } from './repository';
+import { setupSchema, storeIdAndBillboardIdSchema, storeIdSchema } from '../schemas';
+import { createStore, deleteStore, findStoreByUserIdAndStoreId, getStores } from './repository';
+import { deleteBillboard } from '$features/billboards/server/repository';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 const app = new Hono()
 	.use(
@@ -41,12 +43,45 @@ const app = new Hono()
 		const { id: storeId } = c.req.valid('param');
 		const userId = c.get('userId');
 
+		// TODO: check if store exists
 		await deleteStore(userId, storeId);
 
 		return c.json({
 			status: 'success',
 			data: null
 		});
-	});
+	})
+	.delete(
+		'/:storeId/billboards/:billboardId',
+		clerkMiddlewareAuthenticated(),
+		zValidator('param', storeIdAndBillboardIdSchema),
+		async (c) => {
+			const { storeId, billboardId } = c.req.valid('param');
+			const userId = c.get('userId');
+
+			const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
+
+			if (!storeByUserId)
+				return c.json(
+					{
+						status: 'error',
+						error: {
+							code: StatusCodes.UNAUTHORIZED,
+							message: ReasonPhrases.UNAUTHORIZED
+						}
+					},
+					StatusCodes.UNAUTHORIZED
+				);
+
+			// TODO: check if billboard exists
+
+			await deleteBillboard(storeId, billboardId);
+
+			return c.json({
+				status: 'success',
+				data: null
+			});
+		}
+	);
 
 export default app;

@@ -78,11 +78,18 @@
 			{#snippet children({ props })}
 				<FormLabel>Background Image</FormLabel>
 
-				<ImageUpload value={$formData.imageUrl ? [$formData.imageUrl] : []} />
+				<ImageUpload
+					class="mt-2"
+					value={$formData.imageUrl ? [$formData.imageUrl] : []}
+					onChange={(url) => ($formData.imageUrl = url)}
+					onRemove={() => ($formData.imageUrl = '')}
+				/>
+
+				<Input {...props} {disabled} value={$formData.imageUrl} hidden />
 			{/snippet}
 		</FormControl>
 
-		<!-- <FormFieldErrors /> -->
+		<FormFieldErrors />
 	</FormField>
 
 	<div class="grid grid-cols-3 gap-8">

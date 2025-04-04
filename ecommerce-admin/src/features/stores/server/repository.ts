@@ -54,3 +54,12 @@ export async function deleteStore(userId: string, storeId: number) {
 		}
 	});
 }
+
+export async function findStoreByUserIdAndStoreId(userId: string, storeId: number) {
+	return prisma.store.findFirst({
+		where: {
+			id: storeId,
+			userId
+		}
+	});
+}
