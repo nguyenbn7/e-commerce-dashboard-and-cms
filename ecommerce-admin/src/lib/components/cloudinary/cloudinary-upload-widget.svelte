@@ -15,7 +15,6 @@
 		CloudinaryUploadWidgetResults,
 		CloudinaryUploadWidgetSources
 	} from '@cloudinary-util/types';
-	import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 	import {
 		generateSignatureCallback,
 		generateUploadWidgetResultCallback,
@@ -23,6 +22,7 @@
 		UPLOAD_WIDGET_EVENTS
 	} from '@cloudinary-util/url-loader';
 	import { getCloudinaryConfig } from './lib';
+	import { PUBLIC_CLOUDINARY_UPLOAD_PRESET } from '$env/static/public';
 
 	let {
 		children,
@@ -77,7 +77,7 @@
 
 	const uploadOptions = getUploadWidgetOptions(
 		{
-			uploadPreset: uploadPreset || process.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+			uploadPreset: uploadPreset || PUBLIC_CLOUDINARY_UPLOAD_PRESET,
 			uploadSignature,
 			...options
 		},
