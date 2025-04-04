@@ -12,6 +12,11 @@
 			active: page.url.pathname === `/${page.params.storeId}`
 		},
 		{
+			href: `/${page.params.storeId}/billboards`,
+			label: 'Billboards',
+			active: page.url.pathname === `/${page.params.storeId}/billboards`
+		},
+		{
 			href: `/${page.params.storeId}/settings`,
 			label: 'Settings',
 			active: page.url.pathname === `/${page.params.storeId}/settings`

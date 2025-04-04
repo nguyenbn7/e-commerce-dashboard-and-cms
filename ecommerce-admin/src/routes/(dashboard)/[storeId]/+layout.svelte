@@ -39,4 +39,8 @@
 
 <Navbar handleClickCreateButton={() => (open = true)} {stores} />
 
-{@render children()}
+<div class="flex-col">
+	<div class="flex-1 space-y-4 p-8 pt-6">
+		{@render children()}
+	</div>
+</div>

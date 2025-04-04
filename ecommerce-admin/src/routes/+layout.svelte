@@ -5,6 +5,7 @@
 	import '../app.css';
 	import { ClerkProvider } from 'svelte-clerk';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { ConfirmDialog } from '$lib/components/confirm-dialog';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 
 	interface LayoutProps {
@@ -16,6 +17,8 @@
 </script>
 
 <Toaster richColors position="top-right" closeButton theme="light" />
+
+<ConfirmDialog />
 
 <QueryClientProvider>
 	<ClerkProvider>

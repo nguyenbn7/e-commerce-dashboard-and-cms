@@ -1,10 +1,27 @@
 <script lang="ts" module>
 	let promise: { resolve: (value: boolean) => void } | null = $state(null);
 
-	export const getConfirmation: () => Promise<boolean | null> = () =>
-		new Promise((resolve, _) => {
+	let autoOpen = $state(false);
+	var titleFromFunction = $state('');
+	var descriptionFromFunction = $state('');
+
+	export async function confirmFromDialog({
+		title = '',
+		description = '',
+		autoOpen: _autoOpen = true
+	}: {
+		title?: string;
+		description?: string;
+		autoOpen?: boolean;
+	}) {
+		titleFromFunction = title;
+		descriptionFromFunction = description;
+		autoOpen = _autoOpen;
+
+		return new Promise<boolean | null>((resolve, reject) => {
 			promise = { resolve };
 		});
+	}
 </script>
 
 <script lang="ts">
@@ -29,30 +46,40 @@
 
 	const handleClose = () => {
 		promise = null;
+		autoOpen = false;
+		open = false;
 	};
 
 	const handleConfirm = () => {
 		promise?.resolve(true);
 		handleClose();
-		open = false;
 	};
 
 	const handleCancel = () => {
 		promise?.resolve(false);
 		handleClose();
 	};
+
+	let dialogTitle = $derived(titleFromFunction || title || 'Are you absolutely sure?');
+	let dialogDescription = $derived(
+		descriptionFromFunction ||
+			description ||
+			'This action cannot be undone. This will permanently delete your data.'
+	);
+
+	$effect(() => {
+		if (autoOpen && !open) open = true;
+	});
 </script>
 
 <AlertDialog bind:open>
 	<AlertDialogContent>
 		<AlertDialogHeader>
 			<AlertDialogTitle>
-				{title && title.length ? title : 'Are you absolutely sure?'}
+				{dialogTitle}
 			</AlertDialogTitle>
 			<AlertDialogDescription>
-				{description && description.length
-					? description
-					: 'This action cannot be undone. This will permanently delete your data.'}
+				{dialogDescription}
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 
