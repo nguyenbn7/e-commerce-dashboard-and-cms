@@ -13,8 +13,3 @@ export const settingsFormSchema = z.object({
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;
-
-export const storeIdAndBillboardIdSchema = z.object({
-	storeId: z.coerce.number(),
-	billboardId: z.coerce.number()
-});

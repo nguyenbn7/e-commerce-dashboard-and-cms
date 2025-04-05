@@ -10,3 +10,8 @@ export type BillboardFormValues = z.infer<typeof billboardFormSchema>;
 export const billboardIdSchema = z.object({
 	id: z.coerce.number()
 });
+
+export const storeIdAndBillboardIdSchema = z.object({
+	storeId: z.coerce.number(),
+	billboardId: z.coerce.number()
+});

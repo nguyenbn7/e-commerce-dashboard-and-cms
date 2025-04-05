@@ -1,6 +1,8 @@
 import type { ClerkClient } from '@clerk/backend';
 import type { MiddlewareHandler } from 'hono';
-import { getAuth } from '@hono/clerk-auth';
+import { CLERK_SECRET_KEY } from '$env/static/private';
+import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
+import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 type ClerkAuth = ReturnType<Awaited<ReturnType<ClerkClient['authenticateRequest']>>['toAuth']>;
@@ -33,3 +35,8 @@ export const clerkMiddlewareAuthenticated = (): MiddlewareHandler<ClerkEnv> => a
 
 	await next();
 };
+
+export const configuredClerkMiddleware = clerkMiddleware({
+	secretKey: CLERK_SECRET_KEY,
+	publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
+});
