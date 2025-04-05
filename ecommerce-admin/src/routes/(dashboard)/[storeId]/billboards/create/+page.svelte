@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
 	import { BillboardForm } from '$features/billboards/components';
 
@@ -14,18 +15,13 @@
 
 <Metadata title="Create billboard" />
 
-<div class="flex items-center justify-between">
-	<div>
-		<h2 class="text-3xl font-bold tracking-tight">Create billboard</h2>
-		<p class="text-sm text-muted-foreground">Add a new billboard</p>
-	</div>
-</div>
+<Heading title="Create billboard" description="Add a new billboard" />
 
 <Separator />
 
 <BillboardForm
 	form={data.form}
-	onUpdated={async ({ form }) => {
+	onUpdated={({ form }) => {
 		if (form.valid) {
 			toast.success('Billboard created');
 			window.location.reload();

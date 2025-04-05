@@ -9,6 +9,8 @@ import { createStore, deleteStore, findStoreByUserIdAndStoreId, getStores } from
 import { deleteBillboard } from '$features/billboards/server/repository';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
+// TODO: public and private route
+
 const app = new Hono()
 	.use(
 		clerkMiddleware({ secretKey: CLERK_SECRET_KEY, publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY })

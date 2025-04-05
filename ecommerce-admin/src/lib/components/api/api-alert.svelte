@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 	import { toast } from 'svelte-sonner';
-	import { Button } from '../ui/button';
-	import { Badge, type BadgeVariant } from '../ui/badge';
+	import { Button } from '$lib/components/ui/button';
+	import { Badge, type BadgeVariant } from '$lib/components/ui/badge';
+	import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
 	import Server from '@lucide/svelte/icons/server';
 	import Copy from '@lucide/svelte/icons/copy';
 
@@ -33,7 +33,7 @@
 
 <Alert>
 	<Server class="size-4" />
-	
+
 	<AlertTitle class="flex items-center gap-x-2">
 		{title}
 		<Badge variant={variantMap[variant]}>{textMap[variant]}</Badge>

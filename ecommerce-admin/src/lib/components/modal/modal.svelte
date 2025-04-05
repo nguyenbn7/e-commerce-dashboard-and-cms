@@ -6,7 +6,7 @@
 		DialogDescription,
 		DialogHeader,
 		DialogTitle
-	} from '../ui/dialog';
+	} from '$lib/components/ui/dialog';
 
 	interface Props {
 		title: string;

@@ -4,8 +4,9 @@
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
-	import { ApiAlert } from '$lib/components/alert';
+	import { ApiAlert } from '$lib/components/api';
 	import { confirmFromDialog } from '$lib/components/confirm-dialog';
 	import { SettingsForm } from '$features/stores/components';
 	import { useDeleteStore } from '$features/stores/api/use-delete-store';
@@ -18,7 +19,7 @@
 	let { data }: PageProps = $props();
 
 	const deleteStore = useDeleteStore({
-		onSuccess: async () => {
+		onSuccess: () => {
 			toast.success('Store deleted');
 			window.location.reload();
 		},
@@ -48,10 +49,7 @@
 <Metadata title="Settings" />
 
 <div class="flex items-center justify-between">
-	<div>
-		<h2 class="text-3xl font-bold tracking-tight">Settings</h2>
-		<p class="text-sm text-muted-foreground">Manage store preferences</p>
-	</div>
+	<Heading title="Settings" description="Manage store preferences" />
 
 	<Button variant="destructive" size="sm" onclick={onDelete}>
 		<Trash size={16} />
@@ -63,7 +61,7 @@
 <SettingsForm
 	form={data.form}
 	disabled={$deleteStore.isPending}
-	onUpdated={async ({ form }) => {
+	onUpdated={({ form }) => {
 		if (form.valid) {
 			toast.success('Store updated');
 			window.location.reload();

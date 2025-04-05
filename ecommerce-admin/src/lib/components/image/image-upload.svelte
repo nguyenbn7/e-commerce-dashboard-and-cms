@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { CloudinaryUploadWidgetResults } from '@cloudinary-util/types';
-	import type { CloudinaryUploadEventCallbackWidget } from '../cloudinary/cloudinary-upload-widget';
-	import { CloudinaryUploadWidget } from '../cloudinary';
-	import { Button } from '../ui/button';
+	import type { CloudinaryUploadEventCallbackWidget } from '$lib/components/cloudinary/cloudinary-upload-widget';
+	import { CloudinaryUploadWidget } from '$lib/components/cloudinary';
+	import { Button } from '$lib/components/ui/button';
 	import Trash from '@lucide/svelte/icons/trash';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 

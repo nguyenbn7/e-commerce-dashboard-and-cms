@@ -3,6 +3,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
 	import { confirmFromDialog } from '$lib/components/confirm-dialog';
 	import { BillboardForm } from '$features/billboards/components';
@@ -16,7 +17,7 @@
 	let { data }: PageProps = $props();
 
 	const deleteStore = useDeleteBillboard({
-		onSuccess: async () => {
+		onSuccess: () => {
 			toast.success('Billboard deleted');
 			window.location.reload();
 		},
@@ -51,10 +52,7 @@
 <Metadata title="Edit billboard" />
 
 <div class="flex items-center justify-between">
-	<div>
-		<h2 class="text-3xl font-bold tracking-tight">Edit billboard</h2>
-		<p class="text-sm text-muted-foreground">Edit a billboard</p>
-	</div>
+	<Heading title="Edit billboard" description="Edit a billboard" />
 
 	<Button variant="destructive" size="sm" onclick={onDelete}>
 		<Trash size={16} />
@@ -65,7 +63,7 @@
 
 <BillboardForm
 	form={data.form}
-	onUpdated={async ({ form }) => {
+	onUpdated={({ form }) => {
 		if (form.valid) {
 			toast.success('Billboard updated');
 			window.location.reload();

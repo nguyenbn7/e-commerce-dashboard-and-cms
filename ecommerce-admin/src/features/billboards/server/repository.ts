@@ -25,6 +25,9 @@ export async function getBillboards(storeId: number) {
 	return prisma.billboard.findMany({
 		where: {
 			storeId
+		},
+		orderBy: {
+			createdAt: 'desc'
 		}
 	});
 }

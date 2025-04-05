@@ -3,7 +3,11 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
+	import { ApiList } from '$lib/components/api';
+	import { DataTable } from '$lib/components/data-table';
+	import { columns } from '$features/billboards/columns';
 	import Plus from '@lucide/svelte/icons/plus';
 
 	interface PageProps {
@@ -16,10 +20,10 @@
 <Metadata title="Billboards" />
 
 <div class="flex items-center justify-between">
-	<div>
-		<h2 class="text-3xl font-bold tracking-tight">Billboards (0)</h2>
-		<p class="text-sm text-muted-foreground">Manage billboards for your store</p>
-	</div>
+	<Heading
+		title={`Billboards (${data.billboards.length})`}
+		description="Manage billboards for your store"
+	/>
 
 	<Button href={`/${page.params.storeId}/billboards/create`}>
 		<Plus class="mr-2 size-4" />
@@ -28,3 +32,9 @@
 </div>
 
 <Separator />
+
+<DataTable data={data.billboards} {columns} searchColumnId="label" />
+
+<Heading title="API" description="API calls for Billboards" class="mt-3" />
+
+<ApiList entityName="billboards" entityIdName="billboardId"/>
