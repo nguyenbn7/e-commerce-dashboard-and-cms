@@ -14,28 +14,43 @@ datasource db {
 }
 
 model Store {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
-  userId    String   @map("user_id") @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(255)
+  userId     String      @map("user_id") @db.VarChar(255)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
   billboards Billboard[] @relation("store_billboard")
+  Category   Category[]  @relation("store_category")
 
   @@index([userId])
   @@map("store")
 }
 
 model Billboard {
-  id        Int      @id @default(autoincrement())
-  label     String   @db.VarChar(255)
-  imageUrl  String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  storeId Int   @map("store_id")
-  store   Store @relation("store_billboard", fields: [storeId], references: [id])
+  id        Int        @id @default(autoincrement())
+  label     String     @db.VarChar(255)
+  imageUrl  String     @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  storeId   Int        @map("store_id")
+  store     Store      @relation("store_billboard", fields: [storeId], references: [id])
+  Category  Category[]
 
   @@index([storeId])
   @@map("billboard")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  storeId     Int       @map("store_id")
+  store       Store     @relation("store_category", fields: [storeId], references: [id])
+  billboardId Int       @map("billboard_id")
+  billboard   Billboard @relation(fields: [billboardId], references: [id])
+  name        String    @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([storeId])
+  @@index([billboardId])
+  @@map("category")
 }
