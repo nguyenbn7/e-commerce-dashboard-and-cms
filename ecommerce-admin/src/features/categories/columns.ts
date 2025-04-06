@@ -1,15 +1,20 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import type { getBillboards } from './server/repository';
+import type { getCategories } from './server/repository';
 import { toast } from 'svelte-sonner';
 import { renderComponent } from '$lib/components/ui/data-table';
 import { CellAction } from './components';
 
-export type BillboardColumn = ArrayElement<Awaited<ReturnType<typeof getBillboards>>>;
+export type Category = ArrayElement<Awaited<ReturnType<typeof getCategories>>>;
 
-export const columns: ColumnDef<BillboardColumn>[] = [
+export const columns: ColumnDef<Category>[] = [
 	{
-		accessorKey: 'label',
-		header: 'Label'
+		accessorKey: 'name',
+		header: 'Name'
+	},
+	{
+		accessorKey: 'billboard',
+		header: 'Billboard',
+		cell: ({ row }) => row.original.billboard.label
 	},
 	{
 		accessorKey: 'createdAt',

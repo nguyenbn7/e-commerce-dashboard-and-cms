@@ -3,30 +3,30 @@ import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { storeIdSchema } from '$features/stores/schemas';
-import { billboardFormSchema, billboardIdSchema } from '$features/billboards/schemas';
+import { categoryFormSchema, categoryIdSchema } from '$features/categories/schemas';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { getBillboard, updateBillboard } from '$features/billboards/server/repository';
+import { getCategory, updateCategory } from '$features/categories/server/repository';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
-	// TODO: check billboardId
-	const { billboardId: id } = params;
 
-	const result = billboardIdSchema.safeParse({ id: id });
+	const { categoryId: id } = params;
 
-	if (!result.success) redirect(307, `/${store.id}/billboards`);
+	const result = categoryIdSchema.safeParse({ id: id });
 
-	const { id: billboardId } = result.data;
+	if (!result.success) redirect(307, `/${store.id}/categories`);
 
-	const billboard = await getBillboard(store.id, billboardId);
+	const { id: categoryId } = result.data;
 
-	if (!billboard) redirect(307, `/${store.id}/billboards`);
+	const category = await getCategory(store.id, categoryId);
 
-	const form = await superValidate(zod(billboardFormSchema), {
-		defaults: billboard
+	if (!category) redirect(307, `/${store.id}/categories`);
+
+	const form = await superValidate(zod(categoryFormSchema), {
+		defaults: category
 	});
 
-	return { form, billboard };
+	return { form, category };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -41,7 +41,7 @@ export const actions: Actions = {
 
 		const { id: storeId } = checkStoreIdResult.data;
 
-		const form = await superValidate(request, zod(billboardFormSchema));
+		const form = await superValidate(request, zod(categoryFormSchema));
 		if (!form.valid) return fail(400, { form });
 
 		const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
@@ -49,15 +49,15 @@ export const actions: Actions = {
 		// TODO: add message
 		if (!storeByUserId) return fail(403, { form });
 
-		const checkBillboardIdResult = billboardIdSchema.safeParse({ id: params.billboardId });
+		const checkCategoryIdResult = categoryIdSchema.safeParse({ id: params.categoryId });
 
-		if (!checkBillboardIdResult.success) redirect(308, `/${storeId}/billboards`);
+		if (!checkCategoryIdResult.success) redirect(308, `/${storeId}/categories`);
 
-		const { id: billboardId } = checkBillboardIdResult.data;
+		const { id: categoryId } = checkCategoryIdResult.data;
 
-		const { label, imageUrl } = form.data;
+		const { name, billboardId } = form.data;
 
-		await updateBillboard(storeId, billboardId, { label, imageUrl });
+		await updateCategory(storeId, categoryId, { name, billboardId });
 
 		return { form };
 	}

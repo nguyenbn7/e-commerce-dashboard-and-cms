@@ -6,38 +6,38 @@ import {
 } from '$lib/server/hono.middleware';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { deleteBillboard, getBillboard, getBillboards } from './repository';
-import { storeIdAndBillboardIdSchema } from '../schemas';
+import { deleteCategory, getCategories, getCategory } from './repository';
+import { storeIdAndCategoryIdSchema } from '../schemas';
 
 const app = new Hono()
 	.get(
 		'/',
-		zValidator('param', storeIdAndBillboardIdSchema.omit({ billboardId: true })),
+		zValidator('param', storeIdAndCategoryIdSchema.omit({ categoryId: true })),
 		async (c) => {
 			const { storeId } = c.req.valid('param');
 
-			const billboards = await getBillboards(storeId);
+			const categories = await getCategories(storeId);
 
 			return c.json({
 				status: 'success',
 				data: {
-					billboards
+					categories
 				}
 			});
 		}
 	)
-	.get('/:billboardId', zValidator('param', storeIdAndBillboardIdSchema), async (c) => {
-		const { storeId, billboardId } = c.req.valid('param');
+	.get('/:categoryId', zValidator('param', storeIdAndCategoryIdSchema), async (c) => {
+		const { storeId, categoryId } = c.req.valid('param');
 
-		const billboard = await getBillboard(storeId, billboardId);
+		const category = await getCategory(storeId, categoryId);
 
-		if (!billboard)
+		if (!category)
 			return c.json(
 				{
 					status: 'fail',
 					data: {
 						code: StatusCodes.NOT_FOUND,
-						message: 'Billboard not found'
+						message: 'Category not found'
 					}
 				},
 				StatusCodes.NOT_FOUND
@@ -46,17 +46,17 @@ const app = new Hono()
 		return c.json({
 			status: 'success',
 			data: {
-				billboard
+				category
 			}
 		});
 	})
 	.delete(
-		'/:billboardId',
+		'/:categoryId',
 		configuredClerkMiddleware,
 		clerkMiddlewareAuthenticated(),
-		zValidator('param', storeIdAndBillboardIdSchema),
+		zValidator('param', storeIdAndCategoryIdSchema),
 		async (c) => {
-			const { storeId, billboardId } = c.req.valid('param');
+			const { storeId, categoryId } = c.req.valid('param');
 			const userId = c.get('userId');
 
 			const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
@@ -73,9 +73,9 @@ const app = new Hono()
 					StatusCodes.UNAUTHORIZED
 				);
 
-			const billboard = await getBillboard(storeId, billboardId);
+			const category = await getCategory(storeId, categoryId);
 
-			if (!billboard)
+			if (!category)
 				return c.json(
 					{
 						status: 'fail',
@@ -87,7 +87,7 @@ const app = new Hono()
 					StatusCodes.NOT_FOUND
 				);
 
-			await deleteBillboard(storeId, billboardId);
+			await deleteCategory(storeId, categoryId);
 
 			return c.json({
 				status: 'success',

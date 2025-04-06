@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getBillboard(billboardId: number, storeId: number) {
+export async function getBillboard(storeId: number, billboardId: number) {
 	return prisma.billboard.findUnique({
 		where: {
 			id: billboardId,
