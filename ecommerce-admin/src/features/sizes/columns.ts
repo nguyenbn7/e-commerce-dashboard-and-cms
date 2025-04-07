@@ -1,20 +1,19 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import type { getCategories } from './server/repository';
+import type { getSizes } from './server/repository';
 import { toast } from 'svelte-sonner';
 import { renderComponent } from '$lib/components/ui/data-table';
 import { CellAction } from './components';
 
-export type Category = ArrayElement<Awaited<ReturnType<typeof getCategories>>>;
+export type SizeColumn = ArrayElement<Awaited<ReturnType<typeof getSizes>>>;
 
-export const columns: ColumnDef<Category>[] = [
+export const columns: ColumnDef<SizeColumn>[] = [
 	{
 		accessorKey: 'name',
 		header: 'Name'
 	},
 	{
-		accessorKey: 'billboard',
-		header: 'Billboard',
-		cell: ({ row }) => row.original.billboard.label
+		accessorKey: 'value',
+		header: 'Value'
 	},
 	{
 		accessorKey: 'createdAt',
@@ -36,7 +35,7 @@ export const columns: ColumnDef<Category>[] = [
 			renderComponent(CellAction, {
 				data: row.original,
 				onSuccess: () => {
-					toast.success('Category deleted');
+					toast.success('Size deleted');
 					window.location.reload();
 				},
 				onError() {

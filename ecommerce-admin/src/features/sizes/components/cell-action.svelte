@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { BillboardColumn } from '../columns';
+	import type { SizeColumn } from '../columns';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
@@ -11,23 +11,23 @@
 		DropdownMenuTrigger
 	} from '$lib/components/ui/dropdown-menu';
 	import { confirmFromDialog } from '$lib/components/confirm-dialog';
-	import { useDeleteBillboard, type UseDeleteBillboardOptions } from '../api/use-delete-billboard';
+	import { useDeleteSize, type UseDeleteSizeOptions } from '../api/use-delete-size';
 	import Edit from '@lucide/svelte/icons/edit';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Trash from '@lucide/svelte/icons/trash';
 	import MoreHorizontal from '@lucide/svelte/icons/more-horizontal';
 
 	interface Props {
-		data: BillboardColumn;
+		data: SizeColumn;
 	}
 
-	let { data, onSuccess, onError }: Props & UseDeleteBillboardOptions = $props();
+	let { data, onSuccess, onError }: Props & UseDeleteSizeOptions = $props();
 
-	const deleteBillboard = useDeleteBillboard({ onSuccess, onError });
+	const deleteSize = useDeleteSize({ onSuccess, onError });
 
 	async function onCopy(id: number) {
 		await navigator.clipboard.writeText(id.toString());
-		toast.success('Billboard Id copied to the clipboard');
+		toast.success('Size Id copied to the clipboard');
 	}
 </script>
 
@@ -51,7 +51,7 @@
 
 		<DropdownMenuItem>
 			{#snippet child({ props })}
-				<a {...props} href={`/${page.params.storeId}/billboards/${data.id}`}>
+				<a {...props} href={`/${page.params.storeId}/sizes/${data.id}`}>
 					<Edit class="mr-2 size-4" />
 					Update
 				</a>
@@ -66,10 +66,10 @@
 				});
 
 				if (ok) {
-					$deleteBillboard.mutate({
+					$deleteSize.mutate({
 						param: {
 							storeId: page.params.storeId,
-							billboardId: data.id.toString()
+							sizeId: data.id.toString()
 						}
 					});
 				}

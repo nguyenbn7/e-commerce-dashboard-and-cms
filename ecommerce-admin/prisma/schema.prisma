@@ -21,6 +21,7 @@ model Store {
   updatedAt  DateTime    @updatedAt @map("updated_at")
   billboards Billboard[] @relation("store_billboard")
   Category   Category[]  @relation("store_category")
+  Size       Size[]      @relation("store_size")
 
   @@index([userId])
   @@map("store")
@@ -34,7 +35,7 @@ model Billboard {
   updatedAt DateTime   @updatedAt @map("updated_at")
   storeId   Int        @map("store_id")
   store     Store      @relation("store_billboard", fields: [storeId], references: [id])
-  Category  Category[]
+  Category  Category[] @relation("category_billboard")
 
   @@index([storeId])
   @@map("billboard")
@@ -45,7 +46,7 @@ model Category {
   storeId     Int       @map("store_id")
   store       Store     @relation("store_category", fields: [storeId], references: [id])
   billboardId Int       @map("billboard_id")
-  billboard   Billboard @relation(fields: [billboardId], references: [id])
+  billboard   Billboard @relation("category_billboard", fields: [billboardId], references: [id])
   name        String    @db.VarChar(255)
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -53,4 +54,17 @@ model Category {
   @@index([storeId])
   @@index([billboardId])
   @@map("category")
+}
+
+model Size {
+  id        Int      @id @default(autoincrement())
+  storeId   Int      @map("store_id")
+  store     Store    @relation("store_size", fields: [storeId], references: [id])
+  name      String   @db.VarChar(255)
+  value     String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([storeId])
+  @@map("size")
 }
