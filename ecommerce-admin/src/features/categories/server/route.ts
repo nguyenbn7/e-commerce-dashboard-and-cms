@@ -6,8 +6,8 @@ import {
 } from '$lib/server/hono.middleware';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { deleteCategory, getCategories, getCategory } from './repository';
-import { storeIdAndCategoryIdSchema } from '../schemas';
+import { deleteCategory, getCategories, getCategory } from '$features/categories/server/repository';
+import { storeIdAndCategoryIdSchema } from '$features/categories/schemas';
 
 const app = new Hono()
 	.get(

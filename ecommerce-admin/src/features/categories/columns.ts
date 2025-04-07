@@ -1,12 +1,11 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import type { getCategories } from './server/repository';
-import { toast } from 'svelte-sonner';
+import type { getCategories } from '$features/categories/server/repository';
 import { renderComponent } from '$lib/components/ui/data-table';
-import { CellAction } from './components';
+import { CellAction } from '$features/categories/components';
 
-export type Category = ArrayElement<Awaited<ReturnType<typeof getCategories>>>;
+export type CategoryColumn = ArrayElement<Awaited<ReturnType<typeof getCategories>>>;
 
-export const columns: ColumnDef<Category>[] = [
+export const columns: ColumnDef<CategoryColumn>[] = [
 	{
 		accessorKey: 'name',
 		header: 'Name'
@@ -32,16 +31,6 @@ export const columns: ColumnDef<Category>[] = [
 	},
 	{
 		id: 'actions',
-		cell: ({ row }) =>
-			renderComponent(CellAction, {
-				data: row.original,
-				onSuccess: () => {
-					toast.success('Category deleted');
-					window.location.reload();
-				},
-				onError() {
-					toast.error('Something went wrong');
-				}
-			})
+		cell: ({ row }) => renderComponent(CellAction, { data: row.original })
 	}
 ];

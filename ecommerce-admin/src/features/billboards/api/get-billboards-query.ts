@@ -8,9 +8,7 @@ type Response = InferResponseType<
 >;
 type ResponseError = { status: string; error: { code: number; message: string } };
 
-export type UseGetBillboards = ReturnType<typeof useGetBillboards>;
-
-export function useGetBillboards(param: { storeId: number }) {
+export default function getBillboardsQuery(param: { storeId: number }) {
 	const { storeId } = param;
 
 	const queryClient = createQuery({

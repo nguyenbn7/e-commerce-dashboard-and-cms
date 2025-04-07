@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Store } from '$features/stores/api/use-get-stores';
+	import type { Store } from '$features/stores/api';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { cn } from '$lib/utils';

@@ -6,8 +6,8 @@ import {
 } from '$lib/server/hono.middleware';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { deleteSize, getSize, getSizes } from './repository';
-import { storeIdAndSizeIdSchema } from '../schemas';
+import { deleteSize, getSize, getSizes } from '$features/sizes/server/repository';
+import { storeIdAndSizeIdSchema } from '$features/sizes/schemas';
 
 const app = new Hono()
 	.get('/', zValidator('param', storeIdAndSizeIdSchema.omit({ sizeId: true })), async (c) => {

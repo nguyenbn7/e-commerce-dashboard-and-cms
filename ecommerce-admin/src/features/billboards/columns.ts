@@ -1,8 +1,7 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import type { getBillboards } from './server/repository';
-import { toast } from 'svelte-sonner';
+import type { getBillboards } from '$features/billboards/server/repository';
 import { renderComponent } from '$lib/components/ui/data-table';
-import { CellAction } from './components';
+import { CellAction } from '$features/billboards/components';
 
 export type BillboardColumn = ArrayElement<Awaited<ReturnType<typeof getBillboards>>>;
 
@@ -27,16 +26,6 @@ export const columns: ColumnDef<BillboardColumn>[] = [
 	},
 	{
 		id: 'actions',
-		cell: ({ row }) =>
-			renderComponent(CellAction, {
-				data: row.original,
-				onSuccess: () => {
-					toast.success('Billboard deleted');
-					window.location.reload();
-				},
-				onError() {
-					toast.error('Something went wrong');
-				}
-			})
+		cell: ({ row }) => renderComponent(CellAction, { data: row.original })
 	}
 ];

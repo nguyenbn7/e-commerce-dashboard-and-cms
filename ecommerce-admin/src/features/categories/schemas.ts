@@ -5,8 +5,6 @@ export const categoryFormSchema = z.object({
 	billboardId: z.coerce.number().min(1, 'Required')
 });
 
-export type CategoryFormValues = z.infer<typeof categoryFormSchema>;
-
 export const categoryIdSchema = z.object({
 	id: z.coerce.number()
 });

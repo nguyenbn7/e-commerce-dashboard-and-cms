@@ -1,138 +1,111 @@
 <script lang="ts">
-	import type { ActionResult } from '@sveltejs/kit';
-	import type { Billboard } from '$features/billboards/api/use-get-billboards';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
-	import { categoryFormSchema, type CategoryFormValues } from '../schemas';
+	import type { Billboard } from '$features/billboards/api';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { z } from 'zod';
+	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
-	import {
-		FormButton,
-		FormControl,
-		FormField,
-		FormFieldErrors,
-		FormLabel
-	} from '$lib/components/ui/form';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-
-	type FormValues = SuperValidated<CategoryFormValues, any, CategoryFormValues>;
+	import { Form } from '$lib/components/form';
+	import { categoryFormSchema } from '$features/categories/schemas';
 
 	interface Props {
-		form: FormValues;
+		form: SuperValidated<z.infer<typeof categoryFormSchema>, any>;
 		action?: string | undefined | null;
 		disabled?: boolean;
-		submitBtnText?: string;
+		createForm?: boolean;
 		billboards?: Billboard[];
-		onUpdated?: (event: { form: Readonly<FormValues> }) => MaybePromise<unknown | void>;
-		onUpdate?: (event: {
-			form: FormValues;
-			formElement: HTMLFormElement;
-			cancel: () => void;
-			result: Required<
-				Extract<
-					ActionResult,
-					{
-						type: 'success' | 'failure';
-					}
-				>
-			>;
-		}) => MaybePromise<unknown | void>;
-		onError?:
-			| 'apply'
-			| ((event: {
-					result: {
-						type: 'error';
-						status?: number;
-						error:
-							| App.Error
-							| Error
-							| {
-									message: string;
-							  };
-					};
-			  }) => MaybePromise<unknown | void>);
+		onSuccess?: () => void;
 	}
 
 	let {
-		form: sForm,
+		form: _form,
 		action,
-		onUpdated,
-		onError,
-		onUpdate,
 		billboards = [],
-		disabled: externalDisabled = false,
-		submitBtnText = 'Save Changes'
+		disabled: _disabled = false,
+		createForm = false,
+		onSuccess
 	}: Props = $props();
 
-	const form = superForm(sForm, {
+	const form = superForm(_form, {
 		validators: zodClient(categoryFormSchema),
-		onUpdated,
-		onUpdate,
-		onError
+		onUpdated({ form }) {
+			if (form.valid) {
+				if (createForm) toast.success('Category created');
+				else {
+					formData.set(form.data);
+					toast.success('Category updated');
+				}
+				onSuccess?.();
+			}
+		},
+		onError() {
+			// TODO:
+			toast.error('Something went wrong');
+		}
 	});
 
-	const { form: formData, enhance, delayed } = form;
-
-	let disabled = $derived($delayed || externalDisabled);
+	const { form: formData } = form;
 
 	let selectedBillboardLabel = $derived(
 		billboards.find((b) => b.id === $formData.billboardId)?.label ?? ''
 	);
 </script>
 
-<form method="post" {action} class="space-y-8 w-full" use:enhance>
-	<div class="grid grid-cols-3 gap-8">
-		<FormField {form} name="name">
-			<FormControl>
-				{#snippet children({ props })}
-					<FormLabel>Name</FormLabel>
+<Form {form} {action} disabled={_disabled} {createForm}>
+	{#snippet content({ disabled })}
+		<div class="grid grid-cols-3 gap-8">
+			<FormField {form} name="name">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Name</FormLabel>
 
-					<Input
-						{...props}
-						{disabled}
-						placeholder="Category name"
-						class="mt-2"
-						bind:value={$formData.name}
-					/>
-				{/snippet}
-			</FormControl>
+						<Input
+							{...props}
+							{disabled}
+							placeholder="Category name"
+							class="mt-2"
+							bind:value={$formData.name}
+						/>
+					{/snippet}
+				</FormControl>
 
-			<FormFieldErrors />
-		</FormField>
+				<FormFieldErrors />
+			</FormField>
 
-		<FormField {form} name="billboardId">
-			<FormControl>
-				{#snippet children({ props })}
-					<FormLabel>Billboard</FormLabel>
+			<FormField {form} name="billboardId">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Billboard</FormLabel>
 
-					<Select
-						type="single"
-						{disabled}
-						name={props.name}
-						bind:value={
-							() => ($formData.billboardId <= 0 ? '' : $formData.billboardId.toString()),
-							(newValue) => ($formData.billboardId = Number(newValue))
-						}
-					>
-						<SelectTrigger {...props} class="mt-2">
-							{selectedBillboardLabel}
-						</SelectTrigger>
+						<Select
+							type="single"
+							{disabled}
+							name={props.name}
+							bind:value={
+								() => ($formData.billboardId <= 0 ? '' : $formData.billboardId.toString()),
+								(newValue) => ($formData.billboardId = Number(newValue))
+							}
+						>
+							<SelectTrigger {...props} class="mt-2">
+								{selectedBillboardLabel}
+							</SelectTrigger>
 
-						<SelectContent>
-							{#each billboards as billboard (billboard.id)}
-								<SelectItem value={billboard.id.toString()}>
-									{billboard.label}
-								</SelectItem>
-							{/each}
-						</SelectContent>
-					</Select>
-				{/snippet}
-			</FormControl>
+							<SelectContent>
+								{#each billboards as billboard (billboard.id)}
+									<SelectItem value={billboard.id.toString()}>
+										{billboard.label}
+									</SelectItem>
+								{/each}
+							</SelectContent>
+						</Select>
+					{/snippet}
+				</FormControl>
 
-			<FormFieldErrors />
-		</FormField>
-	</div>
-
-	<FormButton {disabled} class="ml-auto">
-		{submitBtnText}
-	</FormButton>
-</form>
+				<FormFieldErrors />
+			</FormField>
+		</div>
+	{/snippet}
+</Form>

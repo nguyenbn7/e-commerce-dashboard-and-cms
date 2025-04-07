@@ -1,118 +1,86 @@
 <script lang="ts">
-	import type { ActionResult } from '@sveltejs/kit';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
-	import { billboardFormSchema, type BillboardFormValues } from '../schemas';
-	import {
-		FormButton,
-		FormControl,
-		FormField,
-		FormFieldErrors,
-		FormLabel
-	} from '$lib/components/ui/form';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { z } from 'zod';
+	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
-
-	type FormValues = SuperValidated<BillboardFormValues, any, BillboardFormValues>;
+	import { billboardFormSchema } from '$features/billboards/schemas';
 
 	interface Props {
-		form: FormValues;
+		form: SuperValidated<z.infer<typeof billboardFormSchema>, any>;
 		action?: string | undefined | null;
 		disabled?: boolean;
-		submitBtnText?: string;
-		onUpdated?: (event: { form: Readonly<FormValues> }) => MaybePromise<unknown | void>;
-		onUpdate?: (event: {
-			form: FormValues;
-			formElement: HTMLFormElement;
-			cancel: () => void;
-			result: Required<
-				Extract<
-					ActionResult,
-					{
-						type: 'success' | 'failure';
-					}
-				>
-			>;
-		}) => MaybePromise<unknown | void>;
-		onError?:
-			| 'apply'
-			| ((event: {
-					result: {
-						type: 'error';
-						status?: number;
-						error:
-							| App.Error
-							| Error
-							| {
-									message: string;
-							  };
-					};
-			  }) => MaybePromise<unknown | void>);
+		createForm?: boolean;
+		onSuccess?: () => void;
 	}
 
-	let {
-		form: sForm,
-		action,
-		onUpdated,
-		onError,
-		onUpdate,
-		disabled: externalDisabled = false,
-		submitBtnText = 'Save Changes'
-	}: Props = $props();
+	let { form: _form, disabled: _disabled = false, action, createForm, onSuccess }: Props = $props();
 
-	const form = superForm(sForm, {
+	const form = superForm(_form, {
 		validators: zodClient(billboardFormSchema),
-		onUpdated,
-		onUpdate,
-		onError
+		onUpdated({ form }) {
+			if (form.valid) {
+				if (createForm) toast.success('Billboard created');
+				else {
+					formData.set(form.data);
+					toast.success('Billboard updated');
+				}
+				onSuccess?.();
+			}
+		},
+		onError() {
+			// TODO:
+			toast.error('Something went wrong');
+		}
 	});
 
-	const { form: formData, enhance, delayed } = form;
-
-	let disabled = $derived($delayed || externalDisabled);
+	const { form: formData } = form;
 </script>
 
-<form method="post" {action} class="space-y-8 w-full" use:enhance>
-	<FormField {form} name="imageUrl">
-		<FormControl>
-			{#snippet children({ props })}
-				<FormLabel>Background Image</FormLabel>
-
-				<ImageUpload
-					class="mt-2"
-					value={$formData.imageUrl ? [$formData.imageUrl] : []}
-					onChange={(url) => ($formData.imageUrl = url)}
-					onRemove={() => ($formData.imageUrl = '')}
-				/>
-
-				<Input {...props} {disabled} value={$formData.imageUrl} hidden />
-			{/snippet}
-		</FormControl>
-
-		<FormFieldErrors />
-	</FormField>
-
-	<div class="grid grid-cols-3 gap-8">
-		<FormField {form} name="label">
+<Form {form} {action} disabled={_disabled} {createForm}>
+	{#snippet content({ disabled })}
+		<FormField {form} name="imageUrl">
 			<FormControl>
 				{#snippet children({ props })}
-					<FormLabel>Label</FormLabel>
+					<FormLabel>Background Image</FormLabel>
 
-					<Input
-						{...props}
-						{disabled}
-						placeholder="Billboard label"
+					<ImageUpload
 						class="mt-2"
-						bind:value={$formData.label}
+						value={$formData.imageUrl ? [$formData.imageUrl] : []}
+						onChange={(url) => ($formData.imageUrl = url)}
+						onRemove={() => ($formData.imageUrl = '')}
+						{disabled}
 					/>
+
+					<Input {...props} {disabled} value={$formData.imageUrl} hidden />
 				{/snippet}
 			</FormControl>
 
 			<FormFieldErrors />
 		</FormField>
-	</div>
 
-	<FormButton {disabled} class="ml-auto">
-		{submitBtnText}
-	</FormButton>
-</form>
+		<div class="grid grid-cols-3 gap-8">
+			<FormField {form} name="label">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Label</FormLabel>
+
+						<Input
+							{...props}
+							{disabled}
+							placeholder="Billboard label"
+							class="mt-2"
+							bind:value={$formData.label}
+						/>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+		</div>
+	{/snippet}
+</Form>

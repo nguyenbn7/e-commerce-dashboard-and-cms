@@ -2,7 +2,7 @@ import type { InferResponseType } from 'hono';
 import { client } from '$lib/rpc';
 import { createQuery } from '@tanstack/svelte-query';
 
-export function useGetStores() {
+export default function getStoresQuery() {
 	const query = createQuery({
 		queryKey: ['stores'],
 		queryFn: async () => {

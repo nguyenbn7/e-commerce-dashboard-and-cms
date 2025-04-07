@@ -4,8 +4,8 @@ import {
 	clerkMiddlewareAuthenticated,
 	configuredClerkMiddleware
 } from '$lib/server/hono.middleware';
-import { setupSchema, storeIdSchema } from '../schemas';
-import { createStore, deleteStore, getStores } from './repository';
+import { setupSchema, storeIdSchema } from '$features/stores/schemas';
+import { createStore, deleteStore, getStores } from '$features/stores/server/repository';
 
 const app = new Hono()
 	.get('/', configuredClerkMiddleware, clerkMiddlewareAuthenticated(), async (c) => {

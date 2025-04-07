@@ -1,94 +1,69 @@
 <script lang="ts">
-	import type { ActionResult } from '@sveltejs/kit';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
-	import { settingsFormSchema, type SettingsFormValues } from '../schemas';
-	import {
-		FormButton,
-		FormControl,
-		FormField,
-		FormFieldErrors,
-		FormLabel
-	} from '$lib/components/ui/form';
+	import type { z } from 'zod';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-
-	type FormValues = SuperValidated<SettingsFormValues, any, SettingsFormValues>;
+	import { settingsFormSchema } from '$features/stores/schemas';
+	import { Form } from '$lib/components/form';
 
 	interface Props {
-		form: FormValues;
+		form: SuperValidated<z.infer<typeof settingsFormSchema>, any>;
 		action?: string | undefined | null;
 		disabled?: boolean;
-		onUpdated?: (event: { form: Readonly<FormValues> }) => MaybePromise<unknown | void>;
-		onUpdate?: (event: {
-			form: FormValues;
-			formElement: HTMLFormElement;
-			cancel: () => void;
-			result: Required<
-				Extract<
-					ActionResult,
-					{
-						type: 'success' | 'failure';
-					}
-				>
-			>;
-		}) => MaybePromise<unknown | void>;
-		onError?:
-			| 'apply'
-			| ((event: {
-					result: {
-						type: 'error';
-						status?: number;
-						error:
-							| App.Error
-							| Error
-							| {
-									message: string;
-							  };
-					};
-			  }) => MaybePromise<unknown | void>);
+		createForm?: boolean;
+		onSuccess?: () => void;
 	}
 
 	let {
-		form: sForm,
+		form: _form,
 		action,
-		onUpdated,
-		onError,
-		onUpdate,
-		disabled: externalDisabled = false
+		disabled: _disabled = false,
+		createForm = false,
+		onSuccess
 	}: Props = $props();
 
-	const form = superForm(sForm, {
+	const form = superForm(_form, {
 		validators: zodClient(settingsFormSchema),
-		onUpdated,
-		onUpdate,
-		onError
+		onUpdated({ form }) {
+			if (form.valid) {
+				if (!createForm) {
+					toast.success('Store updated');
+				}
+
+				onSuccess?.();
+			}
+		},
+		onError() {
+			toast.error('Something went wrong');
+		}
 	});
 
-	const { form: formData, enhance, delayed } = form;
-
-	let disabled = $derived($delayed || externalDisabled);
+	const { form: formData } = form;
 </script>
 
-<form method="post" {action} class="space-y-8 w-full" use:enhance>
-	<div class="grid grid-cols-3 gap-8">
-		<FormField {form} name="name">
-			<FormControl>
-				{#snippet children({ props })}
-					<FormLabel>Name</FormLabel>
+<Form {form} {action} disabled={_disabled} {createForm}>
+	{#snippet content({ disabled })}
+		<div class="grid grid-cols-3 gap-8">
+			<FormField {form} name="name">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Name</FormLabel>
 
-					<Input
-						{...props}
-						{disabled}
-						placeholder="Store name"
-						class="mt-2"
-						bind:value={$formData.name}
-					/>
-				{/snippet}
-			</FormControl>
+						<Input
+							{...props}
+							{disabled}
+							placeholder="Store name"
+							class="mt-2"
+							bind:value={$formData.name}
+						/>
+					{/snippet}
+				</FormControl>
 
-			<FormFieldErrors />
-		</FormField>
-	</div>
-
-	<FormButton {disabled} class="ml-auto">Save Changes</FormButton>
-</form>
+				<FormFieldErrors />
+			</FormField>
+		</div>
+	{/snippet}
+</Form>

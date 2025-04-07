@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
@@ -19,18 +18,6 @@
 
 <Separator />
 
-<BillboardForm
-	form={data.form}
-	onUpdated={({ form }) => {
-		if (form.valid) {
-			toast.success('Billboard created');
-			window.location.reload();
-		}
-	}}
-	onError={() => {
-		toast.error('Something went wrong');
-	}}
-	submitBtnText="Create"
-/>
+<BillboardForm form={data.form} createForm />
 
 <Separator />

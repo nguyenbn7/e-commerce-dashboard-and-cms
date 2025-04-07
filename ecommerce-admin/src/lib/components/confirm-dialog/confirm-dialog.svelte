@@ -5,18 +5,22 @@
 	var titleFromFunction = $state('');
 	var descriptionFromFunction = $state('');
 
-	export async function confirmFromDialog({
-		title = '',
-		description = '',
-		autoOpen: _autoOpen = true
-	}: {
+	type Options = {
 		title?: string;
 		description?: string;
 		autoOpen?: boolean;
-	}) {
-		titleFromFunction = title;
-		descriptionFromFunction = description;
-		autoOpen = _autoOpen;
+	};
+
+	export async function confirmFromDialog(
+		options: Options = {
+			title: '',
+			description: '',
+			autoOpen: true
+		}
+	) {
+		titleFromFunction = options.title ?? '';
+		descriptionFromFunction = options.description ?? '';
+		autoOpen = options.autoOpen === undefined ? true : options.autoOpen;
 
 		return new Promise<boolean | null>((resolve, reject) => {
 			promise = { resolve };

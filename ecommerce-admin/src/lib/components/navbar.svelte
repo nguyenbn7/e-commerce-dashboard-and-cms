@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Store } from '$features/stores/api/use-get-stores';
+	import type { Store } from '$features/stores/api/get-stores-query';
 	import { UserButton } from 'svelte-clerk';
 	import MainNav from './main-nav.svelte';
 	import { StoreSwitcher } from '$features/stores/components';

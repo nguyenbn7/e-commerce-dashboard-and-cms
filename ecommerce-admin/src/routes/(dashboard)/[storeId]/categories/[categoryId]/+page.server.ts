@@ -23,7 +23,10 @@ export const load = (async ({ parent, params }) => {
 	if (!category) redirect(307, `/${store.id}/categories`);
 
 	const form = await superValidate(zod(categoryFormSchema), {
-		defaults: category
+		defaults: {
+			name: category.name,
+			billboardId: category.billboardId
+		}
 	});
 
 	return { form, category };
@@ -57,7 +60,12 @@ export const actions: Actions = {
 
 		const { name, billboardId } = form.data;
 
-		await updateCategory(storeId, categoryId, { name, billboardId });
+		const category = await updateCategory(storeId, categoryId, { name, billboardId });
+
+		form.data = {
+			name: category.name,
+			billboardId: category.billboardId
+		};
 
 		return { form };
 	}

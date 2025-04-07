@@ -6,8 +6,12 @@ import {
 } from '$lib/server/hono.middleware';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { deleteBillboard, getBillboard, getBillboards } from './repository';
-import { storeIdAndBillboardIdSchema } from '../schemas';
+import { storeIdAndBillboardIdSchema } from '$features/billboards/schemas';
+import {
+	deleteBillboard,
+	getBillboard,
+	getBillboards
+} from '$features/billboards/server/repository';
 
 const app = new Hono()
 	.get(

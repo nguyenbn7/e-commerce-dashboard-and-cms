@@ -23,7 +23,10 @@ export const load = (async ({ parent, params }) => {
 	if (!billboard) redirect(307, `/${store.id}/billboards`);
 
 	const form = await superValidate(zod(billboardFormSchema), {
-		defaults: billboard
+		defaults: {
+			label: billboard.label,
+			imageUrl: billboard.imageUrl
+		}
 	});
 
 	return { form, billboard };
@@ -57,7 +60,12 @@ export const actions: Actions = {
 
 		const { label, imageUrl } = form.data;
 
-		await updateBillboard(storeId, billboardId, { label, imageUrl });
+		const newBillboard = await updateBillboard(storeId, billboardId, { label, imageUrl });
+
+		form.data = {
+			label: newBillboard.label,
+			imageUrl: newBillboard.imageUrl
+		};
 
 		return { form };
 	}

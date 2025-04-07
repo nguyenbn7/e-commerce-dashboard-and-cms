@@ -49,11 +49,11 @@ export async function updateCategory(
 	return prisma.category.update({
 		where: {
 			id: categoryId,
-			storeId,
-			billboardId
+			storeId
 		},
 		data: {
-			name
+			name,
+			billboardId
 		}
 	});
 }

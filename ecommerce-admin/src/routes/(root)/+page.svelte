@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
 	import { Metadata } from '$lib/components/metadata';
 	import { StoreModal } from '$features/stores/components';
-	import { goto } from '$app/navigation';
 
 	interface PageProps {
 		data: PageData;
@@ -24,11 +23,7 @@
 
 <StoreModal
 	bind:open
-	onSuccess={async (data) => {
-		toast.success('Store created');
-		const { data: responseData } = data;
-		const { id } = responseData.store;
-		await goto(`${id}`, { invalidate: ['/'] });
-		open = false;
+	onSuccess={async (storeId) => {
+		await goto(`${storeId}`, { invalidate: ['/'] });
 	}}
 />

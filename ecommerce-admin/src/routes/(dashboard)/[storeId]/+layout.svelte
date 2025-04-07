@@ -2,10 +2,9 @@
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { toast } from 'svelte-sonner';
 	import { Navbar } from '$lib/components';
+	import { getStoresQuery } from '$features/stores/api';
 	import { StoreModal } from '$features/stores/components';
-	import { useGetStores } from '$features/stores/api/use-get-stores';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -16,24 +15,20 @@
 
 	let open = $state(false);
 
-	let getStoresQuery: undefined | ReturnType<typeof useGetStores> = $state();
+	let getStores: undefined | ReturnType<typeof getStoresQuery> = $state();
 
 	onMount(() => {
-		getStoresQuery = useGetStores();
+		getStores = getStoresQuery();
 	});
 
-	let stores = $derived($getStoresQuery?.data?.data.stores ?? []);
+	let stores = $derived($getStores?.data?.data.stores ?? []);
 </script>
 
 <StoreModal
 	bind:open
-	onSuccess={async (data) => {
-		toast.success('Store created');
-		const { data: responseData } = data;
-		const { id } = responseData.store;
-		await goto(`${id}`, { invalidateAll: true });
-		open = false;
-		$getStoresQuery?.refetch();
+	onSuccess={async (storeId) => {
+		await goto(`/${storeId}`, { invalidateAll: true });
+		$getStores?.refetch();
 	}}
 />
 

@@ -5,8 +5,6 @@ export const sizeFormSchema = z.object({
 	value: z.string().min(1, 'Required')
 });
 
-export type SizeFormValues = z.infer<typeof sizeFormSchema>;
-
 export const sizeIdSchema = z.object({
 	id: z.coerce.number()
 });

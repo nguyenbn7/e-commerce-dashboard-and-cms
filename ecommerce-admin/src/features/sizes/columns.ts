@@ -1,8 +1,7 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import type { getSizes } from './server/repository';
-import { toast } from 'svelte-sonner';
+import type { getSizes } from '$features/sizes/server/repository';
 import { renderComponent } from '$lib/components/ui/data-table';
-import { CellAction } from './components';
+import { CellAction } from '$features/sizes/components';
 
 export type SizeColumn = ArrayElement<Awaited<ReturnType<typeof getSizes>>>;
 
@@ -31,16 +30,6 @@ export const columns: ColumnDef<SizeColumn>[] = [
 	},
 	{
 		id: 'actions',
-		cell: ({ row }) =>
-			renderComponent(CellAction, {
-				data: row.original,
-				onSuccess: () => {
-					toast.success('Size deleted');
-					window.location.reload();
-				},
-				onError() {
-					toast.error('Something went wrong');
-				}
-			})
+		cell: ({ row }) => renderComponent(CellAction, { data: row.original })
 	}
 ];

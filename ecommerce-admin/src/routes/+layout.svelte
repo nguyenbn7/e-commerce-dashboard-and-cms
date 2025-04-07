@@ -18,7 +18,7 @@
 
 <Toaster richColors position="top-right" closeButton theme="light" />
 
-<ConfirmDialog />
+<ConfirmDialog title="Are you sure?" description="This action cannot be undone." />
 
 <QueryClientProvider>
 	<ClerkProvider>

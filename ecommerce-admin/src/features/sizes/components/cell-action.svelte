@@ -1,82 +1,35 @@
 <script lang="ts">
-	import type { SizeColumn } from '../columns';
+	import type { SizeColumn } from '$features/sizes/columns';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
-	import { Button } from '$lib/components/ui/button';
-	import {
-		DropdownMenu,
-		DropdownMenuContent,
-		DropdownMenuItem,
-		DropdownMenuLabel,
-		DropdownMenuTrigger
-	} from '$lib/components/ui/dropdown-menu';
-	import { confirmFromDialog } from '$lib/components/confirm-dialog';
-	import { useDeleteSize, type UseDeleteSizeOptions } from '../api/use-delete-size';
-	import Edit from '@lucide/svelte/icons/edit';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Trash from '@lucide/svelte/icons/trash';
-	import MoreHorizontal from '@lucide/svelte/icons/more-horizontal';
+	import { CellAction } from '$lib/components/data-table';
+	import { deleteSizeMutation } from '$features/sizes/api';
 
 	interface Props {
 		data: SizeColumn;
 	}
 
-	let { data, onSuccess, onError }: Props & UseDeleteSizeOptions = $props();
+	let { data }: Props = $props();
 
-	const deleteSize = useDeleteSize({ onSuccess, onError });
-
-	async function onCopy(id: number) {
-		await navigator.clipboard.writeText(id.toString());
-		toast.success('Size Id copied to the clipboard');
-	}
+	const deleteClient = deleteSizeMutation({
+		onSuccess: () => {
+			window.location.reload();
+		}
+	});
 </script>
 
-<DropdownMenu>
-	<DropdownMenuTrigger>
-		{#snippet child({ props })}
-			<Button {...props} variant="ghost" class="size-8 p-0">
-				<span class="sr-only">Open menu</span>
-				<MoreHorizontal class="size-4" />
-			</Button>
-		{/snippet}
-	</DropdownMenuTrigger>
-
-	<DropdownMenuContent align="end">
-		<DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-		<DropdownMenuItem onclick={() => onCopy(data.id)}>
-			<Copy class="mr-2 size-4" />
-			Copy Id
-		</DropdownMenuItem>
-
-		<DropdownMenuItem>
-			{#snippet child({ props })}
-				<a {...props} href={`/${page.params.storeId}/sizes/${data.id}`}>
-					<Edit class="mr-2 size-4" />
-					Update
-				</a>
-			{/snippet}
-		</DropdownMenuItem>
-
-		<DropdownMenuItem
-			onclick={async () => {
-				const ok = await confirmFromDialog({
-					title: 'Are you sure?',
-					description: 'This action cannot be undone.'
-				});
-
-				if (ok) {
-					$deleteSize.mutate({
-						param: {
-							storeId: page.params.storeId,
-							sizeId: data.id.toString()
-						}
-					});
-				}
-			}}
-		>
-			<Trash class="mr-2 size-4" />
-			Delete
-		</DropdownMenuItem>
-	</DropdownMenuContent>
-</DropdownMenu>
+<CellAction
+	updateHref={`/${page.params.storeId}/sizes/${data.id}`}
+	onCopy={async () => {
+		await navigator.clipboard.writeText(data.id.toString());
+		toast.success('Size Id copied to the clipboard');
+	}}
+	onDelete={() => {
+		$deleteClient.mutate({
+			param: {
+				storeId: page.params.storeId,
+				sizeId: data.id.toString()
+			}
+		});
+	}}
+/>

@@ -5,17 +5,25 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { Modal } from '$lib/components/modal';
-	import { setupSchema } from '../schemas';
-	import { useCreateStore, type UseCreateStoreOptions } from '../api/use-create-store';
+	import { setupSchema } from '$features/stores/schemas';
+	import { createStoreMutation } from '$features/stores/api';
 	import Loader from '@lucide/svelte/icons/loader';
 
 	interface Props {
 		open?: boolean;
+		onSuccess?: (storeId: number) => MaybePromise<unknown | void>;
 	}
 
-	let { open = $bindable(false), onSuccess, onError }: Props & UseCreateStoreOptions = $props();
+	let { open = $bindable(false), onSuccess }: Props = $props();
 
-	const createStoreMutation = useCreateStore({ onSuccess, onError });
+	const createMutation = createStoreMutation({
+		onSuccess: async (data) => {
+			const { data: responseData } = data;
+			const { id } = responseData.store;
+			await onSuccess?.(id);
+			open = false;
+		}
+	});
 
 	const form = superForm(defaults(zod(setupSchema)), {
 		id: `stores_${Math.floor(Math.random() * Date.now()).toString(16)}`,
@@ -23,7 +31,7 @@
 		validators: zod(setupSchema),
 		onUpdate({ form }) {
 			if (form.valid) {
-				$createStoreMutation.mutate(form.data);
+				$createMutation.mutate(form.data);
 			}
 		}
 	});
@@ -46,7 +54,7 @@
 							{...props}
 							class="mt-5"
 							placeholder="E-commerce"
-							disabled={$createStoreMutation.isPending}
+							disabled={$createMutation.isPending}
 							bind:value={$formData.name}
 						/>
 					{/snippet}
@@ -60,14 +68,14 @@
 					type="button"
 					variant="outline"
 					onclick={() => (open = false)}
-					disabled={$createStoreMutation.isPending}
+					disabled={$createMutation.isPending}
 				>
 					Cancel
 				</Button>
 
-				<Button type="submit" disabled={$createStoreMutation.isPending}>
+				<Button type="submit" disabled={$createMutation.isPending}>
 					Continue
-					{#if $createStoreMutation.isPending}
+					{#if $createMutation.isPending}
 						<Loader size={16} class="animate-spin ml-1 text-primary-foreground" />
 					{/if}
 				</Button>
