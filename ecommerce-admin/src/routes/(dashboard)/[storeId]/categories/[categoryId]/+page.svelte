@@ -27,13 +27,13 @@
 		getBillboards = useGetBillboards({ storeId: data.store.id });
 	});
 
-	const deleteStore = useDeleteCategory({
+	const deleteCategory = useDeleteCategory({
 		onSuccess: () => {
 			toast.success('Category deleted');
 			window.location.reload();
 		},
 		onError() {
-			toast.error('Something went wrong');
+			toast.error('Make sure you removed all products using this category first');
 		}
 	});
 
@@ -50,7 +50,7 @@
 		});
 
 		if (ok) {
-			$deleteStore.mutate({
+			$deleteCategory.mutate({
 				param: {
 					storeId: data.store.id.toString(),
 					categoryId: data.category.id.toString()

@@ -16,13 +16,13 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteStore = useDeleteBillboard({
+	const deleteBillboard = useDeleteBillboard({
 		onSuccess: () => {
 			toast.success('Billboard deleted');
 			window.location.reload();
 		},
 		onError() {
-			toast.error('Something went wrong');
+			toast.error('Make sure you removed all categories using this billboard first');
 		}
 	});
 
@@ -39,7 +39,7 @@
 		});
 
 		if (ok) {
-			$deleteStore.mutate({
+			$deleteBillboard.mutate({
 				param: {
 					storeId: data.store.id.toString(),
 					billboardId: data.billboard.id.toString()

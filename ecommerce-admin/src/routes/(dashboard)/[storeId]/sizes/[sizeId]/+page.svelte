@@ -22,7 +22,7 @@
 			window.location.reload();
 		},
 		onError() {
-			toast.error('Something went wrong');
+			toast.error('Make sure you removed all products using this category first');
 		}
 	});
 
