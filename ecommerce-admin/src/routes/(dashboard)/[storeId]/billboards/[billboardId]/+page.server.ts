@@ -60,11 +60,11 @@ export const actions: Actions = {
 
 		const { label, imageUrl } = form.data;
 
-		const newBillboard = await updateBillboard(storeId, billboardId, { label, imageUrl });
+		const billboard = await updateBillboard(storeId, billboardId, { label, imageUrl });
 
 		form.data = {
-			label: newBillboard.label,
-			imageUrl: newBillboard.imageUrl
+			label: billboard.label,
+			imageUrl: billboard.imageUrl
 		};
 
 		return { form };

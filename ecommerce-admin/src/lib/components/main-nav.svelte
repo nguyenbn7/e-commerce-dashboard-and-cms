@@ -27,6 +27,11 @@
 			active: page.url.pathname === `/${page.params.storeId}/sizes`
 		},
 		{
+			href: `/${page.params.storeId}/colors`,
+			label: 'Colors',
+			active: page.url.pathname === `/${page.params.storeId}/colors`
+		},
+		{
 			href: `/${page.params.storeId}/settings`,
 			label: 'Settings',
 			active: page.url.pathname === `/${page.params.storeId}/settings`

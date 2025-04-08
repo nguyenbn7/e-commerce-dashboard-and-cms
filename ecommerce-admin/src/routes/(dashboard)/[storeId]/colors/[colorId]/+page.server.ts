@@ -3,33 +3,33 @@ import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { storeIdSchema } from '$features/stores/schemas';
-import { sizeFormSchema, sizeIdSchema } from '$features/sizes/schemas';
+import { colorFormSchema, colorIdSchema } from '$features/colors/schemas';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { getSize, updateSize } from '$features/sizes/server/repository';
+import { getColor, updateColor } from '$features/colors/server/repository';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 	// TODO: check billboardId
-	const { sizeId: id } = params;
+	const { colorId: id } = params;
 
-	const result = sizeIdSchema.safeParse({ id: id });
+	const result = colorIdSchema.safeParse({ id: id });
 
-	if (!result.success) redirect(307, `/${store.id}/sizes`);
+	if (!result.success) redirect(307, `/${store.id}/colors`);
 
-	const { id: sizeId } = result.data;
+	const { id: colorId } = result.data;
 
-	const size = await getSize(store.id, sizeId);
+	const color = await getColor(store.id, colorId);
 
-	if (!size) redirect(307, `/${store.id}/sizes`);
+	if (!color) redirect(307, `/${store.id}/colors`);
 
-	const form = await superValidate(zod(sizeFormSchema), {
+	const form = await superValidate(zod(colorFormSchema), {
 		defaults: {
-			name: size.name,
-			value: size.value
+			name: color.name,
+			value: color.value
 		}
 	});
 
-	return { form, size };
+	return { form, color };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -44,7 +44,7 @@ export const actions: Actions = {
 
 		const { id: storeId } = checkStoreIdResult.data;
 
-		const form = await superValidate(request, zod(sizeFormSchema));
+		const form = await superValidate(request, zod(colorFormSchema));
 		if (!form.valid) return fail(400, { form });
 
 		const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
@@ -52,19 +52,19 @@ export const actions: Actions = {
 		// TODO: add message
 		if (!storeByUserId) return fail(403, { form });
 
-		const checkSizeIdResult = sizeIdSchema.safeParse({ id: params.sizeId });
+		const checkColorIdResult = colorIdSchema.safeParse({ id: params.colorId });
 
-		if (!checkSizeIdResult.success) redirect(308, `/${storeId}/sizes`);
+		if (!checkColorIdResult.success) redirect(308, `/${storeId}/colors`);
 
-		const { id: sizeId } = checkSizeIdResult.data;
+		const { id: colorId } = checkColorIdResult.data;
 
 		const { name, value } = form.data;
 
-		const size = await updateSize(storeId, sizeId, { name, value });
+		const color = await updateColor(storeId, colorId, { name, value });
 
 		form.data = {
-			name: size.name,
-			value: size.value
+			name: color.name,
+			value: color.value
 		};
 
 		return { form };

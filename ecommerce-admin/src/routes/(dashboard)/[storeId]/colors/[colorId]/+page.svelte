@@ -4,8 +4,8 @@
 	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
 	import { DeleteButton } from '$lib/components/button';
-	import { SizeForm } from '$features/sizes/components';
-	import { deleteSizeMutation } from '$features/sizes/api';
+	import { ColorForm } from '$features/colors/components';
+	import { deleteColorMutation } from '$features/colors/api';
 
 	interface PageProps {
 		data: PageData;
@@ -13,24 +13,24 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteMutation = deleteSizeMutation({
+	const deleteMutation = deleteColorMutation({
 		onSuccess: () => {
 			window.location.reload();
 		}
 	});
 </script>
 
-<Metadata title="Edit Size" />
+<Metadata title="Edit Color" />
 
 <div class="flex items-center justify-between">
-	<Heading title="Edit Size" description="Edit a size" />
+	<Heading title="Edit Color" description="Edit a color" />
 
 	<DeleteButton
 		onDelete={() => {
 			$deleteMutation.mutate({
 				param: {
 					storeId: data.store.id.toString(),
-					sizeId: data.size.id.toString()
+					colorId: data.color.id.toString()
 				}
 			});
 		}}
@@ -39,6 +39,6 @@
 
 <Separator />
 
-<SizeForm form={data.form} disabled={$deleteMutation.isPending} />
+<ColorForm form={data.form} disabled={$deleteMutation.isPending} />
 
 <Separator />
