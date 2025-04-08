@@ -23,6 +23,7 @@ model Store {
   Category   Category[]  @relation("store_category")
   Size       Size[]      @relation("store_size")
   Color      Color[]     @relation("store_color")
+  Product    Product[]   @relation("store_product")
 
   @@index([userId])
   @@map("store")
@@ -51,6 +52,7 @@ model Category {
   name        String    @db.VarChar(255)
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  Product     Product[] @relation("category_product")
 
   @@index([storeId])
   @@index([billboardId])
@@ -58,27 +60,66 @@ model Category {
 }
 
 model Size {
-  id        Int      @id @default(autoincrement())
-  storeId   Int      @map("store_id")
-  store     Store    @relation("store_size", fields: [storeId], references: [id])
-  name      String   @db.VarChar(255)
-  value     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        Int       @id @default(autoincrement())
+  storeId   Int       @map("store_id")
+  store     Store     @relation("store_size", fields: [storeId], references: [id])
+  name      String    @db.VarChar(255)
+  value     String    @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Product   Product[] @relation("size_product")
 
   @@index([storeId])
   @@map("size")
 }
 
 model Color {
-  id        Int      @id @default(autoincrement())
-  storeId   Int      @map("store_id")
-  store     Store    @relation("store_color", fields: [storeId], references: [id])
-  name      String   @db.VarChar(255)
-  value     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        Int       @id @default(autoincrement())
+  storeId   Int       @map("store_id")
+  store     Store     @relation("store_color", fields: [storeId], references: [id])
+  name      String    @db.VarChar(255)
+  value     String    @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Product   Product[] @relation("color_product")
 
   @@index([storeId])
   @@map("color")
+}
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  storeId    Int      @map("store_id")
+  store      Store    @relation("store_product", fields: [storeId], references: [id])
+  categoryId Int      @map("category_id")
+  category   Category @relation("category_product", fields: [categoryId], references: [id])
+  name       String   @db.VarChar(255)
+  price      Int
+  isFeatured Boolean  @default(false) @map("is_featured")
+  isArchived Boolean  @default(false) @map("is_archived")
+  sizeId     Int      @map("size_id")
+  size       Size     @relation("size_product", fields: [sizeId], references: [id])
+  colorId    Int      @map("color_id")
+  color      Color    @relation("color_product", fields: [colorId], references: [id])
+  Image      Image[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([sizeId])
+  @@index([colorId])
+  @@map("product")
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String   @db.VarChar(255)
+  productId Int      @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@map("image")
 }
