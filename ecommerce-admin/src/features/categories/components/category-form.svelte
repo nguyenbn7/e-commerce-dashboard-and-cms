@@ -52,10 +52,6 @@
 	});
 
 	const { form: formData } = form;
-
-	let selectedBillboardLabel = $derived(
-		billboards.find((b) => b.id === $formData.billboardId)?.label ?? ''
-	);
 </script>
 
 <Form {form} {action} disabled={_disabled} {createForm}>
@@ -94,7 +90,7 @@
 							}
 						>
 							<SelectTrigger {...props} class="mt-2">
-								{selectedBillboardLabel}
+								{billboards.find((b) => b.id === $formData.billboardId)?.label ?? ''}
 							</SelectTrigger>
 
 							<SelectContent>

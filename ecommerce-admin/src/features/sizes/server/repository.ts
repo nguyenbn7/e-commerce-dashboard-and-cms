@@ -59,3 +59,15 @@ export async function deleteSize(storeId: number, sizeId: number) {
 		}
 	});
 }
+
+export async function getSizesSelection(storeId: number) {
+	return prisma.size.findMany({
+		where: {
+			storeId
+		},
+		select: {
+			id: true,
+			name: true
+		}
+	});
+}

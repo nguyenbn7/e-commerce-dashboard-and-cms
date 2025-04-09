@@ -1,62 +1,95 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Product } from '@prisma/client';
 	import type { z } from 'zod';
-	import { toast } from 'svelte-sonner';
+
 	import { Input } from '$lib/components/ui/input';
-	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import {
+		FormControl,
+		FormDescription,
+		FormField,
+		FormFieldErrors,
+		FormLabel
+	} from '$lib/components/ui/form';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
+
+	import { defaults, superForm } from 'sveltekit-superforms';
+	import { zod, zodClient } from 'sveltekit-superforms/adapters';
+
 	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
+
+	import { ColorDisplay } from '$features/colors/components';
 	import { productFormSchema } from '$features/products/schemas';
+	import { currencyFormatter } from '$lib';
 
 	interface Props {
-		form: SuperValidated<z.infer<typeof productFormSchema>, any>;
-		action?: string | undefined | null;
 		disabled?: boolean;
 		createForm?: boolean;
-		onSuccess?: () => void;
+		initData?: Product;
+		onSubmit: (values: z.infer<typeof productFormSchema>) => void;
+		categories: { id: number; name: string }[];
+		sizes: { id: number; name: string }[];
+		colors: { id: number; name: string; value: string }[];
 	}
 
-	let { form: _form, disabled: _disabled = false, action, createForm, onSuccess }: Props = $props();
+	let {
+		disabled: _disabled = false,
+		createForm,
+		categories,
+		sizes,
+		colors,
+		onSubmit,
+		initData
+	}: Props = $props();
 
-	const form = superForm(_form, {
-		validators: zodClient(productFormSchema),
-		onUpdated({ form }) {
-			if (form.valid) {
-				if (createForm) toast.success('Billboard created');
-				else {
-					formData.set(form.data);
-					toast.success('Billboard updated');
+	const form = superForm(
+		initData ? defaults(initData, zod(productFormSchema)) : defaults(zod(productFormSchema)),
+		{
+			id: `product_${Math.floor(Math.random() * Date.now()).toString(16)}`,
+			dataType: 'json',
+			SPA: true,
+			validators: zodClient(productFormSchema),
+			onUpdate({ form }) {
+				if (form.valid) {
+					onSubmit(form.data);
 				}
-				onSuccess?.();
 			}
-		},
-		onError() {
-			// TODO:
-			toast.error('Something went wrong');
 		}
-	});
+	);
 
 	const { form: formData } = form;
+
+	let selectedColor = $derived(colors.find((c) => c.id === $formData.colorId));
+	let displayPrice = $state(currencyFormatter.format($formData.price / 100));
+
+	$effect(() => {
+		const numericValue = Number(displayPrice.replace(/\D/g, ''));
+		displayPrice = currencyFormatter.format(numericValue / 100);
+
+		return () => {
+			$formData.price = numericValue;
+		};
+	});
 </script>
 
-<Form {form} {action} disabled={_disabled} {createForm}>
+<Form {form} disabled={_disabled} {createForm}>
 	{#snippet content({ disabled })}
-		<FormField {form} name="image">
+		<FormField {form} name="images">
 			<FormControl>
 				{#snippet children({ props })}
-					<FormLabel>Background Image</FormLabel>
+					<FormLabel>Images</FormLabel>
 
-					<!-- <ImageUpload
+					<ImageUpload
 						class="mt-2"
-						value={$formData.image ? [$formData.imageUrl] : []}
-						onChange={(url) => ($formData.imageUrl = url)}
-						onRemove={() => ($formData.imageUrl = '')}
+						value={$formData.images.map((image) => image.url)}
+						onChange={(url) => ($formData.images = [...$formData.images, { url }])}
+						onRemove={(url) =>
+							($formData.images = [...$formData.images.filter((current) => current.url !== url)])}
 						{disabled}
 					/>
 
-					<Input {...props} {disabled} value={$formData.imageUrl} hidden /> -->
+					<!-- <Input {...props} {disabled} value={$formData.imageUrl} hidden /> -->
 				{/snippet}
 			</FormControl>
 
@@ -72,10 +105,169 @@
 						<Input
 							{...props}
 							{disabled}
-							placeholder="Billboard label"
+							placeholder="Product name"
 							class="mt-2"
 							bind:value={$formData.name}
 						/>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField {form} name="price">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Price</FormLabel>
+
+						<Input
+							{...props}
+							{disabled}
+							type="text"
+							placeholder="9.99"
+							class="mt-2"
+							bind:value={displayPrice}
+						/>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField {form} name="categoryId">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Category</FormLabel>
+
+						<Select
+							type="single"
+							{disabled}
+							name={props.name}
+							bind:value={
+								() => ($formData.categoryId <= 0 ? '' : $formData.categoryId.toString()),
+								(newValue) => ($formData.categoryId = Number(newValue))
+							}
+						>
+							<SelectTrigger {...props} class="mt-2">
+								{categories.find((c) => c.id === $formData.categoryId)?.name ?? 'Select a category'}
+							</SelectTrigger>
+
+							<SelectContent>
+								{#each categories as category (category.id)}
+									<SelectItem value={category.id.toString()}>
+										{category.name}
+									</SelectItem>
+								{/each}
+							</SelectContent>
+						</Select>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField {form} name="sizeId">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Size</FormLabel>
+
+						<Select
+							type="single"
+							{disabled}
+							name={props.name}
+							bind:value={
+								() => ($formData.sizeId <= 0 ? '' : $formData.sizeId.toString()),
+								(newValue) => ($formData.sizeId = Number(newValue))
+							}
+						>
+							<SelectTrigger {...props} class="mt-2">
+								{sizes.find((s) => s.id === $formData.sizeId)?.name ?? 'Select a size'}
+							</SelectTrigger>
+
+							<SelectContent>
+								{#each sizes as size (size.id)}
+									<SelectItem value={size.id.toString()}>
+										{size.name}
+									</SelectItem>
+								{/each}
+							</SelectContent>
+						</Select>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField {form} name="colorId">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel>Color</FormLabel>
+
+						<Select
+							type="single"
+							{disabled}
+							name={props.name}
+							bind:value={
+								() => ($formData.colorId <= 0 ? '' : $formData.colorId.toString()),
+								(newValue) => ($formData.colorId = Number(newValue))
+							}
+						>
+							<SelectTrigger {...props} class="mt-2">
+								{selectedColor?.name ?? 'Select a color'}
+								{#if selectedColor}
+									<span class="ml-2">
+										<ColorDisplay colorValue={selectedColor.value} colorOnly />
+									</span>
+								{/if}
+							</SelectTrigger>
+
+							<SelectContent>
+								{#each colors as color (color.id)}
+									<SelectItem value={color.id.toString()}>
+										{color.name}
+										<span class="ml-2">
+											<ColorDisplay colorValue={color.value} colorOnly />
+										</span>
+									</SelectItem>
+								{/each}
+							</SelectContent>
+						</Select>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField
+				{form}
+				name="isFeatured"
+				class="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"
+			>
+				<FormControl>
+					{#snippet children({ props })}
+						<Checkbox bind:checked={$formData.isFeatured} />
+						<div class="space-y-1 leading-none">
+							<FormLabel>Featured</FormLabel>
+							<FormDescription>This product will appear on the home page.</FormDescription>
+						</div>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField
+				{form}
+				name="isArchived"
+				class="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"
+			>
+				<FormControl>
+					{#snippet children({ props })}
+						<Checkbox bind:checked={$formData.isArchived} />
+						<div class="space-y-1 leading-none">
+							<FormLabel>Archived</FormLabel>
+							<FormDescription>This product will not appear anywhere in the store.</FormDescription>
+						</div>
 					{/snippet}
 				</FormControl>
 

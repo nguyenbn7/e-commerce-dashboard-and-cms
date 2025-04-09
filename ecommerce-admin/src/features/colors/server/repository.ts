@@ -59,3 +59,16 @@ export async function deleteColor(storeId: number, colorId: number) {
 		}
 	});
 }
+
+export async function getColorsSelection(storeId: number) {
+	return prisma.color.findMany({
+		where: {
+			storeId
+		},
+		select: {
+			id: true,
+			name: true,
+			value: true
+		}
+	});
+}

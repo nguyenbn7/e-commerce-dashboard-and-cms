@@ -5,7 +5,7 @@
 	import { Metadata } from '$lib/components/metadata';
 	import { DeleteButton } from '$lib/components/button';
 	import { ProductForm } from '$features/products/components';
-	import { deleteProductMutation } from '$features/products/api';
+	import { deleteProductMutation, updateProductMutation } from '$features/products/api';
 
 	interface PageProps {
 		data: PageData;
@@ -18,6 +18,8 @@
 			window.location.reload();
 		}
 	});
+
+	const updateMutation = updateProductMutation();
 </script>
 
 <Metadata title="Edit product" />
@@ -39,6 +41,21 @@
 
 <Separator />
 
-<ProductForm form={data.form} disabled={$deleteMutation.isPending} />
+<ProductForm
+	initData={data.product}
+	categories={data.categories}
+	sizes={data.sizes}
+	colors={data.colors}
+	disabled={$deleteMutation.isPending || $updateMutation.isPending}
+	onSubmit={(values) => {
+		$updateMutation.mutate({
+			param: {
+				storeId: data.store.id.toString(),
+				productId: data.product.id.toString()
+			},
+			json: values
+		});
+	}}
+/>
 
 <Separator />

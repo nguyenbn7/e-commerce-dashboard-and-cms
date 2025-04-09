@@ -19,7 +19,7 @@
 </script>
 
 <CellAction
-	updateHref={`/${page.params.storeId}/productId/${data.id}`}
+	updateHref={`/${page.params.storeId}/products/${data.id}`}
 	onCopy={async () => {
 		await navigator.clipboard.writeText(data.id.toString());
 		toast.success('Product Id copied to the clipboard');

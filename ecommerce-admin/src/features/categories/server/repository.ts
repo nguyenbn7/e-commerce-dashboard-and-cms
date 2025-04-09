@@ -57,13 +57,24 @@ export async function updateCategory(
 		}
 	});
 }
-// TODO: order params function
 
 export async function deleteCategory(storeId: number, categoryId: number) {
 	return prisma.category.delete({
 		where: {
 			id: categoryId,
 			storeId
+		}
+	});
+}
+
+export async function getCategoriesSelection(storeId: number) {
+	return prisma.category.findMany({
+		where: {
+			storeId
+		},
+		select: {
+			id: true,
+			name: true
 		}
 	});
 }

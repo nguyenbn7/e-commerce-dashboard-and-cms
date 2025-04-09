@@ -43,6 +43,7 @@
 						variant="destructive"
 						size="icon"
 						class="cursor-pointer"
+						{disabled}
 					>
 						<Trash class="size-4" />
 					</Button>

@@ -101,7 +101,7 @@ model Product {
   size       Size     @relation("size_product", fields: [sizeId], references: [id])
   colorId    Int      @map("color_id")
   color      Color    @relation("color_product", fields: [colorId], references: [id])
-  image      Image[]
+  images     Image[]
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 

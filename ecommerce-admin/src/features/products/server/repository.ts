@@ -7,16 +7,27 @@ export async function getProduct(storeId: number, productId: number) {
 			storeId
 		},
 		include: {
-			image: true
+			images: true
 		}
 	});
 }
 
 export async function createProduct(
 	storeId: number,
-	data: { name: string; price: number; categoryId: number; colorId: number; sizeId: number }
+	data: {
+		name: string;
+		price: number;
+		categoryId: number;
+		colorId: number;
+		sizeId: number;
+		images: {
+			url: string;
+		}[];
+		isFeatured?: boolean;
+		isArchived?: boolean;
+	}
 ) {
-	const { name, price, categoryId, colorId, sizeId } = data;
+	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = data;
 
 	return prisma.product.create({
 		data: {
@@ -25,17 +36,36 @@ export async function createProduct(
 			storeId,
 			categoryId,
 			colorId,
-			sizeId
+			sizeId,
+			isArchived,
+			isFeatured,
+			images: {
+				createMany: {
+					data: [...images]
+				}
+			}
 		}
 	});
 }
 
-export async function getProducts(storeId: number) {
+export async function getProducts(
+	storeId: number,
+	categoryId?: number,
+	isFeatured?: boolean,
+	colorId?: number,
+	sizeId?: number
+) {
 	return prisma.product.findMany({
 		where: {
-			storeId
+			storeId,
+			categoryId,
+			colorId,
+			sizeId,
+			isFeatured: isFeatured ? true : undefined,
+			isArchived: false
 		},
 		include: {
+			images: true,
 			category: true,
 			size: true,
 			color: true
@@ -46,21 +76,42 @@ export async function getProducts(storeId: number) {
 	});
 }
 
-export async function updateBillboard(
+export async function updateProduct(
 	storeId: number,
-	billboardId: number,
-	data: { label: string; imageUrl: string }
+	productId: number,
+	data: {
+		name: string;
+		price: number;
+		categoryId: number;
+		colorId: number;
+		sizeId: number;
+		images: {
+			url: string;
+		}[];
+		isFeatured?: boolean;
+		isArchived?: boolean;
+	}
 ) {
-	const { label, imageUrl } = data;
+	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = data;
 
-	return prisma.billboard.update({
+	return prisma.product.update({
 		where: {
-			id: billboardId,
+			id: productId,
 			storeId
 		},
 		data: {
-			label,
-			imageUrl
+			name,
+			price,
+			categoryId,
+			colorId,
+			sizeId,
+			isArchived,
+			isFeatured,
+			images: {
+				createMany: {
+					data: [...images]
+				}
+			}
 		}
 	});
 }

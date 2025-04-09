@@ -12,8 +12,14 @@ import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
 import { storeIdSchema } from '$features/stores/schemas';
 import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
 
-import { productIdSchema } from '$features/products/schemas';
-import { deleteProduct, getProduct, getProducts } from '$features/products/server/repository';
+import { productFormSchema, productIdSchema } from '$features/products/schemas';
+import {
+	createProduct,
+	deleteProduct,
+	getProduct,
+	getProducts,
+	updateProduct
+} from '$features/products/server/repository';
 
 const publicRoute = new Hono()
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
@@ -58,7 +64,58 @@ const app = publicRoute
 		})
 	)
 	.use(clerkMiddlewareAuthenticated())
-	// TODO: create product
+	.post(
+		'/',
+		zValidator('param', storeIdSchema),
+		checkStoreBelongsToUser(),
+		zValidator('json', productFormSchema),
+		async (c) => {
+			const { storeId } = c.req.valid('param');
+			const { name, price, categoryId, colorId, images, sizeId, isArchived, isFeatured } =
+				c.req.valid('json');
+
+			const product = await createProduct(storeId, {
+				name,
+				price,
+				categoryId,
+				colorId,
+				images,
+				sizeId,
+				isArchived,
+				isFeatured
+			});
+
+			return c.json({
+				product
+			});
+		}
+	)
+	.put(
+		'/:productId',
+		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
+		checkStoreBelongsToUser(),
+		zValidator('json', productFormSchema),
+		async (c) => {
+			const { storeId, productId } = c.req.valid('param');
+			const { name, price, categoryId, colorId, images, sizeId, isArchived, isFeatured } =
+				c.req.valid('json');
+
+			// const product = await updateProduct(storeId, productId, {
+			// 	name,
+			// 	price,
+			// 	categoryId,
+			// 	colorId,
+			// 	images,
+			// 	sizeId,
+			// 	isArchived,
+			// 	isFeatured
+			// });
+
+			return c.json({
+				// product
+			});
+		}
+	)
 	.delete(
 		'/:productId',
 		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
