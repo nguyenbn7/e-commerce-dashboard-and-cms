@@ -33,7 +33,11 @@
 					toast.success('Store updated');
 				}
 
-				onSuccess?.();
+				return onSuccess?.();
+			}
+
+			if (form.message) {
+				toast.error(form.message);
 			}
 		},
 		onError() {

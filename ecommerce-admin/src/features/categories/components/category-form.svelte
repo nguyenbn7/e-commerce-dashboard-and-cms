@@ -38,7 +38,11 @@
 					formData.set(form.data);
 					toast.success('Category updated');
 				}
-				onSuccess?.();
+				return onSuccess?.();
+			}
+
+			if (form.message) {
+				toast.error(form.message);
 			}
 		},
 		onError() {

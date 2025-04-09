@@ -34,7 +34,11 @@
 					formData.set(form.data);
 					toast.success('Color updated');
 				}
-				onSuccess?.();
+				return onSuccess?.();
+			}
+
+			if (form.message) {
+				toast.error(form.message);
 			}
 		},
 		onError() {

@@ -1,11 +1,16 @@
 import type { Actions, PageServerLoad } from './$types';
+import { StatusCodes } from 'http-status-codes';
+
 import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+
+import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { categoryFormSchema } from '$features/categories/schemas';
+
 import { storeIdSchema } from '$features/stores/schemas';
-import { createCategory } from '$features/categories/server/repository';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+
+import { categoryFormSchema } from '$features/categories/schemas';
+import { createCategory } from '$features/categories/server/repository';
 
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
@@ -29,7 +34,8 @@ export const actions: Actions = {
 		const { storeId } = result.data;
 
 		const store = await findStoreByUserIdAndStoreId(userId, storeId);
-		if (!store) return fail(403, { form });
+		if (!store)
+			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const { name, billboardId } = form.data;
 

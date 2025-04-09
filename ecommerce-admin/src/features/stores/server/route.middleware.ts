@@ -44,11 +44,11 @@ export const checkStoreBelongsToUser =
 			return c.json(
 				{
 					error: {
-						code: StatusCodes.UNAUTHORIZED,
-						message: 'User does not own this store'
+						code: StatusCodes.FORBIDDEN,
+						message: 'You do not own this store'
 					}
 				},
-				StatusCodes.UNAUTHORIZED
+				StatusCodes.FORBIDDEN
 			);
 
 		await next();

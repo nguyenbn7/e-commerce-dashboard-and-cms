@@ -1,8 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
 
+import { StatusCodes } from 'http-status-codes';
+
 import { fail, redirect } from '@sveltejs/kit';
 
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 import { storeIdSchema } from '$features/stores/schemas';
@@ -45,8 +47,9 @@ export const actions: Actions = {
 
 		const { storeId } = checkStoreIdResult.data;
 
-		const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
-		if (!storeByUserId) return fail(403, { form });
+		const store = await findStoreByUserIdAndStoreId(userId, storeId);
+		if (!store)
+			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkCategoryIdResult = categoryIdSchema.safeParse({ categoryId: params.categoryId });
 		if (!checkCategoryIdResult.success) redirect(308, `/${storeId}/categories`);

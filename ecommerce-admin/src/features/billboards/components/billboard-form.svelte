@@ -29,7 +29,11 @@
 					formData.set(form.data);
 					toast.success('Billboard updated');
 				}
-				onSuccess?.();
+				return onSuccess?.();
+			}
+
+			if (form.message) {
+				toast.error(form.message);
 			}
 		},
 		onError() {
