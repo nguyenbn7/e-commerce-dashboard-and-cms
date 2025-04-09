@@ -1,13 +1,13 @@
 import type { PageServerLoad } from './$types';
 
-import { getBillboards } from '$features/billboards/server/repository';
+import { getProducts } from '$features/products/server/repository';
 
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
 
-	const billboards = await getBillboards(store.id);
+	const products = await getProducts(store.id);
 
 	return {
-		billboards
+		products
 	};
 }) satisfies PageServerLoad;

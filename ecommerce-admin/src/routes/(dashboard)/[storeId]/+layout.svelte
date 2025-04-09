@@ -21,7 +21,7 @@
 		getStores = getStoresQuery();
 	});
 
-	let stores = $derived($getStores?.data?.data.stores ?? []);
+	let stores = $derived($getStores?.data?.stores ?? []);
 </script>
 
 <StoreModal

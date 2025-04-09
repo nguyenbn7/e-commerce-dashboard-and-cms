@@ -1,28 +1,31 @@
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import {
-	clerkMiddlewareAuthenticated,
-	configuredClerkMiddleware
-} from '$lib/server/hono.middleware';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
-import { deleteSize, getSize, getSizes } from '$features/sizes/server/repository';
-import { storeIdAndSizeIdSchema } from '$features/sizes/schemas';
+import { CLERK_SECRET_KEY } from '$env/static/private';
+import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 
-const app = new Hono()
-	.get('/', zValidator('param', storeIdAndSizeIdSchema.omit({ sizeId: true })), async (c) => {
+import { StatusCodes } from 'http-status-codes';
+
+import { Hono } from 'hono';
+import { clerkMiddleware } from '@hono/clerk-auth';
+import { zValidator } from '@hono/zod-validator';
+
+import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
+
+import { storeIdSchema } from '$features/stores/schemas';
+import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
+
+import { sizeIdSchema } from '$features/sizes/schemas';
+import { deleteSize, getSize, getSizes } from '$features/sizes/server/repository';
+
+const publicRoute = new Hono()
+	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 
 		const sizes = await getSizes(storeId);
 
 		return c.json({
-			status: 'success',
-			data: {
-				sizes
-			}
+			sizes
 		});
 	})
-	.get('/:sizeId', zValidator('param', storeIdAndSizeIdSchema), async (c) => {
+	.get('/:sizeId', zValidator('param', storeIdSchema.extend(sizeIdSchema.shape)), async (c) => {
 		const { storeId, sizeId } = c.req.valid('param');
 
 		const size = await getSize(storeId, sizeId);
@@ -30,8 +33,7 @@ const app = new Hono()
 		if (!size)
 			return c.json(
 				{
-					status: 'fail',
-					data: {
+					error: {
 						code: StatusCodes.NOT_FOUND,
 						message: 'Size not found'
 					}
@@ -40,42 +42,31 @@ const app = new Hono()
 			);
 
 		return c.json({
-			status: 'success',
-			data: {
-				size
-			}
+			size
 		});
-	})
+	});
+
+const app = publicRoute
+	.use(
+		clerkMiddleware({
+			secretKey: CLERK_SECRET_KEY,
+			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
+		})
+	)
+	.use(clerkMiddlewareAuthenticated())
 	.delete(
 		'/:sizeId',
-		configuredClerkMiddleware,
-		clerkMiddlewareAuthenticated(),
-		zValidator('param', storeIdAndSizeIdSchema),
+		zValidator('param', storeIdSchema.extend(sizeIdSchema.shape)),
+		checkStoreBelongsToUser(),
 		async (c) => {
 			const { storeId, sizeId } = c.req.valid('param');
-			const userId = c.get('userId');
-
-			const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
-
-			if (!storeByUserId)
-				return c.json(
-					{
-						status: 'error',
-						error: {
-							code: StatusCodes.UNAUTHORIZED,
-							message: ReasonPhrases.UNAUTHORIZED
-						}
-					},
-					StatusCodes.UNAUTHORIZED
-				);
 
 			const size = await getSize(storeId, sizeId);
 
 			if (!size)
 				return c.json(
 					{
-						status: 'fail',
-						data: {
+						error: {
 							code: StatusCodes.NOT_FOUND,
 							message: 'Size not found'
 						}
@@ -83,11 +74,10 @@ const app = new Hono()
 					StatusCodes.NOT_FOUND
 				);
 
-			await deleteSize(storeId, sizeId);
+			const deletedSize = await deleteSize(storeId, sizeId);
 
 			return c.json({
-				status: 'success',
-				data: null
+				size: deletedSize
 			});
 		}
 	);

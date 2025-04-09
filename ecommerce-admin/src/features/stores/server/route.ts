@@ -1,62 +1,55 @@
+import { CLERK_SECRET_KEY } from '$env/static/private';
+import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
+
+import { StatusCodes } from 'http-status-codes';
+
 import { Hono } from 'hono';
+import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
-import {
-	clerkMiddlewareAuthenticated,
-	configuredClerkMiddleware
-} from '$lib/server/hono.middleware';
+
+import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
+
 import { setupSchema, storeIdSchema } from '$features/stores/schemas';
+import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
 import { createStore, deleteStore, getStores } from '$features/stores/server/repository';
 
 const app = new Hono()
-	.get('/', configuredClerkMiddleware, clerkMiddlewareAuthenticated(), async (c) => {
+	.use(
+		clerkMiddleware({
+			secretKey: CLERK_SECRET_KEY,
+			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
+		})
+	)
+	.use(clerkMiddlewareAuthenticated())
+	.get('/', async (c) => {
 		const userId = c.get('userId');
 
 		const stores = await getStores(userId);
 
 		return c.json({
-			status: 'success',
-			data: {
-				stores
-			}
+			stores
 		});
 	})
-	.post(
-		'/',
-		configuredClerkMiddleware,
-		clerkMiddlewareAuthenticated(),
-		zValidator('json', setupSchema),
-		async (c) => {
-			const userId = c.get('userId');
+	.post('/', zValidator('json', setupSchema), async (c) => {
+		const userId = c.get('userId');
 
-			const { name } = c.req.valid('json');
+		const { name } = c.req.valid('json');
 
-			const store = await createStore(userId, { name });
+		const store = await createStore(userId, { name });
 
-			return c.json({
-				status: 'success',
-				data: {
-					store
-				}
-			});
-		}
-	)
-	.delete(
-		'/:id',
-		configuredClerkMiddleware,
-		clerkMiddlewareAuthenticated(),
-		zValidator('param', storeIdSchema),
-		async (c) => {
-			const { id: storeId } = c.req.valid('param');
-			const userId = c.get('userId');
+		return c.json({
+			store
+		});
+	})
+	.delete('/:storeId', zValidator('param', storeIdSchema), checkStoreBelongsToUser(), async (c) => {
+		const { userId } = c.var;
+		const { storeId } = c.req.valid('param');
 
-			// TODO: check if store exists
-			await deleteStore(userId, storeId);
+		const deletedStore = await deleteStore(userId, storeId);
 
-			return c.json({
-				status: 'success',
-				data: null
-			});
-		}
-	);
+		return c.json({
+			store: deletedStore
+		});
+	});
 
 export default app;

@@ -18,8 +18,7 @@
 
 	const createMutation = createStoreMutation({
 		onSuccess: async (data) => {
-			const { data: responseData } = data;
-			const { id } = responseData.store;
+			const { id } = data.store;
 			await onSuccess?.(id);
 			open = false;
 		}

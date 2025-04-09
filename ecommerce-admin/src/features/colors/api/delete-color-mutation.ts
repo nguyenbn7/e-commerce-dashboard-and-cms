@@ -10,7 +10,7 @@ type Response = InferResponseType<
 type Request = InferRequestType<
 	(typeof client.api.stores)[':storeId']['colors'][':colorId']['$delete']
 >;
-type ResponseError = { status: string; error: { code: number; message: string } };
+type ResponseError = { error: { code: number; message: string } };
 
 type Options = {
 	onSuccess?: (data: Response, variables: Request, context: unknown) => Promise<unknown> | unknown;

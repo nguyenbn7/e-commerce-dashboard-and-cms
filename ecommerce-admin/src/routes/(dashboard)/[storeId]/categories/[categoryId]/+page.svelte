@@ -50,7 +50,7 @@
 <CategoryForm
 	form={data.form}
 	disabled={$getBillboards?.isPending || $deleteMutation.isPending}
-	billboards={$getBillboards?.data?.data.billboards}
+	billboards={$getBillboards?.data?.billboards}
 />
 
 <Separator />

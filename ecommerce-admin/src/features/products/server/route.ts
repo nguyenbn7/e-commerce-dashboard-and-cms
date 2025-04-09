@@ -12,39 +12,43 @@ import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
 import { storeIdSchema } from '$features/stores/schemas';
 import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
 
-import { colorIdSchema } from '$features/colors/schemas';
-import { deleteColor, getColor, getColors } from '$features/colors/server/repository';
+import { productIdSchema } from '$features/products/schemas';
+import { deleteProduct, getProduct, getProducts } from '$features/products/server/repository';
 
 const publicRoute = new Hono()
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 
-		const colors = await getColors(storeId);
+		const products = await getProducts(storeId);
 
 		return c.json({
-			colors
+			products
 		});
 	})
-	.get('/:colorId', zValidator('param', storeIdSchema.extend(colorIdSchema.shape)), async (c) => {
-		const { storeId, colorId } = c.req.valid('param');
+	.get(
+		'/:productId',
+		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
+		async (c) => {
+			const { storeId, productId } = c.req.valid('param');
 
-		const color = await getColor(storeId, colorId);
+			const product = await getProduct(storeId, productId);
 
-		if (!color)
-			return c.json(
-				{
-					error: {
-						code: StatusCodes.NOT_FOUND,
-						message: 'Color not found'
-					}
-				},
-				StatusCodes.NOT_FOUND
-			);
+			if (!product)
+				return c.json(
+					{
+						error: {
+							code: StatusCodes.NOT_FOUND,
+							message: 'Product not found'
+						}
+					},
+					StatusCodes.NOT_FOUND
+				);
 
-		return c.json({
-			color
-		});
-	});
+			return c.json({
+				product
+			});
+		}
+	);
 
 const app = publicRoute
 	.use(
@@ -54,30 +58,31 @@ const app = publicRoute
 		})
 	)
 	.use(clerkMiddlewareAuthenticated())
+	// TODO: create product
 	.delete(
-		'/:colorId',
-		zValidator('param', storeIdSchema.extend(colorIdSchema.shape)),
+		'/:productId',
+		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
 		checkStoreBelongsToUser(),
 		async (c) => {
-			const { storeId, colorId } = c.req.valid('param');
+			const { storeId, productId } = c.req.valid('param');
 
-			const color = await getColor(storeId, colorId);
+			const product = await getProduct(storeId, productId);
 
-			if (!color)
+			if (!product)
 				return c.json(
 					{
 						error: {
 							code: StatusCodes.NOT_FOUND,
-							message: 'Color not found'
+							message: 'Product not found'
 						}
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			const deletedColor = await deleteColor(storeId, colorId);
+			const deletedProduct = await deleteProduct(storeId, productId);
 
 			return c.json({
-				color: deletedColor
+				product: deletedProduct
 			});
 		}
 	);

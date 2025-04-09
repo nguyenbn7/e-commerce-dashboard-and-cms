@@ -25,7 +25,7 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({ param: { id: data.store.id.toString() } });
+			$deleteMutation.mutate({ param: { storeId: data.store.id.toString() } });
 		}}
 	/>
 </div>

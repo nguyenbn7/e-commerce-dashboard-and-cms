@@ -6,10 +6,5 @@ export const sizeFormSchema = z.object({
 });
 
 export const sizeIdSchema = z.object({
-	id: z.coerce.number()
-});
-
-export const storeIdAndSizeIdSchema = z.object({
-	storeId: z.coerce.number(),
 	sizeId: z.coerce.number()
 });

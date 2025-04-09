@@ -15,6 +15,4 @@ export default function getStoresQuery() {
 	return query;
 }
 
-export type Store = ArrayElement<
-	InferResponseType<typeof client.api.stores.$get>['data']['stores']
->;
+export type Store = ArrayElement<InferResponseType<typeof client.api.stores.$get>['stores']>;

@@ -5,7 +5,7 @@ export const setupSchema = z.object({
 });
 
 export const storeIdSchema = z.object({
-	id: z.coerce.number()
+	storeId: z.coerce.number()
 });
 
 export const settingsFormSchema = z.object({

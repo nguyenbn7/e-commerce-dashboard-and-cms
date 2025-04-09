@@ -1,97 +1,88 @@
+import { CLERK_SECRET_KEY } from '$env/static/private';
+import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
+
+import { StatusCodes } from 'http-status-codes';
+
 import { Hono } from 'hono';
+import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
-import {
-	clerkMiddlewareAuthenticated,
-	configuredClerkMiddleware
-} from '$lib/server/hono.middleware';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+
+import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
+
+import { storeIdSchema } from '$features/stores/schemas';
+import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
+
+import { categoryIdSchema } from '$features/categories/schemas';
 import { deleteCategory, getCategories, getCategory } from '$features/categories/server/repository';
-import { storeIdAndCategoryIdSchema } from '$features/categories/schemas';
 
-const app = new Hono()
-	.get(
-		'/',
-		zValidator('param', storeIdAndCategoryIdSchema.omit({ categoryId: true })),
-		async (c) => {
-			const { storeId } = c.req.valid('param');
+const publicRoute = new Hono()
+	.get('/', zValidator('param', storeIdSchema), async (c) => {
+		const { storeId } = c.req.valid('param');
 
-			const categories = await getCategories(storeId);
-
-			return c.json({
-				status: 'success',
-				data: {
-					categories
-				}
-			});
-		}
-	)
-	.get('/:categoryId', zValidator('param', storeIdAndCategoryIdSchema), async (c) => {
-		const { storeId, categoryId } = c.req.valid('param');
-
-		const category = await getCategory(storeId, categoryId);
-
-		if (!category)
-			return c.json(
-				{
-					status: 'fail',
-					data: {
-						code: StatusCodes.NOT_FOUND,
-						message: 'Category not found'
-					}
-				},
-				StatusCodes.NOT_FOUND
-			);
+		const categories = await getCategories(storeId);
 
 		return c.json({
-			status: 'success',
-			data: {
-				category
-			}
+			categories
 		});
 	})
-	.delete(
+	.get(
 		'/:categoryId',
-		configuredClerkMiddleware,
-		clerkMiddlewareAuthenticated(),
-		zValidator('param', storeIdAndCategoryIdSchema),
+		zValidator('param', storeIdSchema.extend(categoryIdSchema.shape)),
 		async (c) => {
 			const { storeId, categoryId } = c.req.valid('param');
-			const userId = c.get('userId');
-
-			const storeByUserId = await findStoreByUserIdAndStoreId(userId, storeId);
-
-			if (!storeByUserId)
-				return c.json(
-					{
-						status: 'error',
-						error: {
-							code: StatusCodes.UNAUTHORIZED,
-							message: ReasonPhrases.UNAUTHORIZED
-						}
-					},
-					StatusCodes.UNAUTHORIZED
-				);
 
 			const category = await getCategory(storeId, categoryId);
 
 			if (!category)
 				return c.json(
 					{
-						status: 'fail',
-						data: {
+						error: {
 							code: StatusCodes.NOT_FOUND,
-							message: 'Billboard not found'
+							message: 'Category not found'
 						}
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			await deleteCategory(storeId, categoryId);
+			return c.json({
+				category
+			});
+		}
+	);
+
+const app = publicRoute
+	.use(
+		clerkMiddleware({
+			secretKey: CLERK_SECRET_KEY,
+			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
+		})
+	)
+	.use(clerkMiddlewareAuthenticated())
+	.delete(
+		'/:categoryId',
+		clerkMiddlewareAuthenticated(),
+		zValidator('param', storeIdSchema.extend(categoryIdSchema.shape)),
+		checkStoreBelongsToUser(),
+		async (c) => {
+			const { storeId, categoryId } = c.req.valid('param');
+
+			const category = await getCategory(storeId, categoryId);
+
+			if (!category)
+				return c.json(
+					{
+						error: {
+							code: StatusCodes.NOT_FOUND,
+							message: 'Category not found'
+						}
+					},
+					StatusCodes.NOT_FOUND
+				);
+
+			const deletedCategory = await deleteCategory(storeId, categoryId);
 
 			return c.json({
-				status: 'success',
-				data: null
+				category: deletedCategory
 			});
 		}
 	);

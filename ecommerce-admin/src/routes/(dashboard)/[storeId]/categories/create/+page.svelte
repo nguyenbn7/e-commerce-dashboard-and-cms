@@ -30,7 +30,7 @@
 	createForm
 	form={data.form}
 	disabled={$getBillboards?.isPending}
-	billboards={$getBillboards?.data?.data.billboards}
+	billboards={$getBillboards?.data?.billboards}
 />
 
 <Separator />

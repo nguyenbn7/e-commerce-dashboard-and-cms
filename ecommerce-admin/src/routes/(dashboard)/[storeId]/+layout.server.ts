@@ -8,11 +8,11 @@ export const load = (async ({ locals, params }) => {
 
 	if (!userId) redirect(307, '/sign-in');
 
-	const result = storeIdSchema.safeParse({ id: params.storeId });
+	const result = storeIdSchema.safeParse({ storeId: params.storeId });
 
 	if (!result.success) redirect(307, '/');
 
-	const { id: storeId } = result.data;
+	const { storeId } = result.data;
 
 	const store = await findStoreById(userId, storeId);
 

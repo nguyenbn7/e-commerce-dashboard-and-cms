@@ -3,9 +3,9 @@ import { toast } from 'svelte-sonner';
 import { createMutation } from '@tanstack/svelte-query';
 import { client } from '$lib/rpc';
 
-type Response = InferResponseType<(typeof client.api.stores)[':id']['$delete']>;
-type Request = InferRequestType<(typeof client.api.stores)[':id']['$delete']>;
-type ResponseError = { status: string; error: { code: number; message: string } };
+type Response = InferResponseType<(typeof client.api.stores)[':storeId']['$delete']>;
+type Request = InferRequestType<(typeof client.api.stores)[':storeId']['$delete']>;
+type ResponseError = { error: { code: number; message: string } };
 
 type Options = {
 	onSuccess?: (data: Response, variables: Request, context: unknown) => Promise<unknown> | unknown;
@@ -19,7 +19,7 @@ export default function deleteStoreMutation(
 
 	const mutation = createMutation<Response, Error, Request>({
 		mutationFn: async ({ param }) => {
-			const response = await client.api.stores[':id'].$delete({ param });
+			const response = await client.api.stores[':storeId'].$delete({ param });
 
 			if (!response.ok) {
 				const { error } = (await response.json()) as unknown as ResponseError;
