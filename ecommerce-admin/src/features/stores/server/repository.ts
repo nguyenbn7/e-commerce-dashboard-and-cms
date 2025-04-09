@@ -63,3 +63,16 @@ export async function findStoreByUserIdAndStoreId(userId: string, storeId: numbe
 		}
 	});
 }
+
+export async function getStore(id: number) {
+	return prisma.store.findUnique({
+		where: {
+			id
+		},
+		select: {
+			id: true,
+			name: true,
+			createdAt: true
+		}
+	});
+}

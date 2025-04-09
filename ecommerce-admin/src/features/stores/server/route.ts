@@ -11,9 +11,26 @@ import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
 
 import { setupSchema, storeIdSchema } from '$features/stores/schemas';
 import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
-import { createStore, deleteStore, getStores } from '$features/stores/server/repository';
+import { createStore, deleteStore, getStore, getStores } from '$features/stores/server/repository';
 
-const app = new Hono()
+const publicRoute = new Hono().get('/:storeId', zValidator('param', storeIdSchema), async (c) => {
+	const { storeId } = c.req.valid('param');
+
+	const store = await getStore(storeId);
+	if (!store)
+		return c.json({
+			error: {
+				code: StatusCodes.NOT_FOUND,
+				message: 'Store not found'
+			}
+		});
+
+	return c.json({
+		store
+	});
+});
+
+const app = publicRoute
 	.use(
 		clerkMiddleware({
 			secretKey: CLERK_SECRET_KEY,

@@ -42,4 +42,7 @@
 
 <Separator />
 
-<ApiAlert title="PUBLIC_API_URL" description={`${page.url.origin}/api/${page.params.storeId}`} />
+<ApiAlert
+	title="PUBLIC_API_URL"
+	description={`${page.url.origin}/api/stores/${page.params.storeId}`}
+/>
