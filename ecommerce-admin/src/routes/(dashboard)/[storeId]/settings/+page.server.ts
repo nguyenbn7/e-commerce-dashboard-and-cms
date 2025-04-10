@@ -17,7 +17,7 @@ export const load = (async ({ parent }) => {
 
 export const actions = {
 	default: async ({ locals, request, params }) => {
-		const { userId } = locals.auth;
+		const { userId } = locals.auth();
 
 		if (!userId) redirect(307, '/sign-in');
 

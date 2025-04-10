@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { getFirstStore } from '$features/stores/server/repository';
 
 export const load = (async ({ locals }) => {
-	const { userId } = locals.auth;
+	const { userId } = locals.auth();
 
 	if (!userId) redirect(307, '/sign-in');
 

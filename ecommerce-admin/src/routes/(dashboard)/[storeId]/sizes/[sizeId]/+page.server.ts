@@ -36,7 +36,7 @@ export const load = (async ({ parent, params }) => {
 
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
-		const { userId } = locals.auth;
+		const { userId } = locals.auth();
 		if (!userId) redirect(307, '/sign-in');
 
 		const checkStoreIdResult = storeIdSchema.safeParse({ storeId: params.storeId });

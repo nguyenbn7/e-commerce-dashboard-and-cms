@@ -4,7 +4,7 @@ import { findStoreById } from '$features/stores/server/repository';
 import { storeIdSchema } from '$features/stores/schemas';
 
 export const load = (async ({ locals, params }) => {
-	const { userId } = locals.auth;
+	const { userId } = locals.auth();
 
 	if (!userId) redirect(307, '/sign-in');
 
