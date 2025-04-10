@@ -16,12 +16,13 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
 
+	import { currencyFormatter } from '$lib';
+
 	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
 
 	import { ColorDisplay } from '$features/colors/components';
 	import { productFormSchema } from '$features/products/schemas';
-	import { currencyFormatter } from '$lib';
 
 	interface Props {
 		disabled?: boolean;
@@ -61,16 +62,6 @@
 	const { form: formData } = form;
 
 	let selectedColor = $derived(colors.find((c) => c.id === $formData.colorId));
-	let displayPrice = $state(currencyFormatter.format($formData.price / 100));
-
-	$effect(() => {
-		const numericValue = Number(displayPrice.replace(/\D/g, ''));
-		displayPrice = currencyFormatter.format(numericValue / 100);
-
-		return () => {
-			$formData.price = numericValue;
-		};
-	});
 </script>
 
 <Form {form} disabled={_disabled} {createForm}>
@@ -88,8 +79,6 @@
 							($formData.images = [...$formData.images.filter((current) => current.url !== url)])}
 						{disabled}
 					/>
-
-					<!-- <Input {...props} {disabled} value={$formData.imageUrl} hidden /> -->
 				{/snippet}
 			</FormControl>
 
@@ -123,10 +112,11 @@
 						<Input
 							{...props}
 							{disabled}
-							type="text"
+							type="currency"
 							placeholder="9.99"
+							{currencyFormatter}
 							class="mt-2"
-							bind:value={displayPrice}
+							bind:value={$formData.price}
 						/>
 					{/snippet}
 				</FormControl>
