@@ -3,6 +3,7 @@
 	import type { SuperForm } from 'sveltekit-superforms';
 	import { cn } from '$lib/utils';
 	import { FormButton } from '$lib/components/ui/form';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	interface Props {
 		form: SuperForm<TForm, TFormMessage>;
@@ -31,6 +32,11 @@
 	{@render content({ disabled })}
 
 	<FormButton {disabled} class="ml-auto">
-		{createForm ? 'Create' : 'Save Changes'}
+		{#if !disabled}
+			{createForm ? 'Create' : 'Save Changes'}
+		{:else}
+			{createForm ? 'Creating...' : 'Saving Changes...'}
+			<LoaderCircle class="animate-spin ml-2" />
+		{/if}
 	</FormButton>
 </form>
