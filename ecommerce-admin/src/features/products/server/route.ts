@@ -12,7 +12,11 @@ import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
 import { storeIdSchema } from '$features/stores/schemas';
 import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
 
-import { productFormSchema, productIdSchema } from '$features/products/schemas';
+import {
+	productFormSchema,
+	productIdSchema,
+	productsSearchParamsSchema
+} from '$features/products/schemas';
 import {
 	createProduct,
 	deleteProduct,
@@ -22,15 +26,21 @@ import {
 } from '$features/products/server/repository';
 
 const publicRoute = new Hono()
-	.get('/', zValidator('param', storeIdSchema), async (c) => {
-		const { storeId } = c.req.valid('param');
+	.get(
+		'/',
+		zValidator('param', storeIdSchema),
+		zValidator('query', productsSearchParamsSchema),
+		async (c) => {
+			const { storeId } = c.req.valid('param');
+			const { categoryId, colorId, isFeatured, sizeId } = c.req.valid('query');
 
-		const products = await getProducts(storeId);
+			const products = await getProducts(storeId, categoryId, isFeatured, colorId, sizeId);
 
-		return c.json({
-			products
-		});
-	})
+			return c.json({
+				products
+			});
+		}
+	)
 	.get(
 		'/:productId',
 		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
