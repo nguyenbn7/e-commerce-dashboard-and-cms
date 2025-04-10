@@ -34,4 +34,6 @@
 
 <Heading title="API" description="API calls for Sizes" class="mt-3" />
 
+<Separator />
+
 <ApiList entityName="sizes" entityIdName="sizeId" />

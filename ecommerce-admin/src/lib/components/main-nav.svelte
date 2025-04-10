@@ -37,6 +37,11 @@
 			active: page.url.pathname === `/${page.params.storeId}/products`
 		},
 		{
+			href: `/${page.params.storeId}/orders`,
+			label: 'Orders',
+			active: page.url.pathname === `/${page.params.storeId}/orders`
+		},
+		{
 			href: `/${page.params.storeId}/settings`,
 			label: 'Settings',
 			active: page.url.pathname === `/${page.params.storeId}/settings`

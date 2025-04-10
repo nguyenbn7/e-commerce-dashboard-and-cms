@@ -34,4 +34,6 @@
 
 <Heading title="API" description="API calls for Colors" class="mt-3" />
 
+<Separator />
+
 <ApiList entityName="colors" entityIdName="colorId" />

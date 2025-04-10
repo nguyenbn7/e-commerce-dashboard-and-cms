@@ -37,4 +37,6 @@
 
 <Heading title="API" description="API calls for Categories" class="mt-3" />
 
+<Separator />
+
 <ApiList entityName="categories" entityIdName="categoryId" />

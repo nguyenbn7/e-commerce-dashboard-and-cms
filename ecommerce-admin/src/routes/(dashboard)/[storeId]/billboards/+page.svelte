@@ -37,4 +37,6 @@
 
 <Heading title="API" description="API calls for Billboards" class="mt-3" />
 
-<ApiList entityName="billboards" entityIdName="billboardId"/>
+<Separator />
+
+<ApiList entityName="billboards" entityIdName="billboardId" />

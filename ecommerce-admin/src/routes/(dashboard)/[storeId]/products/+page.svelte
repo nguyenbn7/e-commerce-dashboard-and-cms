@@ -37,4 +37,6 @@
 
 <Heading title="API" description="API calls for Products" class="mt-3" />
 
+<Separator />
+
 <ApiList entityName="products" entityIdName="productId" />
