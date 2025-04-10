@@ -7,7 +7,10 @@ export async function getProduct(storeId: number, productId: number) {
 			storeId
 		},
 		include: {
-			images: true
+			images: true,
+			category: true,
+			size: true,
+			color: true
 		}
 	});
 }
@@ -94,7 +97,7 @@ export async function updateProduct(
 ) {
 	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = data;
 
-	return prisma.product.update({
+	await prisma.product.update({
 		where: {
 			id: productId,
 			storeId
@@ -107,6 +110,24 @@ export async function updateProduct(
 			sizeId,
 			isArchived,
 			isFeatured,
+			images: {
+				deleteMany: {}
+			}
+		}
+	});
+
+	return prisma.product.update({
+		where: {
+			id: productId,
+			storeId
+		},
+		include: {
+			images: true,
+			category: true,
+			size: true,
+			color: true
+		},
+		data: {
 			images: {
 				createMany: {
 					data: [...images]

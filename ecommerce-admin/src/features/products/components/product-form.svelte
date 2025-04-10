@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Product } from '@prisma/client';
+	import type { getProduct } from '$features/products/server/repository';
 	import type { z } from 'zod';
 
 	import { Input } from '$lib/components/ui/input';
@@ -27,7 +27,7 @@
 	interface Props {
 		disabled?: boolean;
 		createForm?: boolean;
-		initData?: Product;
+		initData?: Awaited<ReturnType<typeof getProduct>>;
 		onSubmit: (values: z.infer<typeof productFormSchema>) => void;
 		categories: { id: number; name: string }[];
 		sizes: { id: number; name: string }[];
@@ -62,6 +62,12 @@
 	const { form: formData } = form;
 
 	let selectedColor = $derived(colors.find((c) => c.id === $formData.colorId));
+
+	$effect(() => {
+		if (!createForm && initData) {
+			formData.set(initData);
+		}
+	});
 </script>
 
 <Form {form} disabled={_disabled} {createForm}>

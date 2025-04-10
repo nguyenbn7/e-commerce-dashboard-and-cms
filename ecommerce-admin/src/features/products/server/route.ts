@@ -100,19 +100,32 @@ const app = publicRoute
 			const { name, price, categoryId, colorId, images, sizeId, isArchived, isFeatured } =
 				c.req.valid('json');
 
-			// const product = await updateProduct(storeId, productId, {
-			// 	name,
-			// 	price,
-			// 	categoryId,
-			// 	colorId,
-			// 	images,
-			// 	sizeId,
-			// 	isArchived,
-			// 	isFeatured
-			// });
+			const existedProduct = await getProduct(storeId, productId);
+
+			if (!existedProduct)
+				return c.json(
+					{
+						error: {
+							code: StatusCodes.NOT_FOUND,
+							message: 'Product not found'
+						}
+					},
+					StatusCodes.NOT_FOUND
+				);
+
+			const product = await updateProduct(storeId, productId, {
+				name,
+				price,
+				categoryId,
+				colorId,
+				images,
+				sizeId,
+				isArchived,
+				isFeatured
+			});
 
 			return c.json({
-				// product
+				product
 			});
 		}
 	)

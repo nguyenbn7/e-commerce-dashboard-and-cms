@@ -19,7 +19,38 @@
 		}
 	});
 
-	const updateMutation = updateProductMutation();
+	let initData = $state(data.product);
+
+	const updateMutation = updateProductMutation({
+		onSuccess: (data) => {
+			const { product } = data;
+			initData = {
+				...product,
+				size: {
+					...product.size,
+					createdAt: new Date(product.size.createdAt),
+					updatedAt: new Date(product.size.updatedAt)
+				},
+				category: {
+					...product.category,
+					createdAt: new Date(product.category.createdAt),
+					updatedAt: new Date(product.category.updatedAt)
+				},
+				color: {
+					...product.color,
+					createdAt: new Date(product.color.createdAt),
+					updatedAt: new Date(product.color.updatedAt)
+				},
+				images: product.images.map((img) => ({
+					...img,
+					createdAt: new Date(img.createdAt),
+					updatedAt: new Date(img.updatedAt)
+				})),
+				createdAt: new Date(product.createdAt),
+				updatedAt: new Date(product.updatedAt)
+			};
+		}
+	});
 </script>
 
 <Metadata title="Edit product" />
@@ -42,7 +73,7 @@
 <Separator />
 
 <ProductForm
-	initData={data.product}
+	{initData}
 	categories={data.categories}
 	sizes={data.sizes}
 	colors={data.colors}

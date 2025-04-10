@@ -33,7 +33,7 @@
 
 <Separator />
 
-<DataTable data={data.products} {columns} searchColumnId="label" />
+<DataTable data={data.products} {columns} searchColumnId="name" />
 
 <Heading title="API" description="API calls for Products" class="mt-3" />
 
