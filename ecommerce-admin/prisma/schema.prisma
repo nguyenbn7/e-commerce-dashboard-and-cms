@@ -24,6 +24,7 @@ model Store {
   Size       Size[]      @relation("store_size")
   Color      Color[]     @relation("store_color")
   Product    Product[]   @relation("store_product")
+  Order      Order[]     @relation("store_order")
 
   @@index([userId])
   @@map("store")
@@ -88,22 +89,23 @@ model Color {
 }
 
 model Product {
-  id         Int      @id @default(autoincrement())
-  storeId    Int      @map("store_id")
-  store      Store    @relation("store_product", fields: [storeId], references: [id])
-  categoryId Int      @map("category_id")
-  category   Category @relation("category_product", fields: [categoryId], references: [id])
-  name       String   @db.VarChar(255)
+  id         Int         @id @default(autoincrement())
+  storeId    Int         @map("store_id")
+  store      Store       @relation("store_product", fields: [storeId], references: [id])
+  categoryId Int         @map("category_id")
+  category   Category    @relation("category_product", fields: [categoryId], references: [id])
+  name       String      @db.VarChar(255)
   price      Int
-  isFeatured Boolean  @default(false) @map("is_featured")
-  isArchived Boolean  @default(false) @map("is_archived")
-  sizeId     Int      @map("size_id")
-  size       Size     @relation("size_product", fields: [sizeId], references: [id])
-  colorId    Int      @map("color_id")
-  color      Color    @relation("color_product", fields: [colorId], references: [id])
+  isFeatured Boolean     @default(false) @map("is_featured")
+  isArchived Boolean     @default(false) @map("is_archived")
+  sizeId     Int         @map("size_id")
+  size       Size        @relation("size_product", fields: [sizeId], references: [id])
+  colorId    Int         @map("color_id")
+  color      Color       @relation("color_product", fields: [colorId], references: [id])
   images     Image[]
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  OrderItem  OrderItem[] @relation("order_item_product")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
 
   @@index([storeId])
   @@index([categoryId])
@@ -122,4 +124,31 @@ model Image {
 
   @@index([productId])
   @@map("image")
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  storeId    Int         @map("store_id")
+  store      Store       @relation("store_order", fields: [storeId], references: [id])
+  isPaid     Boolean     @default(false) @map("is_paid")
+  phone      String      @default("") @db.VarChar(16)
+  address    String      @default("") @db.VarChar(511)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  orderItems OrderItem[]
+
+  @@index([storeId])
+  @@map("order")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String  @map("order_id")
+  Order     Order   @relation(fields: [orderId], references: [id])
+  productId Int     @map("product_id")
+  product   Product @relation("order_item_product", fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_item")
 }
