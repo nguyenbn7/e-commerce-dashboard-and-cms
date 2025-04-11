@@ -40,8 +40,7 @@ const publicRoute = new Hono()
 			if (!billboard)
 				return c.json(
 					{
-						status: 'fail',
-						data: {
+						error: {
 							code: StatusCodes.NOT_FOUND,
 							message: 'Billboard not found'
 						}
@@ -50,10 +49,7 @@ const publicRoute = new Hono()
 				);
 
 			return c.json({
-				status: 'success',
-				data: {
-					billboard
-				}
+				billboard
 			});
 		}
 	);

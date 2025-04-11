@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import 'tailwindcss' source(none);
+
+@source "../src";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@custom-variant hover (&:hover);
+
+@theme {
+	--font-urbanist: 'Urbanist', sans-serif;
+}
+
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+}
+
+@layer base {
+	body {
+		@apply font-urbanist;
+	}
+}
