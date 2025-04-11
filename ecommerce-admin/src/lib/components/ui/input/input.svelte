@@ -33,6 +33,7 @@
 
 	if (type === 'currency') {
 		$effect(() => {
+			// TODO:
 			const numericValue = Number(currency.replace(/\D/g, ''));
 			currency = currencyFormatter.format(numericValue / digits);
 

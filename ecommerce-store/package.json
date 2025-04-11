@@ -37,6 +37,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^0.487.0",
-		"@tanstack/svelte-query": "^5.72.2"
+		"@tanstack/svelte-query": "^5.72.2",
+		"query-string": "^9.1.1"
 	}
 }

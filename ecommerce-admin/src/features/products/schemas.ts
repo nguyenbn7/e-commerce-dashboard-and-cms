@@ -19,5 +19,10 @@ export const productsSearchParamsSchema = z.object({
 	categoryId: z.coerce.number().optional(),
 	colorId: z.coerce.number().optional(),
 	sizeId: z.coerce.number().optional(),
-	isFeatured: z.boolean().optional()
+	isFeatured: z
+		.string()
+		.toLowerCase()
+		.transform((v) => JSON.parse(v))
+		.pipe(z.boolean())
+		.optional()
 });

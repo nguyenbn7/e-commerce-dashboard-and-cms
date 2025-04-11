@@ -1,32 +1,28 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
-	import { Billboard as BillboardComponent } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
 	import { Container } from '$lib/components/ui/container';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { Billboard as BillboardComponent, ProductList } from '$lib/components';
+	import { getBillboardQuery } from '$features/billboards/api';
+	import { getProductsQuery } from '$features/products/api';
 
 	interface PageProps {}
 
 	let {}: PageProps = $props();
 
-	const billboardId = 6;
-
-	const getBillboard = createQuery({
-		queryKey: ['billboards', billboardId],
-		queryFn: async () => {
-			const url = `${PUBLIC_API_URL}/billboards/${billboardId}`;
-
-			const response = await fetch(url);
-
-			return response.json() as Promise<{ billboard: Billboard }>;
-		}
-	});
+	const getBillboard = getBillboardQuery(6);
+	const getProducts = getProductsQuery({ isFeatured: true });
 </script>
 
 <Metadata title="Store" description="Store" />
 
 <Container>
 	<div class="space-y-10 pb-10">
-		<BillboardComponent data={$getBillboard.data?.billboard} />
+		{#if $getBillboard.data?.billboard}
+			<BillboardComponent data={$getBillboard.data?.billboard} />
+		{/if}
+
+		<div class="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
+			<ProductList title="Featured Products" items={$getProducts.data?.products ?? []} />
+		</div>
 	</div>
 </Container>

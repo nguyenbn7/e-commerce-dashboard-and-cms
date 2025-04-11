@@ -1,20 +1,10 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
-	import { createQuery } from '@tanstack/svelte-query';
 	import { Container } from '$lib/components/ui/container';
 	import MainNav from '$lib/components/main-nav.svelte';
 	import NavbarActions from '$lib/components/navbar-actions.svelte';
+	import { getCategoriesQuery } from '$features/categories/api';
 
-	const getCategories = createQuery({
-		queryKey: ['categories'],
-		queryFn: async () => {
-			const url = `${PUBLIC_API_URL}/categories`;
-
-			const response = await fetch(url);
-
-			return response.json() as Promise<{ categories: Category[] }>;
-		}
-	});
+	const getCategories = getCategoriesQuery();
 </script>
 
 <div class="border-b">

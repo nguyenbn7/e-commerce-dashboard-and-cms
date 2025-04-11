@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
@@ -13,11 +12,7 @@
 
 	let { data }: PageProps = $props();
 
-	let getBillboards: undefined | ReturnType<typeof getBillboardsQuery> = $state();
-
-	onMount(() => {
-		getBillboards = getBillboardsQuery({ storeId: data.store.id });
-	});
+	const getBillboards = getBillboardsQuery({ storeId: data.store.id });
 </script>
 
 <Metadata title="Create Category" />
@@ -29,8 +24,8 @@
 <CategoryForm
 	createForm
 	form={data.form}
-	disabled={$getBillboards?.isPending}
-	billboards={$getBillboards?.data?.billboards}
+	disabled={$getBillboards.isPending}
+	billboards={$getBillboards.data?.billboards}
 />
 
 <Separator />
