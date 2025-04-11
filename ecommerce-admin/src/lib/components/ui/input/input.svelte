@@ -29,17 +29,22 @@
 		throw new Error('fractionDigits must greater than 0');
 
 	const digits = Math.pow(10, fractionDigits);
-	let currency = $state(currencyFormatter.format(value / digits));
+	let currency = $state(currencyFormatter.format(Number(value) / digits));
 
 	if (type === 'currency') {
 		$effect(() => {
-			// TODO:
 			const numericValue = Number(currency.replace(/\D/g, ''));
 			currency = currencyFormatter.format(numericValue / digits);
 
 			return () => {
 				value = numericValue;
 			};
+		});
+
+		$effect(() => {
+			if (!Number(value)) {
+				currency = currencyFormatter.format(Number(undefined));
+			}
 		});
 	}
 </script>
