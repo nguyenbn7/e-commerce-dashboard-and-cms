@@ -43,7 +43,7 @@
 
 		$effect(() => {
 			if (!Number(value)) {
-				currency = currencyFormatter.format(Number(undefined));
+				currency = currencyFormatter.format(Number(0));
 			}
 		});
 	}
