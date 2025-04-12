@@ -5,6 +5,9 @@ export async function getCategory(storeId: number, categoryId: number) {
 		where: {
 			id: categoryId,
 			storeId
+		},
+		include: {
+			billboard: true
 		}
 	});
 }
@@ -27,11 +30,7 @@ export async function getCategories(storeId: number) {
 			storeId
 		},
 		include: {
-			billboard: {
-				select: {
-					label: true
-				}
-			}
+			billboard: true
 		},
 		orderBy: {
 			createdAt: 'desc'

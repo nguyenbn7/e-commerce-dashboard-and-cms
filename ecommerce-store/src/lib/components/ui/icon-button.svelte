@@ -9,7 +9,7 @@
 		children: Snippet;
 	}
 
-	let { onclick, class: className, children }: Props = $props();
+	let { onclick, class: className, children, ...restProps }: Props = $props();
 </script>
 
 <button
@@ -18,5 +18,6 @@
 		'rounded-full flex items-center justify-center bg-white border shadow-md p-2 hover:scale-110 transition',
 		className
 	)}
+	{...restProps}
 	>{@render children()}
 </button>
