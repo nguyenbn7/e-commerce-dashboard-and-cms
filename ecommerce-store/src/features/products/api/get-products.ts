@@ -2,9 +2,9 @@ import { PUBLIC_API_URL } from '$env/static/public';
 import queryString from 'query-string';
 
 interface ProductsQuery {
-	categoryId?: number;
-	colorId?: number;
-	sizeId?: number;
+	categoryId?: number | string;
+	colorId?: number | string;
+	sizeId?: number | string;
 	isFeatured?: boolean;
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
@@ -31,13 +31,8 @@ export default async function getProducts(
 	try {
 		const response = await _fetch(url);
 
-		if (!response.ok) {
-			const data = (await response.json()) as ResponseError;
-			throw new Error(data.error.message);
-		}
-
 		return response.json();
 	} catch (error) {
-		throw error;
+		return { products: [] };
 	}
 }

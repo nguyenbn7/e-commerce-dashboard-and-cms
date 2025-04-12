@@ -44,3 +44,7 @@ interface ResponseError {
 		message: string;
 	};
 }
+
+interface HttpError extends Error {
+	status?: number;
+}

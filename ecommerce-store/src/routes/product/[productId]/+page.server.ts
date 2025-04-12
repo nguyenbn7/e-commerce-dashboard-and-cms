@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { PUBLIC_API_URL } from '$env/static/public';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { productIdSchema } from '$features/products/schemas';
 import { getProduct, getProducts } from '$features/products/api';
 
@@ -10,10 +9,16 @@ export const load = (async ({ params, fetch }) => {
 
 	const { productId } = result.data;
 
-	const response = await fetch(`${PUBLIC_API_URL}/products/${productId}`);
-	if (!response.ok) redirect(308, '/');
+	let product: Product;
 
-	const { product } = await getProduct(productId, { fetch });
+	try {
+		const data = await getProduct(productId, { fetch });
+		product = data.product;
+	} catch (e) {
+		const err = e as HttpError;
+		error(err.status ?? 500, { message: err.message });
+	}
+
 	const { products: suggestedProducts } = await getProducts({
 		categoryId: product.category.id,
 		fetch

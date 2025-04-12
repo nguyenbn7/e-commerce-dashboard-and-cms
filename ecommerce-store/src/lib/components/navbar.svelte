@@ -2,9 +2,9 @@
 	import { Container } from '$lib/components/ui/container';
 	import MainNav from '$lib/components/main-nav.svelte';
 	import NavbarActions from '$lib/components/navbar-actions.svelte';
-	import { getCategoriesQuery } from '$features/categories/api';
+	import { createGetCategoriesQuery } from '$features/categories/api/query';
 
-	const getCategories = getCategoriesQuery();
+	const getCategories = createGetCategoriesQuery();
 </script>
 
 <div class="border-b">

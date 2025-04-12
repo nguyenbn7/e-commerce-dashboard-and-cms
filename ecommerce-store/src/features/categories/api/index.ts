@@ -1,1 +1,2 @@
-export { default as getCategoriesQuery } from './get-categories-query';
+export { default as getCategories } from './get-categories';
+export { default as getCategory } from './get-category';

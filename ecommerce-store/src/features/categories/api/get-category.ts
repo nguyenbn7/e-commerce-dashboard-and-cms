@@ -5,12 +5,12 @@ interface Options {
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/products`;
+const URL = `${PUBLIC_API_URL}/categories`;
 
-export default async function getProduct(
-	id: number,
+export default async function getCategory(
+	id: number | string,
 	options: Options = {}
-): Promise<{ product: Product }> {
+): Promise<{ category: Category }> {
 	const { fetch: ssrFetch } = options;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
