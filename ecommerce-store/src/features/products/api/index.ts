@@ -1,1 +1,2 @@
-export { default as getProductsQuery } from './get-products-query';
+export { default as getProducts } from './get-products';
+export { default as getProduct } from './get-product';

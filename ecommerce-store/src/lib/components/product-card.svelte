@@ -11,7 +11,10 @@
 	let { data }: Props = $props();
 </script>
 
-<div class="bg-white group cursor-pointer rounded-xl border p-3 space-y-4">
+<a
+	href={`/product/${data.id}`}
+	class="bg-white group cursor-pointer rounded-xl border p-3 space-y-4"
+>
 	<div class="aspect-square rounded-xl bg-gray-100 relative">
 		<img src={data.images[0].url} alt="Product" class="aspect-square object-cover rounded-md" />
 
@@ -37,4 +40,4 @@
 	<div class="flex items-center justify-between">
 		<Currency value={data.price} />
 	</div>
-</div>
+</a>

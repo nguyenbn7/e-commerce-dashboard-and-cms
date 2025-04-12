@@ -3,14 +3,14 @@
 	import { Container } from '$lib/components/ui/container';
 	import { Billboard as BillboardComponent, ProductList } from '$lib/components';
 	import { getBillboardQuery } from '$features/billboards/api';
-	import { getProductsQuery } from '$features/products/api';
+	import { createGetProductsQuery } from '$features/products/api/query';
 
 	interface PageProps {}
 
 	let {}: PageProps = $props();
 
 	const getBillboard = getBillboardQuery(6);
-	const getProducts = getProductsQuery({ isFeatured: true });
+	const getProducts = createGetProductsQuery({ isFeatured: true });
 </script>
 
 <Metadata title="Store" description="Store" />

@@ -13,11 +13,11 @@ interface Category {
 interface Product {
 	id: number;
 	category: Category;
-	name: String;
+	name: string;
 	price: number;
 	isFeatured: boolean;
 	size: Size;
-	Color: Color;
+	color: Color;
 	images: Image[];
 }
 
@@ -36,4 +36,11 @@ interface Color {
 	id: number;
 	name: string;
 	value: string;
+}
+
+interface ResponseError {
+	error: {
+		code: number;
+		message: string;
+	};
 }
