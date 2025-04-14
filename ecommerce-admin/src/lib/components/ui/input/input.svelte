@@ -30,21 +30,17 @@
 
 	const digits = Math.pow(10, fractionDigits);
 	let currency = $state(currencyFormatter.format(Number(value) / digits));
-
+	
 	if (type === 'currency') {
+		let trackingNumValue = $derived(Number(value));
+
 		$effect(() => {
-			const numericValue = Number(currency.replace(/\D/g, ''));
+			let numericValue = Number(currency.replace(/\D/g, ''));
+			
+			if (!isNaN(trackingNumValue) && numericValue !== trackingNumValue)
+				numericValue = trackingNumValue;
+
 			currency = currencyFormatter.format(numericValue / digits);
-
-			return () => {
-				value = numericValue;
-			};
-		});
-
-		$effect(() => {
-			if (!Number(value)) {
-				currency = currencyFormatter.format(Number(0));
-			}
 		});
 	}
 </script>
@@ -69,7 +65,14 @@
 			className
 		)}
 		type="text"
-		bind:value={currency}
+		bind:value={
+			() => currency,
+			(newValue) => {
+				currency = newValue;
+				const numericValue = Number(currency.replace(/\D/g, ''));
+				value = numericValue;
+			}
+		}
 		{...restProps}
 	/>
 {:else}
