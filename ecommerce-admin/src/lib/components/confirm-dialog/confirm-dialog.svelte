@@ -1,9 +1,14 @@
 <script lang="ts" module>
+	const defaultTitle = 'Are you absolutely sure?';
+	const defaultDescription =
+		'This action cannot be undone. This will permanently delete your data.';
+	const defaultAutoOpen = true;
+
 	let promise: { resolve: (value: boolean) => void } | null = $state(null);
 
-	let autoOpen = $state(false);
-	var titleFromFunction = $state('');
-	var descriptionFromFunction = $state('');
+	let autoOpen = $state(defaultAutoOpen);
+	var titleFromFunction = $state(defaultTitle);
+	var descriptionFromFunction = $state(defaultDescription);
 
 	type Options = {
 		title?: string;
@@ -18,9 +23,9 @@
 			autoOpen: true
 		}
 	) {
-		titleFromFunction = options.title ?? '';
-		descriptionFromFunction = options.description ?? '';
-		autoOpen = options.autoOpen === undefined ? true : options.autoOpen;
+		titleFromFunction = options.title ?? defaultTitle;
+		descriptionFromFunction = options.description ?? defaultDescription;
+		autoOpen = options.autoOpen ?? defaultAutoOpen;
 
 		return new Promise<boolean | null>((resolve, reject) => {
 			promise = { resolve };
@@ -46,7 +51,11 @@
 		description?: string;
 	}
 
-	let { open = $bindable(false), title = '', description = '' }: Props = $props();
+	let {
+		open = $bindable(false),
+		title = defaultTitle,
+		description = defaultDescription
+	}: Props = $props();
 
 	const handleClose = () => {
 		promise = null;
@@ -64,12 +73,8 @@
 		handleClose();
 	};
 
-	let dialogTitle = $derived(titleFromFunction || title || 'Are you absolutely sure?');
-	let dialogDescription = $derived(
-		descriptionFromFunction ||
-			description ||
-			'This action cannot be undone. This will permanently delete your data.'
-	);
+	let dialogTitle = $derived(titleFromFunction || title || defaultTitle);
+	let dialogDescription = $derived(descriptionFromFunction || description || defaultDescription);
 
 	$effect(() => {
 		if (autoOpen && !open) open = true;
