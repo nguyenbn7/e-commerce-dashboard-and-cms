@@ -18,8 +18,8 @@
 
 	export async function confirm(
 		options: Options = {
-			title: '',
-			description: '',
+			title: defaultTitle,
+			description: defaultDescription,
 			autoOpen: true
 		}
 	) {
