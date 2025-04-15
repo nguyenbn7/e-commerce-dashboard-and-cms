@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { confirmFromDialog } from '$lib/components/confirm-dialog';
+	import { confirm } from '$lib/components/confirm-dialog';
 	import Trash from '@lucide/svelte/icons/trash';
 
 	interface Props {
@@ -16,7 +16,7 @@
 	) {
 		$event.preventDefault();
 
-		const ok = await confirmFromDialog();
+		const ok = await confirm();
 
 		if (ok) {
 			return onDelete();

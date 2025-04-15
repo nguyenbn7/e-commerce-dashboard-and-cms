@@ -7,7 +7,7 @@
 		DropdownMenuLabel,
 		DropdownMenuTrigger
 	} from '$lib/components/ui/dropdown-menu';
-	import { confirmFromDialog } from '$lib/components/confirm-dialog';
+	import { confirm } from '$lib/components/confirm-dialog';
 	import Edit from '@lucide/svelte/icons/edit';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Trash from '@lucide/svelte/icons/trash';
@@ -51,7 +51,7 @@
 
 		<DropdownMenuItem
 			onclick={async () => {
-				const ok = await confirmFromDialog();
+				const ok = await confirm();
 
 				if (ok) {
 					onDelete();

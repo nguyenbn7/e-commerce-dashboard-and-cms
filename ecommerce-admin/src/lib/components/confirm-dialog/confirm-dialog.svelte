@@ -11,7 +11,7 @@
 		autoOpen?: boolean;
 	};
 
-	export async function confirmFromDialog(
+	export async function confirm(
 		options: Options = {
 			title: '',
 			description: '',

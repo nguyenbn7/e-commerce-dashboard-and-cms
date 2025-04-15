@@ -48,7 +48,6 @@
 			if (!isNaN(trackingNumValue) && numericValue !== trackingNumValue)
 				numericValue = trackingNumValue;
 
-			value = numericValue;
 			currency = currencyFormatter.format(numericValue / fractionDigits);
 		});
 	}
@@ -74,7 +73,14 @@
 			className
 		)}
 		type="text"
-		bind:value={currency}
+		bind:value={
+			() => currency,
+			(newValue) => {
+				currency = newValue;
+				const numericValue = Number(currency.replace(/\D/g, ''));
+				value = numericValue;
+			}
+		}
 		{...restProps}
 	/>
 {:else}
