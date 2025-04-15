@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 	import type { WithElementRef } from 'bits-ui';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/utils';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'>;
 
@@ -9,8 +9,13 @@
 		Omit<HTMLInputAttributes, 'type'> &
 			({ type: 'file'; files?: FileList } | { type?: InputType; files?: undefined }) &
 			(
-				| { type: 'currency'; currencyFormatter: Intl.NumberFormat; fractionDigits?: number }
-				| { type?: InputType; currencyFormatter?: undefined; fractionDigits?: undefined }
+				| {
+						type: 'currency';
+						fractionDigits?: number;
+						locales?: Intl.LocalesArgument;
+						options?: Intl.NumberFormatOptions;
+				  }
+				| { type?: InputType; locales?: undefined; options?: undefined }
 			)
 	>;
 
@@ -20,27 +25,31 @@
 		type,
 		files = $bindable(),
 		class: className,
-		currencyFormatter = new Intl.NumberFormat(),
-		fractionDigits = 2,
+		locales = 'en-US',
+		options = {
+			style: 'currency',
+			currency: 'USD',
+			maximumFractionDigits: 2,
+			minimumFractionDigits: 2
+		},
 		...restProps
 	}: Props = $props();
 
-	if (fractionDigits < 0 && type === 'currency')
-		throw new Error('fractionDigits must greater than 0');
+	const currencyFormatter = Intl.NumberFormat(locales, options);
+	const fractionDigits = Math.pow(10, options.maximumFractionDigits ?? 2);
+	let currency = $state(currencyFormatter.format(Number(value) / fractionDigits));
 
-	const digits = Math.pow(10, fractionDigits);
-	let currency = $state(currencyFormatter.format(Number(value) / digits));
-	
 	if (type === 'currency') {
 		let trackingNumValue = $derived(Number(value));
 
 		$effect(() => {
 			let numericValue = Number(currency.replace(/\D/g, ''));
-			
+
 			if (!isNaN(trackingNumValue) && numericValue !== trackingNumValue)
 				numericValue = trackingNumValue;
 
-			currency = currencyFormatter.format(numericValue / digits);
+			value = numericValue;
+			currency = currencyFormatter.format(numericValue / fractionDigits);
 		});
 	}
 </script>
@@ -65,14 +74,7 @@
 			className
 		)}
 		type="text"
-		bind:value={
-			() => currency,
-			(newValue) => {
-				currency = newValue;
-				const numericValue = Number(currency.replace(/\D/g, ''));
-				value = numericValue;
-			}
-		}
+		bind:value={currency}
 		{...restProps}
 	/>
 {:else}

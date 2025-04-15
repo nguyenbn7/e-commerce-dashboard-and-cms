@@ -16,10 +16,10 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
 
-	import { currencyFormatter } from '$lib';
-
 	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
+
+	import { locales, options } from '$lib/currency';
 
 	import { ColorDisplay } from '$features/colors/components';
 	import { productFormSchema } from '$features/products/schemas';
@@ -120,7 +120,8 @@
 							{disabled}
 							type="currency"
 							placeholder="9.99"
-							{currencyFormatter}
+							{locales}
+							{options}
 							class="mt-2"
 							bind:value={$formData.price}
 						/>

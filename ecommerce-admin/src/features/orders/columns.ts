@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getOrders } from '$features/orders/server/repository';
-import { currencyFormatter } from '$lib';
+import { formatter as currencyFormatter } from '$lib/currency';
 
 export type OrderColumn = ArrayElement<Awaited<ReturnType<typeof getOrders>>>;
 

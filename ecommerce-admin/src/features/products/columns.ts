@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getProducts } from '$features/products/server/repository';
 import { renderComponent } from '$lib/components/ui/data-table';
-import { currencyFormatter } from '$lib';
+import { formatter as currencyFormatter } from '$lib/currency';
 import { ColorDisplay } from '$features/colors/components';
 import { CellAction } from '$features/products/components';
 
