@@ -37,18 +37,13 @@
 
 	const currencyFormatter = Intl.NumberFormat(locales, options);
 	const fractionDigits = Math.pow(10, options.maximumFractionDigits ?? 2);
+	const valueIsNaN = $derived(isNaN(Number(value)));
 	let currency = $state(currencyFormatter.format(Number(value) / fractionDigits));
 
 	if (type === 'currency') {
-		let trackingNumValue = $derived(Number(value));
-
 		$effect(() => {
-			let numericValue = Number(currency.replace(/\D/g, ''));
-
-			if (!isNaN(trackingNumValue) && numericValue !== trackingNumValue)
-				numericValue = trackingNumValue;
-
-			currency = currencyFormatter.format(numericValue / fractionDigits);
+			if (isNaN(Number(value))) value = 0;
+			currency = currencyFormatter.format(value / fractionDigits);
 		});
 	}
 </script>

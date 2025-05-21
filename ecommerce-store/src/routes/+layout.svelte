@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import { Footer, Navbar } from '$lib/components';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { PreviewModal } from '$lib/components/preview-modal';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -22,6 +23,8 @@
 		}
 	});
 </script>
+
+<PreviewModal />
 
 <QueryClientProvider client={queryClient}>
 	<Navbar />

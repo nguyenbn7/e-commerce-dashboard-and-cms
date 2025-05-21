@@ -1,14 +1,18 @@
 <script lang="ts">
-	import { IconButton } from '$lib/components/ui';
-	import { Currency } from '$lib/components';
 	import Expand from '@lucide/svelte/icons/expand';
 	import ShoppingCart from '@lucide/svelte/icons/shopping-cart';
+
+	import { IconButton } from '$lib/components/ui';
+	import { Currency } from '$lib/components';
+	import { usePreviewModal } from '$lib/components/preview-modal';
 
 	interface Props {
 		data: Product;
 	}
 
-	let { data }: Props = $props();
+	const { data }: Props = $props();
+
+	const previewModal = usePreviewModal();
 </script>
 
 <a
@@ -20,7 +24,13 @@
 
 		<div class="opacity-0 group-hover:opacity-100 transition absolute w-full px-6 bottom-5">
 			<div class="flex gap-x-6 justify-center">
-				<IconButton onclick={() => {}}>
+				<IconButton
+					onclick={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						previewModal.onOpen(data, e.currentTarget);
+					}}
+				>
 					<Expand size={20} class="text-gray-600" />
 				</IconButton>
 

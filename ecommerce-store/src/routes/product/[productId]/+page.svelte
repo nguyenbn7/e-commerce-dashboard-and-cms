@@ -4,7 +4,8 @@
 	import { Metadata } from '$lib/components/metadata';
 	import { Container } from '$lib/components/ui/container';
 	import { Gallery } from '$lib/components/gallery';
-	import { Info, ProductList } from '$lib/components';
+	import { Info } from '$lib/components/info';
+	import { ProductList } from '$lib/components';
 
 	interface Props {
 		data: PageData;

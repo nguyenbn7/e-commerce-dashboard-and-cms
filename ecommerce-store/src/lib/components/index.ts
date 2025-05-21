@@ -4,4 +4,3 @@ export { default as Billboard } from './billboard.svelte';
 export { default as ProductList } from './product-list.svelte';
 export { default as ProductCard } from './product-card.svelte';
 export { default as Currency } from './currency.svelte';
-export { default as Info } from './info.svelte';
