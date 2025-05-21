@@ -7,6 +7,7 @@
 	import { Footer, Navbar } from '$lib/components';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { PreviewModal } from '$lib/components/preview-modal';
+	import { Toaster } from 'svelte-sonner';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -25,6 +26,8 @@
 </script>
 
 <PreviewModal />
+
+<Toaster closeButton position="top-center" />
 
 <QueryClientProvider client={queryClient}>
 	<Navbar />
