@@ -4,6 +4,7 @@
 	import { Currency } from '$lib/components';
 	import { Button } from '$lib/components/ui/button';
 	import useCart from '$lib/hooks/cart';
+	import { toast } from 'svelte-sonner';
 
 	const { items: cartItems, removeAll } = useCart();
 	const searchParams = $derived(page.url.searchParams);
@@ -11,6 +12,21 @@
 	const checkout = checkoutClient({
 		onSuccess(data, variables, context) {
 			window.location = data.url;
+		}
+	});
+
+	$effect(() => {
+		if (searchParams.get('success')) {
+			toast.success('Payment completed.');
+			removeAll();
+			searchParams.delete('success');
+			return;
+		}
+
+		if (searchParams.get('canceled')) {
+			toast.error('Something went wrong.');
+			searchParams.delete('canceled');
+			return;
 		}
 	});
 

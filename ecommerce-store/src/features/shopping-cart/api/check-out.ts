@@ -20,6 +20,9 @@ export default function checkout(options: Options = {}) {
 		mutationFn: async ({ json }) => {
 			const response = await fetch(`${URL}`, {
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify(json)
 			});
 
