@@ -3,6 +3,7 @@
 	import { UserButton } from 'svelte-clerk';
 	import MainNav from './main-nav.svelte';
 	import { StoreSwitcher } from '$features/stores/components';
+	import { ThemeToggle } from './button';
 
 	interface Props {
 		handleClickCreateButton: () => void;
@@ -19,6 +20,7 @@
 		<MainNav class="mx-6" />
 
 		<div class="ml-auto flex items-center space-x-4">
+			<ThemeToggle />
 			<UserButton afterSignOutUrl="/" />
 		</div>
 	</div>

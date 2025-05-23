@@ -46,5 +46,5 @@
 		</div>
 	</div>
 
-	<Button class="w-full mt-6" onclick={onCheckout}>Checkout</Button>
+	<Button class="w-full mt-6" onclick={onCheckout} disabled{$cartItems.length === 0}>Checkout</Button>
 </div>

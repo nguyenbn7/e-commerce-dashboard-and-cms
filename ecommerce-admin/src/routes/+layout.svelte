@@ -12,6 +12,7 @@
 
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { ConfirmDialog } from '$lib/components/confirm-dialog';
+	import { ModeWatcher } from 'mode-watcher';
 
 	interface LayoutProps {
 		data: LayoutData;
@@ -29,7 +30,9 @@
 	});
 </script>
 
-<Toaster richColors position="top-right" closeButton theme="light" />
+<ModeWatcher />
+
+<Toaster richColors position="top-right" closeButton />
 
 <ConfirmDialog title="Are you sure?" description="This action cannot be undone." />
 
