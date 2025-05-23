@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { Store } from '$features/stores/api/get-stores-query';
-	import { UserButton } from 'svelte-clerk';
+	import Loader from '@lucide/svelte/icons/loader';
+	import { ThemeToggle } from './button';
+	import { ClerkLoaded, ClerkLoading, UserButton } from 'svelte-clerk';
 	import MainNav from './main-nav.svelte';
 	import { StoreSwitcher } from '$features/stores/components';
-	import { ThemeToggle } from './button';
 
 	interface Props {
 		handleClickCreateButton: () => void;
@@ -21,7 +22,14 @@
 
 		<div class="ml-auto flex items-center space-x-4">
 			<ThemeToggle />
-			<UserButton afterSignOutUrl="/" />
+
+			<ClerkLoading>
+				<Loader size={16} class="animate-spin" />
+			</ClerkLoading>
+
+			<ClerkLoaded>
+				<UserButton afterSignOutUrl="/" />
+			</ClerkLoaded>
 		</div>
 	</div>
 </div>

@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
+	import Loader from '@lucide/svelte/icons/loader-circle';
+
 	import { Metadata } from '$lib/components/metadata';
 
-	import { SignUp } from 'svelte-clerk';
+	import { ClerkLoaded, ClerkLoading, SignUp } from 'svelte-clerk';
 
 	import { dark } from '@clerk/themes';
 	import { mode } from 'mode-watcher';
@@ -13,4 +15,10 @@
 
 <Metadata title="Sign Up" />
 
-<SignUp appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }} />
+<ClerkLoading>
+	<Loader size={16} class="size-28 animate-spin ml-1" />
+</ClerkLoading>
+
+<ClerkLoaded>
+	<SignUp appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }} />
+</ClerkLoaded>

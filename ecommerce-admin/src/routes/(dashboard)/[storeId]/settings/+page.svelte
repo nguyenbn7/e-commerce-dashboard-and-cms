@@ -24,6 +24,7 @@
 	<Heading title="Settings" description="Manage store preferences" />
 
 	<DeleteButton
+		disabled={$deleteMutation.isPending}
 		onDelete={() => {
 			$deleteMutation.mutate({ param: { storeId: data.store.id.toString() } });
 		}}

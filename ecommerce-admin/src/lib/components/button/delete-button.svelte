@@ -5,9 +5,10 @@
 
 	interface Props {
 		onDelete: () => void;
+		disabled?: boolean | null | undefined;
 	}
 
-	let { onDelete }: Props = $props();
+	let { onDelete, disabled = undefined }: Props = $props();
 
 	async function onClick(
 		$event:
@@ -24,6 +25,6 @@
 	}
 </script>
 
-<Button variant="destructive" size="sm" onclick={onClick}>
+<Button variant="destructive" size="sm" onclick={onClick} {disabled}>
 	<Trash size={16} />
 </Button>

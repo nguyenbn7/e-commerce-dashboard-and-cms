@@ -1,6 +1,6 @@
 import type { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'svelte-sonner';
-import { createMutation } from '@tanstack/svelte-query';
+import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 import { client } from '$lib/rpc';
 
 type Response = InferResponseType<(typeof client.api.stores)[':storeId']['$delete']>;
@@ -17,6 +17,8 @@ export default function deleteStoreMutation(
 ) {
 	const { onSuccess, onError } = options;
 
+	const queryClient = useQueryClient();
+
 	const mutation = createMutation<Response, Error, Request>({
 		mutationFn: async ({ param }) => {
 			const response = await client.api.stores[':storeId'].$delete({ param });
@@ -29,12 +31,17 @@ export default function deleteStoreMutation(
 
 			return response.json();
 		},
-		onSuccess(data, variables, context) {
+		async onSuccess(data, variables, context) {
 			toast.success('Store deleted');
+			await queryClient.invalidateQueries({ queryKey: ['stores'] });
+
+			window.location.reload();
+
 			return onSuccess?.(data, variables, context);
 		},
 		onError(error, variables, context) {
 			toast.error('Make sure you removed all billboards, categories, sizes, colors and products');
+
 			return onError?.(error, variables, context);
 		}
 	});

@@ -1,53 +1,95 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import type { EmailCodeFactor } from '@clerk/types';
 
-	import { PUBLIC_DEMO_ACCOUNT, PUBLIC_DEMO_ACCOUNT_CODE } from '$env/static/public';
+	import Loader from '@lucide/svelte/icons/loader-circle';
+
+	import {
+		PUBLIC_DEMO_ACCOUNT_EMAIL,
+		PUBLIC_DEMO_ACCOUNT_CODE,
+		PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL
+	} from '$env/static/public';
 
 	import { Metadata } from '$lib/components/metadata';
 
-	import { SignIn, useClerkContext } from 'svelte-clerk';
-	import { page } from '$app/state';
-	import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
+	import { ClerkLoaded, ClerkLoading, SignIn } from 'svelte-clerk';
+	import { useClerkContext } from 'svelte-clerk/client';
 
 	import { dark } from '@clerk/themes';
 	import { mode } from 'mode-watcher';
+	import { Button } from '$lib/components/ui/button';
+	import { page } from '$app/state';
 
 	const { data }: { data: PageData } = $props();
 
-	let demoAccountOTP: string | undefined = $state();
+	const ctx = useClerkContext();
 
-	$effect(() => {
-		const { hash } = page.url;
-		let oneTimeCode: string | undefined = hash;
+	const signIn = $derived(ctx.client?.signIn);
 
-		if (demoAccountOTP && !oneTimeCode) {
-			demoAccountOTP = undefined;
+	const clerk = $derived(ctx.clerk);
+
+	const userId = $derived(ctx.auth.userId);
+
+	let disabledSignInAsDemoUser = $state(false);
+
+	async function signInAsDemoUser() {
+		if (!signIn) return;
+
+		disabledSignInAsDemoUser = true;
+
+		const signInResp = await signIn.create({ identifier: PUBLIC_DEMO_ACCOUNT_EMAIL });
+
+		if (!signInResp.supportedFirstFactors) {
+			disabledSignInAsDemoUser = false;
 			return;
 		}
 
-		if (PUBLIC_DEMO_ACCOUNT && oneTimeCode === '#/factor-one') {
-			const clerkContext = useClerkContext();
+		const { emailAddressId } = signInResp.supportedFirstFactors.find(
+			(ff) => ff.strategy === 'email_code' && ff.safeIdentifier === PUBLIC_DEMO_ACCOUNT_EMAIL
+		)! as EmailCodeFactor;
 
-			if (clerkContext.client?.signIn.identifier === PUBLIC_DEMO_ACCOUNT) {
-				demoAccountOTP = PUBLIC_DEMO_ACCOUNT_CODE;
-			}
+		await signIn.prepareFirstFactor({
+			strategy: 'email_code',
+			emailAddressId: emailAddressId
+		});
 
-			oneTimeCode = undefined;
+		const attemptResponse = await signIn.attemptFirstFactor({
+			strategy: 'email_code',
+			code: PUBLIC_DEMO_ACCOUNT_CODE
+		});
 
+		if (attemptResponse.status === 'complete') {
+			await clerk?.setActive({ session: signIn.createdSessionId });
+
+			window.location.href = PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL;
 			return;
 		}
-	});
+
+		disabledSignInAsDemoUser = false;
+	}
 </script>
 
 <Metadata title="Sign In" />
 
-{#if demoAccountOTP}
-	<Alert variant="success" class="fixed top-0 left-0 w-full">
-		<AlertTitle>Verification code: {demoAccountOTP}</AlertTitle>
-	</Alert>
-{/if}
+<ClerkLoading>
+	<Loader size={16} class="size-28 animate-spin ml-1" />
+</ClerkLoading>
 
-<SignIn
-	initialValues={{ emailAddress: PUBLIC_DEMO_ACCOUNT }}
-	appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }}
-/>
+<ClerkLoaded>
+	<div class="flex flex-col">
+		<SignIn appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }} />
+
+		{#if !userId}
+			<Button
+				variant="link"
+				class="mt-3 hover:cursor-pointer"
+				onclick={signInAsDemoUser}
+				disabled={disabledSignInAsDemoUser}
+				hidden={!!page.url.hash}
+				>Sign in as Demo User {#if disabledSignInAsDemoUser}
+					<Loader size={16} class="animate-spin" />
+				{/if}</Button
+			>
+		{/if}
+	</div>
+</ClerkLoaded>
