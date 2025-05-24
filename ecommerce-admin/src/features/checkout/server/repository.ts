@@ -13,13 +13,13 @@ export async function createOrder(
 
 	return prisma.order.create({
 		data: {
-			storeId: Number(storeId),
+			storeId,
 			isPaid: false,
 			orderItems: {
 				create: productIds.map((id) => ({
 					product: {
 						connect: {
-							id: Number(id)
+							id
 						}
 					}
 				}))

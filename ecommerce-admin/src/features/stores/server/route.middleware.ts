@@ -24,7 +24,7 @@ interface StoreIdParam extends Input {
 	};
 	out: {
 		param: {
-			storeId: number;
+			storeId: string;
 		};
 	};
 }

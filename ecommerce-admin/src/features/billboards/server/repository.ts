@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getBillboard(storeId: number, billboardId: number) {
+export async function getBillboard(storeId: string, billboardId: string) {
 	return prisma.billboard.findUnique({
 		where: {
 			id: billboardId,
@@ -9,7 +9,7 @@ export async function getBillboard(storeId: number, billboardId: number) {
 	});
 }
 
-export async function createBillboard(storeId: number, data: { label: string; imageUrl: string }) {
+export async function createBillboard(storeId: string, data: { label: string; imageUrl: string }) {
 	const { label, imageUrl } = data;
 
 	return prisma.billboard.create({
@@ -21,7 +21,7 @@ export async function createBillboard(storeId: number, data: { label: string; im
 	});
 }
 
-export async function getBillboards(storeId: number) {
+export async function getBillboards(storeId: string) {
 	return prisma.billboard.findMany({
 		where: {
 			storeId
@@ -33,8 +33,8 @@ export async function getBillboards(storeId: number) {
 }
 
 export async function updateBillboard(
-	storeId: number,
-	billboardId: number,
+	storeId: string,
+	billboardId: string,
 	data: { label: string; imageUrl: string }
 ) {
 	const { label, imageUrl } = data;
@@ -51,7 +51,7 @@ export async function updateBillboard(
 	});
 }
 
-export async function deleteBillboard(storeId: number, billboardId: number) {
+export async function deleteBillboard(storeId: string, billboardId: string) {
 	return prisma.billboard.delete({
 		where: {
 			id: billboardId,

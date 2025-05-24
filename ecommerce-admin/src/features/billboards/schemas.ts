@@ -6,5 +6,5 @@ export const billboardFormSchema = z.object({
 });
 
 export const billboardIdSchema = z.object({
-	billboardId: z.coerce.number()
+	billboardId: z.string().min(1, 'Required')
 });

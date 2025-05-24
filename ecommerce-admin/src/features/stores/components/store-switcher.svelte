@@ -37,7 +37,7 @@
 	let open = $state(false);
 
 	let currentStore = $derived(
-		storeOptions.find((items) => items.value === Number(page.params.storeId))
+		storeOptions.find((items) => items.value === page.params.storeId)
 	);
 
 	const onStoreSelect = async (store: ArrayElement<typeof storeOptions>) => {

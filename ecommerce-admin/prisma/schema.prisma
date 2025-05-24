@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Store {
-  id         Int         @id @default(autoincrement())
+  id         String      @id @default(uuid())
   name       String      @db.VarChar(255)
   userId     String      @map("user_id") @db.VarChar(255)
   createdAt  DateTime    @default(now()) @map("created_at")
@@ -31,12 +31,12 @@ model Store {
 }
 
 model Billboard {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(uuid())
   label     String     @db.VarChar(255)
   imageUrl  String     @db.VarChar(255)
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
-  storeId   Int        @map("store_id")
+  storeId   String     @map("store_id")
   store     Store      @relation("store_billboard", fields: [storeId], references: [id])
   Category  Category[] @relation("category_billboard")
 
@@ -45,10 +45,10 @@ model Billboard {
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  storeId     Int       @map("store_id")
+  id          String    @id @default(uuid())
+  storeId     String    @map("store_id")
   store       Store     @relation("store_category", fields: [storeId], references: [id])
-  billboardId Int       @map("billboard_id")
+  billboardId String    @map("billboard_id")
   billboard   Billboard @relation("category_billboard", fields: [billboardId], references: [id])
   name        String    @db.VarChar(255)
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -61,8 +61,8 @@ model Category {
 }
 
 model Size {
-  id        Int       @id @default(autoincrement())
-  storeId   Int       @map("store_id")
+  id        String    @id @default(uuid())
+  storeId   String    @map("store_id")
   store     Store     @relation("store_size", fields: [storeId], references: [id])
   name      String    @db.VarChar(255)
   value     String    @db.VarChar(255)
@@ -75,8 +75,8 @@ model Size {
 }
 
 model Color {
-  id        Int       @id @default(autoincrement())
-  storeId   Int       @map("store_id")
+  id        String    @id @default(uuid())
+  storeId   String    @map("store_id")
   store     Store     @relation("store_color", fields: [storeId], references: [id])
   name      String    @db.VarChar(255)
   value     String    @db.VarChar(255)
@@ -89,18 +89,18 @@ model Color {
 }
 
 model Product {
-  id         Int         @id @default(autoincrement())
-  storeId    Int         @map("store_id")
+  id         String      @id @default(uuid())
+  storeId    String      @map("store_id")
   store      Store       @relation("store_product", fields: [storeId], references: [id])
-  categoryId Int         @map("category_id")
+  categoryId String      @map("category_id")
   category   Category    @relation("category_product", fields: [categoryId], references: [id])
   name       String      @db.VarChar(255)
   price      Int
   isFeatured Boolean     @default(false) @map("is_featured")
   isArchived Boolean     @default(false) @map("is_archived")
-  sizeId     Int         @map("size_id")
+  sizeId     String      @map("size_id")
   size       Size        @relation("size_product", fields: [sizeId], references: [id])
-  colorId    Int         @map("color_id")
+  colorId    String      @map("color_id")
   color      Color       @relation("color_product", fields: [colorId], references: [id])
   images     Image[]
   OrderItem  OrderItem[] @relation("order_item_product")
@@ -117,7 +117,7 @@ model Product {
 model Image {
   id        String   @id @default(uuid())
   url       String   @db.VarChar(255)
-  productId Int      @map("product_id")
+  productId String   @map("product_id")
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -128,7 +128,7 @@ model Image {
 
 model Order {
   id         String      @id @default(uuid())
-  storeId    Int         @map("store_id")
+  storeId    String      @map("store_id")
   store      Store       @relation("store_order", fields: [storeId], references: [id])
   isPaid     Boolean     @default(false) @map("is_paid")
   phone      String      @default("") @db.VarChar(16)
@@ -145,7 +145,7 @@ model OrderItem {
   id        String  @id @default(uuid())
   orderId   String  @map("order_id")
   Order     Order   @relation(fields: [orderId], references: [id])
-  productId Int     @map("product_id")
+  productId String  @map("product_id")
   product   Product @relation("order_item_product", fields: [productId], references: [id])
 
   @@index([orderId])

@@ -80,15 +80,7 @@
 					{#snippet children({ props })}
 						<FormLabel>Billboard</FormLabel>
 
-						<Select
-							type="single"
-							{disabled}
-							name={props.name}
-							bind:value={
-								() => ($formData.billboardId <= 0 ? '' : $formData.billboardId.toString()),
-								(newValue) => ($formData.billboardId = Number(newValue))
-							}
-						>
+						<Select type="single" {disabled} name={props.name} bind:value={$formData.billboardId}>
 							<SelectTrigger {...props} class="mt-2">
 								{billboards.find((b) => b.id === $formData.billboardId)?.label ?? ''}
 							</SelectTrigger>

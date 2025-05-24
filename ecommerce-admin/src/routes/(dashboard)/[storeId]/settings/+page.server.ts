@@ -27,7 +27,7 @@ export const actions = {
 
 		const { name } = form.data;
 
-		await updateStore(userId, Number(params.storeId), { name });
+		await updateStore(userId, params.storeId, { name });
 
 		return { form };
 	}

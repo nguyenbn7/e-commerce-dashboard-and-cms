@@ -11,7 +11,7 @@
 
 	interface Props {
 		open?: boolean;
-		onSuccess?: (storeId: number) => MaybePromise<unknown | void>;
+		onSuccess?: (storeId: string) => MaybePromise<unknown | void>;
 	}
 
 	let { open = $bindable(false), onSuccess }: Props = $props();

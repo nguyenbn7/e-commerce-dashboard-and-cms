@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getSize(storeId: number, sizeId: number) {
+export async function getSize(storeId: string, sizeId: string) {
 	return prisma.size.findUnique({
 		where: {
 			id: sizeId,
@@ -9,7 +9,7 @@ export async function getSize(storeId: number, sizeId: number) {
 	});
 }
 
-export async function createSize(storeId: number, data: { name: string; value: string }) {
+export async function createSize(storeId: string, data: { name: string; value: string }) {
 	const { name, value } = data;
 
 	return prisma.size.create({
@@ -21,7 +21,7 @@ export async function createSize(storeId: number, data: { name: string; value: s
 	});
 }
 
-export async function getSizes(storeId: number) {
+export async function getSizes(storeId: string) {
 	return prisma.size.findMany({
 		where: {
 			storeId
@@ -33,8 +33,8 @@ export async function getSizes(storeId: number) {
 }
 
 export async function updateSize(
-	storeId: number,
-	sizeId: number,
+	storeId: string,
+	sizeId: string,
 	data: { name: string; value: string }
 ) {
 	const { name, value } = data;
@@ -51,7 +51,7 @@ export async function updateSize(
 	});
 }
 
-export async function deleteSize(storeId: number, sizeId: number) {
+export async function deleteSize(storeId: string, sizeId: string) {
 	return prisma.size.delete({
 		where: {
 			id: sizeId,
@@ -60,7 +60,7 @@ export async function deleteSize(storeId: number, sizeId: number) {
 	});
 }
 
-export async function getSizesSelection(storeId: number) {
+export async function getSizesSelection(storeId: string) {
 	return prisma.size.findMany({
 		where: {
 			storeId

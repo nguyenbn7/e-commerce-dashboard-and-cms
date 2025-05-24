@@ -25,7 +25,7 @@ export async function getFirstStore(userId: string) {
 	});
 }
 
-export async function findStoreById(userId: string, storeId: number) {
+export async function findStoreById(userId: string, storeId: string) {
 	return prisma.store.findFirst({
 		where: {
 			id: storeId,
@@ -34,7 +34,7 @@ export async function findStoreById(userId: string, storeId: number) {
 	});
 }
 
-export async function updateStore(userId: string, storeId: number, data: { name: string }) {
+export async function updateStore(userId: string, storeId: string, data: { name: string }) {
 	return prisma.store.update({
 		where: {
 			id: storeId,
@@ -46,7 +46,7 @@ export async function updateStore(userId: string, storeId: number, data: { name:
 	});
 }
 
-export async function deleteStore(userId: string, storeId: number) {
+export async function deleteStore(userId: string, storeId: string) {
 	return prisma.store.delete({
 		where: {
 			id: storeId,
@@ -55,7 +55,7 @@ export async function deleteStore(userId: string, storeId: number) {
 	});
 }
 
-export async function findStoreByUserIdAndStoreId(userId: string, storeId: number) {
+export async function findStoreByUserIdAndStoreId(userId: string, storeId: string) {
 	return prisma.store.findFirst({
 		where: {
 			id: storeId,
@@ -64,7 +64,7 @@ export async function findStoreByUserIdAndStoreId(userId: string, storeId: numbe
 	});
 }
 
-export async function getStore(id: number) {
+export async function getStore(id: string) {
 	return prisma.store.findUnique({
 		where: {
 			id

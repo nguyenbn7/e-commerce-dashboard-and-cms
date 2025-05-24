@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getCategory(storeId: number, categoryId: number) {
+export async function getCategory(storeId: string, categoryId: string) {
 	return prisma.category.findUnique({
 		where: {
 			id: categoryId,
@@ -12,7 +12,7 @@ export async function getCategory(storeId: number, categoryId: number) {
 	});
 }
 
-export async function createCategory(storeId: number, data: { name: string; billboardId: number }) {
+export async function createCategory(storeId: string, data: { name: string; billboardId: string }) {
 	const { name, billboardId } = data;
 
 	return prisma.category.create({
@@ -24,7 +24,7 @@ export async function createCategory(storeId: number, data: { name: string; bill
 	});
 }
 
-export async function getCategories(storeId: number) {
+export async function getCategories(storeId: string) {
 	return prisma.category.findMany({
 		where: {
 			storeId
@@ -39,9 +39,9 @@ export async function getCategories(storeId: number) {
 }
 
 export async function updateCategory(
-	storeId: number,
-	categoryId: number,
-	data: { name: string; billboardId: number }
+	storeId: string,
+	categoryId: string,
+	data: { name: string; billboardId: string }
 ) {
 	const { name, billboardId } = data;
 
@@ -57,7 +57,7 @@ export async function updateCategory(
 	});
 }
 
-export async function deleteCategory(storeId: number, categoryId: number) {
+export async function deleteCategory(storeId: string, categoryId: string) {
 	return prisma.category.delete({
 		where: {
 			id: categoryId,
@@ -66,7 +66,7 @@ export async function deleteCategory(storeId: number, categoryId: number) {
 	});
 }
 
-export async function getCategoriesSelection(storeId: number) {
+export async function getCategoriesSelection(storeId: string) {
 	return prisma.category.findMany({
 		where: {
 			storeId

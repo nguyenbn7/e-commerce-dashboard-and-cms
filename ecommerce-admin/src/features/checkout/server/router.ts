@@ -24,7 +24,7 @@ const app = new Hono()
 		const { storeId } = c.req.valid('param');
 		const { productIds } = c.req.valid('json');
 
-		const products = await getProducts(productIds.map((v) => Number(v), productIds));
+		const products = await getProducts(productIds.map((v) => v, productIds));
 
 		const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 

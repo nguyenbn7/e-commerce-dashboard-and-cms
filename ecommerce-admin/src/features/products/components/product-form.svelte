@@ -29,9 +29,9 @@
 		createForm?: boolean;
 		initData?: Awaited<ReturnType<typeof getProduct>>;
 		onSubmit: (values: z.infer<typeof productFormSchema>) => void;
-		categories: { id: number; name: string }[];
-		sizes: { id: number; name: string }[];
-		colors: { id: number; name: string; value: string }[];
+		categories: { id: string; name: string }[];
+		sizes: { id: string; name: string }[];
+		colors: { id: string; name: string; value: string }[];
 	}
 
 	let {
@@ -136,15 +136,7 @@
 					{#snippet children({ props })}
 						<FormLabel>Category</FormLabel>
 
-						<Select
-							type="single"
-							{disabled}
-							name={props.name}
-							bind:value={
-								() => ($formData.categoryId <= 0 ? '' : $formData.categoryId.toString()),
-								(newValue) => ($formData.categoryId = Number(newValue))
-							}
-						>
+						<Select type="single" {disabled} name={props.name} bind:value={$formData.categoryId}>
 							<SelectTrigger {...props} class="mt-2">
 								{categories.find((c) => c.id === $formData.categoryId)?.name ?? 'Select a category'}
 							</SelectTrigger>
@@ -168,15 +160,7 @@
 					{#snippet children({ props })}
 						<FormLabel>Size</FormLabel>
 
-						<Select
-							type="single"
-							{disabled}
-							name={props.name}
-							bind:value={
-								() => ($formData.sizeId <= 0 ? '' : $formData.sizeId.toString()),
-								(newValue) => ($formData.sizeId = Number(newValue))
-							}
-						>
+						<Select type="single" {disabled} name={props.name} bind:value={$formData.sizeId}>
 							<SelectTrigger {...props} class="mt-2">
 								{sizes.find((s) => s.id === $formData.sizeId)?.name ?? 'Select a size'}
 							</SelectTrigger>
@@ -200,15 +184,7 @@
 					{#snippet children({ props })}
 						<FormLabel>Color</FormLabel>
 
-						<Select
-							type="single"
-							{disabled}
-							name={props.name}
-							bind:value={
-								() => ($formData.colorId <= 0 ? '' : $formData.colorId.toString()),
-								(newValue) => ($formData.colorId = Number(newValue))
-							}
-						>
+						<Select type="single" {disabled} name={props.name} bind:value={$formData.colorId}>
 							<SelectTrigger {...props} class="mt-2">
 								{selectedColor?.name ?? 'Select a color'}
 								{#if selectedColor}

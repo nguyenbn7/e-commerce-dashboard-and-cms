@@ -1,12 +1,12 @@
-import prisma from '$lib/server/prisma';
 import type { PageServerLoad } from './$types';
+import prisma from '$lib/server/prisma';
 
 export const load = (async ({ params }) => {
 	const { storeId } = params;
 
 	const paidOrders = await prisma.order.findMany({
 		where: {
-			storeId: Number(storeId),
+			storeId,
 			isPaid: true
 		},
 		include: {
@@ -28,14 +28,14 @@ export const load = (async ({ params }) => {
 
 	const salesCount = await prisma.order.count({
 		where: {
-			storeId: Number(storeId),
+			storeId,
 			isPaid: true
 		}
 	});
 
 	const stockCount = await prisma.product.count({
 		where: {
-			storeId: Number(storeId),
+			storeId,
 			isArchived: false
 		}
 	});

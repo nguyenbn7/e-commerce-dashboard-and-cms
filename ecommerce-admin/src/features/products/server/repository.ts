@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getProduct(storeId: number, productId: number) {
+export async function getProduct(storeId: string, productId: string) {
 	return prisma.product.findUnique({
 		where: {
 			id: productId,
@@ -16,13 +16,13 @@ export async function getProduct(storeId: number, productId: number) {
 }
 
 export async function createProduct(
-	storeId: number,
+	storeId: string,
 	data: {
 		name: string;
 		price: number;
-		categoryId: number;
-		colorId: number;
-		sizeId: number;
+		categoryId: string;
+		colorId: string;
+		sizeId: string;
 		images: {
 			url: string;
 		}[];
@@ -52,11 +52,11 @@ export async function createProduct(
 }
 
 export async function getProducts(
-	storeId: number,
-	categoryId?: number,
+	storeId: string,
+	categoryId?: string,
 	isFeatured?: boolean,
-	colorId?: number,
-	sizeId?: number
+	colorId?: string,
+	sizeId?: string
 ) {
 	return prisma.product.findMany({
 		where: {
@@ -80,14 +80,14 @@ export async function getProducts(
 }
 
 export async function updateProduct(
-	storeId: number,
-	productId: number,
+	storeId: string,
+	productId: string,
 	data: {
 		name: string;
 		price: number;
-		categoryId: number;
-		colorId: number;
-		sizeId: number;
+		categoryId: string;
+		colorId: string;
+		sizeId: string;
 		images: {
 			url: string;
 		}[];
@@ -137,7 +137,7 @@ export async function updateProduct(
 	});
 }
 
-export async function deleteProduct(storeId: number, productId: number) {
+export async function deleteProduct(storeId: string, productId: string) {
 	return prisma.product.delete({
 		where: {
 			id: productId,

@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 
-export async function getColor(storeId: number, colorId: number) {
+export async function getColor(storeId: string, colorId: string) {
 	return prisma.color.findUnique({
 		where: {
 			id: colorId,
@@ -9,7 +9,7 @@ export async function getColor(storeId: number, colorId: number) {
 	});
 }
 
-export async function createColor(storeId: number, data: { name: string; value: string }) {
+export async function createColor(storeId: string, data: { name: string; value: string }) {
 	const { name, value } = data;
 
 	return prisma.color.create({
@@ -21,7 +21,7 @@ export async function createColor(storeId: number, data: { name: string; value: 
 	});
 }
 
-export async function getColors(storeId: number) {
+export async function getColors(storeId: string) {
 	return prisma.color.findMany({
 		where: {
 			storeId
@@ -33,8 +33,8 @@ export async function getColors(storeId: number) {
 }
 
 export async function updateColor(
-	storeId: number,
-	colorId: number,
+	storeId: string,
+	colorId: string,
 	data: { name: string; value: string }
 ) {
 	const { name, value } = data;
@@ -51,7 +51,7 @@ export async function updateColor(
 	});
 }
 
-export async function deleteColor(storeId: number, colorId: number) {
+export async function deleteColor(storeId: string, colorId: string) {
 	return prisma.color.delete({
 		where: {
 			id: colorId,
@@ -60,7 +60,7 @@ export async function deleteColor(storeId: number, colorId: number) {
 	});
 }
 
-export async function getColorsSelection(storeId: number) {
+export async function getColorsSelection(storeId: string) {
 	return prisma.color.findMany({
 		where: {
 			storeId

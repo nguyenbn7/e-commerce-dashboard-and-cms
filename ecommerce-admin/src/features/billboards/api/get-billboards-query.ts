@@ -8,7 +8,7 @@ type Response = InferResponseType<
 >;
 type ResponseError = { error: { code: number; message: string } };
 
-export default function getBillboardsQuery(param: { storeId: number }) {
+export default function getBillboardsQuery(param: { storeId: string }) {
 	const { storeId } = param;
 
 	const queryClient = createQuery({
@@ -16,7 +16,7 @@ export default function getBillboardsQuery(param: { storeId: number }) {
 		queryFn: async () => {
 			const response = await client.api.stores[':storeId']['billboards']['$get']({
 				param: {
-					storeId: storeId.toString()
+					storeId
 				}
 			});
 

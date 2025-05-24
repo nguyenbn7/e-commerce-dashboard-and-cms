@@ -8,5 +8,5 @@ export const colorFormSchema = z.object({
 });
 
 export const colorIdSchema = z.object({
-	colorId: z.coerce.number()
+	colorId: z.string().min(1, 'Required')
 });
