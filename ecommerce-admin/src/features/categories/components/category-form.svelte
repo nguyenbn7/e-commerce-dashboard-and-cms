@@ -1,15 +1,19 @@
 <script lang="ts">
-	import type { Billboard } from '$features/billboards/api';
+	import type { Billboard } from '$features/billboards/api/get-billboards';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { z } from 'zod';
-	import { toast } from 'svelte-sonner';
+
+	import { categoryFormSchema } from '$features/categories/schema';
+
+	import { Form } from '$lib/components/form';
+
 	import { Input } from '$lib/components/ui/input';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+
+	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Form } from '$lib/components/form';
-	import { categoryFormSchema } from '$features/categories/schemas';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof categoryFormSchema>, any>;

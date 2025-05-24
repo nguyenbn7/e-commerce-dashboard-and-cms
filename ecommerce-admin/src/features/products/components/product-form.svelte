@@ -22,7 +22,7 @@
 	import { locales, options } from '$lib/currency';
 
 	import { ColorDisplay } from '$features/colors/components';
-	import { productFormSchema } from '$features/products/schemas';
+	import { productFormSchema } from '$features/products/schema';
 
 	interface Props {
 		disabled?: boolean;

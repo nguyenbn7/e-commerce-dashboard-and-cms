@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { ColorColumn } from '$features/colors/columns';
-	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
+
+	import { deleteColor as deleteColorApi } from '$features/colors/api/delete-color';
+
 	import { CellAction } from '$lib/components/data-table';
-	import { deleteColorMutation } from '$features/colors/api';
+
+	import { toast } from 'svelte-sonner';
+
+	import { page } from '$app/state';
 
 	interface Props {
 		data: ColorColumn;
@@ -11,7 +15,7 @@
 
 	let { data }: Props = $props();
 
-	const deleteClient = deleteColorMutation({
+	const deleteColorClient = deleteColorApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -21,14 +25,14 @@
 <CellAction
 	updateHref={`/${page.params.storeId}/colors/${data.id}`}
 	onCopy={async () => {
-		await navigator.clipboard.writeText(data.id.toString());
+		await navigator.clipboard.writeText(data.id);
 		toast.success('Color Id copied to the clipboard');
 	}}
 	onDelete={() => {
-		$deleteClient.mutate({
+		$deleteColorClient.mutate({
 			param: {
-				storeId: page.params.storeId,
-				colorId: data.id.toString()
+				id: data.id,
+				storeId: page.params.storeId
 			}
 		});
 	}}

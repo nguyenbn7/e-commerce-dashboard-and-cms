@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
-	import { Metadata } from '$lib/components/metadata';
-	import { DeleteButton } from '$lib/components/button';
-	import { ProductForm } from '$features/products/components';
+
 	import { deleteProductMutation, updateProductMutation } from '$features/products/api';
+	import { ProductForm } from '$features/products/components';
+
+	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
+	import { DeleteButton } from '$lib/components/button';
+
+	import { Separator } from '$lib/components/ui/separator';
 
 	interface PageProps {
 		data: PageData;
@@ -62,8 +65,8 @@
 		onDelete={() => {
 			$deleteMutation.mutate({
 				param: {
-					storeId: data.store.id.toString(),
-					productId: data.product.id.toString()
+					id: data.store.id,
+					productId: data.product.id
 				}
 			});
 		}}
@@ -81,8 +84,8 @@
 	onSubmit={(values) => {
 		$updateMutation.mutate({
 			param: {
-				storeId: data.store.id.toString(),
-				productId: data.product.id.toString()
+				id: data.store.id,
+				productId: data.product.id
 			},
 			json: values
 		});

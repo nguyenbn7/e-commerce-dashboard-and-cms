@@ -6,16 +6,16 @@
 
 	import XIcon from '@lucide/svelte/icons/x';
 
-	import { browser } from '$app/environment';
+	import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 
-	import { ClerkProvider } from 'svelte-clerk';
-
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { ConfirmDialog } from '$lib/components/confirm-dialog';
 
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { ConfirmDialog } from '$lib/components/confirm-dialog';
+
+	import { ClerkProvider } from 'svelte-clerk';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { browser } from '$app/environment';
 	import { ModeWatcher } from 'mode-watcher';
-	import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 
 	interface LayoutProps {
 		data: LayoutData;

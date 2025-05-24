@@ -7,7 +7,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Form } from '$lib/components/form';
-	import { sizeFormSchema } from '$features/sizes/schemas';
+	import { sizeFormSchema } from '$features/sizes/schema';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof sizeFormSchema>, any>;

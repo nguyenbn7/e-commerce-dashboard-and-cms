@@ -5,7 +5,7 @@ export const setupSchema = z.object({
 });
 
 export const storeIdSchema = z.object({
-	id: z.string().trim().min(1, 'id contains spaces or empty')
+	id: z.string().trim()
 });
 
 export const settingsFormSchema = z.object({

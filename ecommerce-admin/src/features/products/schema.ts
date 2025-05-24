@@ -12,7 +12,11 @@ export const productFormSchema = z.object({
 });
 
 export const productIdSchema = z.object({
-	productId: z.string()
+	id: z.string().trim()
+});
+
+export const storeIdSchema = z.object({
+	storeId: z.string().trim()
 });
 
 export const productsSearchParamsSchema = z.object({

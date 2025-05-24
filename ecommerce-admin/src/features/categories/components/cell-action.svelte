@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { CategoryColumn } from '$features/categories/columns';
-	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
-	import { deleteCategoryMutation } from '$features/categories/api';
+
+	import { deleteCategory as deleteCategoryApi } from '$features/categories/api/delete-category';
+
 	import { CellAction } from '$lib/components/data-table';
+
+	import { toast } from 'svelte-sonner';
+
+	import { page } from '$app/state';
 
 	interface Props {
 		data: CategoryColumn;
@@ -11,7 +15,7 @@
 
 	let { data }: Props = $props();
 
-	const deleteClient = deleteCategoryMutation({
+	const deleteCategoryClient = deleteCategoryApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -21,14 +25,14 @@
 <CellAction
 	updateHref={`/${page.params.storeId}/categories/${data.id}`}
 	onCopy={async () => {
-		await navigator.clipboard.writeText(data.id.toString());
+		await navigator.clipboard.writeText(data.id);
 		toast.success('Category Id copied to the clipboard');
 	}}
 	onDelete={() => {
-		$deleteClient.mutate({
+		$deleteCategoryClient.mutate({
 			param: {
-				storeId: page.params.storeId,
-				categoryId: data.id.toString()
+				id: data.id,
+				storeId: page.params.storeId
 			}
 		});
 	}}

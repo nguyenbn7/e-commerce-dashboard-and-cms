@@ -1,8 +1,13 @@
 <script lang="ts">
-	import type { Store } from '$features/stores/api';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import type { Store } from '$features/stores/api/get-stores';
+
+	import Check from '@lucide/svelte/icons/check';
+	import StoreIcon from '@lucide/svelte/icons/store';
+	import PlusCircle from '@lucide/svelte/icons/plus-circle';
+	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
+
 	import { cn } from '$lib/utils';
+
 	import { Button } from '$lib/components/ui/button';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
 	import {
@@ -14,10 +19,9 @@
 		CommandList,
 		CommandSeparator
 	} from '$lib/components/ui/command';
-	import Check from '@lucide/svelte/icons/check';
-	import StoreIcon from '@lucide/svelte/icons/store';
-	import PlusCircle from '@lucide/svelte/icons/plus-circle';
-	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
+
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		class?: string | null;
@@ -36,9 +40,7 @@
 
 	let open = $state(false);
 
-	let currentStore = $derived(
-		storeOptions.find((items) => items.value === page.params.storeId)
-	);
+	let currentStore = $derived(storeOptions.find((items) => items.value === page.params.storeId));
 
 	const onStoreSelect = async (store: ArrayElement<typeof storeOptions>) => {
 		open = false;

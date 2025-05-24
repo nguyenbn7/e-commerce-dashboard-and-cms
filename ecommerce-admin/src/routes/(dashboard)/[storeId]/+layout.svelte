@@ -2,32 +2,38 @@
 	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 
-	import { goto } from '$app/navigation';
-	import { Navbar } from '$lib/components';
-	import { getStoresQuery } from '$features/stores/api';
+	import { getStores as getStoresApi } from '$features/stores/api/get-stores';
 	import { StoreModal } from '$features/stores/components';
+
+	import { Navbar } from '$lib/components';
+
+	import { goto } from '$app/navigation';
 
 	interface LayoutProps {
 		data: LayoutData;
 		children: Snippet;
 	}
 
-	let { data, children }: LayoutProps = $props();
+	const { data, children }: LayoutProps = $props();
 
 	let open = $state(false);
 
-	const getStores = getStoresQuery();
+	// TODO: get data from server
+	const getStoresClient = getStoresApi();
 </script>
 
 <StoreModal
 	bind:open
 	onSuccess={async (storeId) => {
 		await goto(`/${storeId}`, { invalidateAll: true });
-		$getStores.refetch();
+		$getStoresClient.refetch();
 	}}
 />
 
-<Navbar handleClickCreateButton={() => (open = true)} stores={$getStores.data?.stores ?? []} />
+<Navbar
+	handleClickCreateButton={() => (open = true)}
+	stores={$getStoresClient.data?.stores ?? []}
+/>
 
 <div class="flex-col">
 	<div class="flex-1 space-y-4 p-8 pt-6">

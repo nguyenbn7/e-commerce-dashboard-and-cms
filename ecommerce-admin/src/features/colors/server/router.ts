@@ -1,42 +1,38 @@
-import { CLERK_SECRET_KEY } from '$env/static/private';
-import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
-
-import { StatusCodes } from 'http-status-codes';
-
-import { Hono } from 'hono';
-import { clerkMiddleware } from '@hono/clerk-auth';
-import { zValidator } from '@hono/zod-validator';
-
-import { clerkMiddlewareAuthenticated } from '$lib/server/api/middleware';
-
-import { storeIdSchema } from '$features/stores/schema';
-import { checkStoreBelongsToUser } from '$features/stores/server/api/middleware';
-
-import { colorIdSchema } from '$features/colors/schemas';
+import { colorIdSchema, storeIdSchema } from '$features/colors/schema';
 import { deleteColor, getColor, getColors } from '$features/colors/server/repository';
 
-const publicRoute = new Hono()
+import {
+	clerkMiddleware,
+	clerkMiddlewareAuthenticated,
+	storeCreatedByUserValidator
+} from '$lib/server/router.middleware';
+
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
+
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+
+const publicRoutes = new Hono()
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 
-		const colors = await getColors(storeId);
+		const colors = await getColors({ storeId });
 
 		return c.json({
 			colors
 		});
 	})
-	.get('/:colorId', zValidator('param', storeIdSchema.extend(colorIdSchema.shape)), async (c) => {
-		const { storeId, colorId } = c.req.valid('param');
+	.get('/:id', zValidator('param', storeIdSchema.extend(colorIdSchema.shape)), async (c) => {
+		const { storeId, id } = c.req.valid('param');
 
-		const color = await getColor(storeId, colorId);
+		const color = await getColor({ id, storeId });
 
 		if (!color)
 			return c.json(
 				{
-					error: {
-						code: StatusCodes.NOT_FOUND,
-						message: 'Color not found'
-					}
+					title: ReasonPhrases.NOT_FOUND,
+					status: StatusCodes.NOT_FOUND,
+					detail: `Color not found`
 				},
 				StatusCodes.NOT_FOUND
 			);
@@ -46,35 +42,29 @@ const publicRoute = new Hono()
 		});
 	});
 
-const app = publicRoute
-	.use(
-		clerkMiddleware({
-			secretKey: CLERK_SECRET_KEY,
-			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
-		})
-	)
+const app = publicRoutes
+	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
 	.delete(
-		'/:colorId',
+		'/:id',
 		zValidator('param', storeIdSchema.extend(colorIdSchema.shape)),
-		checkStoreBelongsToUser(),
+		storeCreatedByUserValidator(),
 		async (c) => {
-			const { storeId, colorId } = c.req.valid('param');
+			const { storeId, id } = c.req.valid('param');
 
-			const color = await getColor(storeId, colorId);
+			const color = await getColor({ id, storeId });
 
 			if (!color)
 				return c.json(
 					{
-						error: {
-							code: StatusCodes.NOT_FOUND,
-							message: 'Color not found'
-						}
+						title: ReasonPhrases.NOT_FOUND,
+						status: StatusCodes.NOT_FOUND,
+						detail: `Color not found`
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			const deletedColor = await deleteColor(storeId, colorId);
+			const deletedColor = await deleteColor({ id, storeId });
 
 			return c.json({
 				color: deletedColor

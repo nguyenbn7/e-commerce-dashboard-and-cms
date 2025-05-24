@@ -1,16 +1,34 @@
 import prisma from '$lib/server/prisma';
 
-export async function getColor(storeId: string, colorId: string) {
+interface Params {
+	id: string;
+	storeId: string;
+}
+
+interface Data {
+	name: string;
+	value: string;
+}
+
+interface InsertData extends Data {
+	storeId: string;
+}
+
+type StoreIdParam = Omit<Params, 'id'>;
+
+export async function getColor(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.color.findUnique({
 		where: {
-			id: colorId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function createColor(storeId: string, data: { name: string; value: string }) {
-	const { name, value } = data;
+export async function createColor(data: InsertData) {
+	const { name, value, storeId } = data;
 
 	return prisma.color.create({
 		data: {
@@ -21,7 +39,9 @@ export async function createColor(storeId: string, data: { name: string; value: 
 	});
 }
 
-export async function getColors(storeId: string) {
+export async function getColors(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.color.findMany({
 		where: {
 			storeId
@@ -32,16 +52,13 @@ export async function getColors(storeId: string) {
 	});
 }
 
-export async function updateColor(
-	storeId: string,
-	colorId: string,
-	data: { name: string; value: string }
-) {
+export async function updateColor(params: Params, data: Data) {
+	const { id, storeId } = params;
 	const { name, value } = data;
 
 	return prisma.color.update({
 		where: {
-			id: colorId,
+			id,
 			storeId
 		},
 		data: {
@@ -51,16 +68,20 @@ export async function updateColor(
 	});
 }
 
-export async function deleteColor(storeId: string, colorId: string) {
+export async function deleteColor(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.color.delete({
 		where: {
-			id: colorId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function getColorsSelection(storeId: string) {
+export async function getColorsSelection(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.color.findMany({
 		where: {
 			storeId

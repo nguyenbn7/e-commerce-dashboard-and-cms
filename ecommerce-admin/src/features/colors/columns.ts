@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getColors } from '$features/colors/server/repository';
-import { renderComponent } from '$lib/components/ui/data-table';
+
 import { CellAction, ColorDisplay } from '$features/colors/components';
+
+import { renderComponent } from '$lib/components/ui/data-table';
 
 export type ColorColumn = ArrayElement<Awaited<ReturnType<typeof getColors>>>;
 

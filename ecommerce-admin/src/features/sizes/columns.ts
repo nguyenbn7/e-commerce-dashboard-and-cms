@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getSizes } from '$features/sizes/server/repository';
-import { renderComponent } from '$lib/components/ui/data-table';
+
 import { CellAction } from '$features/sizes/components';
+
+import { renderComponent } from '$lib/components/ui/data-table';
 
 export type SizeColumn = ArrayElement<Awaited<ReturnType<typeof getSizes>>>;
 

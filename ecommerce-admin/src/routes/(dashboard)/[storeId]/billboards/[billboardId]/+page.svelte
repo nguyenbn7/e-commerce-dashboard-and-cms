@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
-	import { Metadata } from '$lib/components/metadata';
-	import { DeleteButton } from '$lib/components/button';
+
+	import { deleteBillboard as deleteBillboardApi } from '$features/billboards/api/delete-billboard';
 	import { BillboardForm } from '$features/billboards/components';
-	import { deleteBillboardMutation } from '$features/billboards/api';
+
+	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
+	import { DeleteButton } from '$lib/components/button';
+
+	import { Separator } from '$lib/components/ui/separator';
 
 	interface PageProps {
 		data: PageData;
@@ -13,7 +16,7 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteMutation = deleteBillboardMutation({
+	const deleteBillboardClient = deleteBillboardApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -27,10 +30,10 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({
+			$deleteBillboardClient.mutate({
 				param: {
-					storeId: data.store.id.toString(),
-					billboardId: data.billboard.id.toString()
+					id: data.billboard.id,
+					storeId: data.store.id
 				}
 			});
 		}}
@@ -39,6 +42,6 @@
 
 <Separator />
 
-<BillboardForm form={data.form} disabled={$deleteMutation.isPending} />
+<BillboardForm form={data.form} disabled={$deleteBillboardClient.isPending} />
 
 <Separator />

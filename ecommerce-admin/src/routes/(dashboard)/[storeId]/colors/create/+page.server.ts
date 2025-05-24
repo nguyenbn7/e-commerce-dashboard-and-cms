@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { storeIdSchema } from '$features/stores/schema';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
-import { colorFormSchema } from '$features/colors/schemas';
+import { colorFormSchema } from '$features/colors/schema';
 import { createColor } from '$features/colors/server/repository';
 
 export const load = (async ({ parent }) => {

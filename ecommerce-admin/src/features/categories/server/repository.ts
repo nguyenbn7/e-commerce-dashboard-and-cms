@@ -1,9 +1,27 @@
 import prisma from '$lib/server/prisma';
 
-export async function getCategory(storeId: string, categoryId: string) {
+interface Params {
+	id: string;
+	storeId: string;
+}
+
+interface Data {
+	name: string;
+	billboardId: string;
+}
+
+interface InsertData extends Data {
+	storeId: string;
+}
+
+type StoreIdParam = Omit<Params, 'id'>;
+
+export async function getCategory(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.category.findUnique({
 		where: {
-			id: categoryId,
+			id,
 			storeId
 		},
 		include: {
@@ -12,8 +30,8 @@ export async function getCategory(storeId: string, categoryId: string) {
 	});
 }
 
-export async function createCategory(storeId: string, data: { name: string; billboardId: string }) {
-	const { name, billboardId } = data;
+export async function createCategory(data: InsertData) {
+	const { name, billboardId, storeId } = data;
 
 	return prisma.category.create({
 		data: {
@@ -24,7 +42,9 @@ export async function createCategory(storeId: string, data: { name: string; bill
 	});
 }
 
-export async function getCategories(storeId: string) {
+export async function getCategories(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.category.findMany({
 		where: {
 			storeId
@@ -38,16 +58,13 @@ export async function getCategories(storeId: string) {
 	});
 }
 
-export async function updateCategory(
-	storeId: string,
-	categoryId: string,
-	data: { name: string; billboardId: string }
-) {
+export async function updateCategory(params: Params, data: Data) {
+	const { id, storeId } = params;
 	const { name, billboardId } = data;
 
 	return prisma.category.update({
 		where: {
-			id: categoryId,
+			id,
 			storeId
 		},
 		data: {
@@ -57,16 +74,20 @@ export async function updateCategory(
 	});
 }
 
-export async function deleteCategory(storeId: string, categoryId: string) {
+export async function deleteCategory(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.category.delete({
 		where: {
-			id: categoryId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function getCategoriesSelection(storeId: string) {
+export async function getCategoriesSelection(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.category.findMany({
 		where: {
 			storeId

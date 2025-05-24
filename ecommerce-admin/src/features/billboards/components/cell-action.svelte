@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { BillboardColumn } from '$features/billboards/columns';
-	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
+
+	import { deleteBillboard as deleteBillboardApi } from '$features/billboards/api/delete-billboard';
+
 	import { CellAction } from '$lib/components/data-table';
-	import { deleteBillboardMutation } from '$features/billboards/api';
+
+	import { toast } from 'svelte-sonner';
+
+	import { page } from '$app/state';
 
 	interface Props {
 		data: BillboardColumn;
@@ -11,7 +15,7 @@
 
 	let { data }: Props = $props();
 
-	const deleteClient = deleteBillboardMutation({
+	const deleteBillboardClient = deleteBillboardApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -21,14 +25,14 @@
 <CellAction
 	updateHref={`/${page.params.storeId}/billboards/${data.id}`}
 	onCopy={async () => {
-		await navigator.clipboard.writeText(data.id.toString());
+		await navigator.clipboard.writeText(data.id);
 		toast.success('Billboard Id copied to the clipboard');
 	}}
 	onDelete={() => {
-		$deleteClient.mutate({
+		$deleteBillboardClient.mutate({
 			param: {
-				storeId: page.params.storeId,
-				billboardId: data.id.toString()
+				id: data.id,
+				storeId: page.params.storeId
 			}
 		});
 	}}

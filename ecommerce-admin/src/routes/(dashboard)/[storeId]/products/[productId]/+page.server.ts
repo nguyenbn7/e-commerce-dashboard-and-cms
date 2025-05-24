@@ -9,7 +9,7 @@ import { getSizesSelection } from '$features/sizes/server/repository';
 import { getCategoriesSelection } from '$features/categories/server/repository';
 import { getColorsSelection } from '$features/colors/server/repository';
 
-import { productFormSchema, productIdSchema } from '$features/products/schemas';
+import { productFormSchema, productIdSchema } from '$features/products/schema';
 import { getProduct } from '$features/products/server/repository';
 
 export const load = (async ({ parent, params }) => {

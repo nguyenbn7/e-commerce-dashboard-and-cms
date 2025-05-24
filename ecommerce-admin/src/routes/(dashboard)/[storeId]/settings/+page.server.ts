@@ -1,9 +1,12 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+
+import { updateStore } from '$features/stores/server/repository';
+import { settingsFormSchema } from '$features/stores/schema';
+
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { settingsFormSchema } from '$features/stores/schema';
-import { updateStore } from '$features/stores/server/repository';
+
+import { fail, redirect } from '@sveltejs/kit';
 
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
@@ -27,7 +30,7 @@ export const actions = {
 
 		const { name } = form.data;
 
-		await updateStore(userId, params.storeId, { name });
+		await updateStore({ userId, id: params.storeId }, { name });
 
 		return { form };
 	}

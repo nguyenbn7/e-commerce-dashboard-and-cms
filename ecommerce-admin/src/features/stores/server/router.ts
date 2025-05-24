@@ -1,18 +1,15 @@
-import { CLERK_SECRET_KEY } from '$env/static/private';
-import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
-
 import { setupSchema, storeIdSchema } from '$features/stores/schema';
-import { validateUserHaveRightWithStore } from '$features/stores/server/api/middleware';
+import { storeCreatedByUserValidator } from '$features/stores/server/router.middleware';
 import { createStore, deleteStore, getStore, getStores } from '$features/stores/server/repository';
-import { clerkMiddlewareAuthenticated } from '$features/stores/server/api/internal/middleware';
+
+import { clerkMiddleware, clerkMiddlewareAuthenticated } from '$lib/server/router.middleware';
 
 import { Hono } from 'hono';
-import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
 
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
-const publicRoute = new Hono().get('/:id', zValidator('param', storeIdSchema), async (c) => {
+const publicRoutes = new Hono().get('/:id', zValidator('param', storeIdSchema), async (c) => {
 	const { id } = c.req.valid('param');
 
 	const store = await getStore({ id });
@@ -32,13 +29,8 @@ const publicRoute = new Hono().get('/:id', zValidator('param', storeIdSchema), a
 	});
 });
 
-const app = publicRoute
-	.use(
-		clerkMiddleware({
-			secretKey: CLERK_SECRET_KEY,
-			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
-		})
-	)
+const app = publicRoutes
+	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
 	.get('/', async (c) => {
 		const userId = c.get('userId');
@@ -60,20 +52,15 @@ const app = publicRoute
 			store
 		});
 	})
-	.delete(
-		'/:id',
-		zValidator('param', storeIdSchema),
-		validateUserHaveRightWithStore(),
-		async (c) => {
-			const { id } = c.req.valid('param');
-			const { userId } = c.var;
+	.delete('/:id', zValidator('param', storeIdSchema), storeCreatedByUserValidator(), async (c) => {
+		const { id } = c.req.valid('param');
+		const { userId } = c.var;
 
-			const deletedStore = await deleteStore({ id, userId });
+		const deletedStore = await deleteStore({ id, userId });
 
-			return c.json({
-				store: deletedStore
-			});
-		}
-	);
+		return c.json({
+			store: deletedStore
+		});
+	});
 
 export default app;

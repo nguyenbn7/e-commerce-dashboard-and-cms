@@ -10,6 +10,10 @@ interface Data {
 	imageUrl: string;
 }
 
+interface InsertData extends Data {
+	storeId: string;
+}
+
 type StoreIdParam = Omit<Params, 'id'>;
 
 export async function getBillboard(params: Params) {
@@ -23,9 +27,8 @@ export async function getBillboard(params: Params) {
 	});
 }
 
-export async function createBillboard(params: StoreIdParam, data: Data) {
-	const { storeId } = params;
-	const { label, imageUrl } = data;
+export async function createBillboard(data: InsertData) {
+	const { label, imageUrl, storeId } = data;
 
 	return prisma.billboard.create({
 		data: {

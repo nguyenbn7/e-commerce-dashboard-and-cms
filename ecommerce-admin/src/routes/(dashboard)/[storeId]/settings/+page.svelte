@@ -1,21 +1,25 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { page } from '$app/state';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
+
+	import { deleteStore as deleteStoreApi } from '$features/stores/api/delete-store';
+	import { SettingsForm } from '$features/stores/components';
+
 	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
 	import { DeleteButton } from '$lib/components/button';
 	import { ApiAlert } from '$lib/components/api';
-	import { SettingsForm } from '$features/stores/components';
-	import { deleteStoreMutation } from '$features/stores/api';
+
+	import { Separator } from '$lib/components/ui/separator';
+
+	import { page } from '$app/state';
 
 	interface PageProps {
 		data: PageData;
 	}
 
-	let { data }: PageProps = $props();
+	const { data }: PageProps = $props();
 
-	const deleteMutation = deleteStoreMutation();
+	const deleteStoreClient = deleteStoreApi();
 </script>
 
 <Metadata title="Settings" />
@@ -24,9 +28,9 @@
 	<Heading title="Settings" description="Manage store preferences" />
 
 	<DeleteButton
-		disabled={$deleteMutation.isPending}
+		disabled={$deleteStoreClient.isPending}
 		onDelete={() => {
-			$deleteMutation.mutate({ param: { storeId: data.store.id.toString() } });
+			$deleteStoreClient.mutate({ param: { id: data.store.id } });
 		}}
 	/>
 </div>
@@ -35,7 +39,7 @@
 
 <SettingsForm
 	form={data.form}
-	disabled={$deleteMutation.isPending}
+	disabled={$deleteStoreClient.isPending}
 	onSuccess={() => {
 		window.location.reload();
 	}}

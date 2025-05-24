@@ -3,19 +3,20 @@ import {
 	getBillboard,
 	getBillboards
 } from '$features/billboards/server/repository';
+import { billboardIdSchema, storeIdSchema } from '$features/billboards/schema';
+
 import {
 	clerkMiddleware,
 	clerkMiddlewareAuthenticated,
-	validateUserHaveRightWithStore
-} from '$features/billboards/server/api/internal/middleware';
-import { billboardIdSchema, storeIdSchema } from '$features/billboards/schema';
-
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+	storeCreatedByUserValidator
+} from '$lib/server/router.middleware';
 
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 
-const publicRoute = new Hono()
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+
+const publicRoutes = new Hono()
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 
@@ -35,7 +36,7 @@ const publicRoute = new Hono()
 				{
 					title: ReasonPhrases.NOT_FOUND,
 					status: StatusCodes.NOT_FOUND,
-					detail: `Billboard with id "${id}" not found`
+					detail: `Billboard not found`
 				},
 				StatusCodes.NOT_FOUND
 			);
@@ -45,13 +46,13 @@ const publicRoute = new Hono()
 		});
 	});
 
-const app = publicRoute
+const app = publicRoutes
 	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
 	.delete(
 		'/:id',
 		zValidator('param', storeIdSchema.extend(billboardIdSchema.shape)),
-		validateUserHaveRightWithStore(),
+		storeCreatedByUserValidator(),
 		async (c) => {
 			const { storeId, id } = c.req.valid('param');
 
@@ -62,7 +63,7 @@ const app = publicRoute
 					{
 						title: ReasonPhrases.NOT_FOUND,
 						status: StatusCodes.NOT_FOUND,
-						detail: `Billboard with id "${id}" not found`
+						detail: `Billboard not found`
 					},
 					StatusCodes.NOT_FOUND
 				);

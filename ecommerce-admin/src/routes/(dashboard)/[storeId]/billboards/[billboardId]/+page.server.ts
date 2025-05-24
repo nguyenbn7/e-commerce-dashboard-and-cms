@@ -1,28 +1,27 @@
 import type { Actions, PageServerLoad } from './$types';
 
-import { StatusCodes } from 'http-status-codes';
+import { billboardFormSchema, billboardIdSchema, storeIdSchema } from '$features/billboards/schema';
+import { getBillboard, updateBillboard } from '$features/billboards/server/repository';
 
-import { fail, redirect } from '@sveltejs/kit';
+import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { storeIdSchema } from '$features/stores/schema';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { fail, redirect } from '@sveltejs/kit';
 
-import { billboardFormSchema, billboardIdSchema } from '$features/billboards/schema';
-import { getBillboard, updateBillboard } from '$features/billboards/server/repository';
+import { StatusCodes } from 'http-status-codes';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
 	const result = billboardIdSchema.safeParse({ billboardId: params.billboardId });
-	if (!result.success) redirect(307, `/${store.id}/billboards`);
+	if (!result.success) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/billboards`);
 
-	const { billboardId } = result.data;
+	const { id } = result.data;
 
-	const billboard = await getBillboard(store.id, billboardId);
-	if (!billboard) redirect(307, `/${store.id}/billboards`);
+	const billboard = await getBillboard({ id, storeId: store.id });
+	if (!billboard) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/billboards`);
 
 	const form = await superValidate(zod(billboardFormSchema), {
 		defaults: {
@@ -37,27 +36,28 @@ export const load = (async ({ parent, params }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
 		const { userId } = locals.auth();
-		if (!userId) redirect(307, '/sign-in');
+		if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
 		const checkStoreIdResult = storeIdSchema.safeParse({ storeId: params.storeId });
-		if (!checkStoreIdResult.success) redirect(307, '/');
+		if (!checkStoreIdResult.success) redirect(StatusCodes.PERMANENT_REDIRECT, '/');
 
 		const form = await superValidate(request, zod(billboardFormSchema));
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { storeId } = checkStoreIdResult.data;
 
-		const store = await findStoreByUserIdAndStoreId(userId, storeId);
+		const store = await findStoreByUserIdAndStoreId({ userId, id: storeId });
 		if (!store)
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
-		const checkBillboardIdResult = billboardIdSchema.safeParse({ billboardId: params.billboardId });
-		if (!checkBillboardIdResult.success) redirect(308, `/${storeId}/billboards`);
+		const checkBillboardIdResult = billboardIdSchema.safeParse({ id: params.billboardId });
+		if (!checkBillboardIdResult.success)
+			redirect(StatusCodes.PERMANENT_REDIRECT, `/${storeId}/billboards`);
 
-		const { billboardId } = checkBillboardIdResult.data;
+		const { id } = checkBillboardIdResult.data;
 		const { label, imageUrl } = form.data;
 
-		const billboard = await updateBillboard(storeId, billboardId, { label, imageUrl });
+		const billboard = await updateBillboard({ storeId, id }, { label, imageUrl });
 
 		form.data = {
 			label: billboard.label,

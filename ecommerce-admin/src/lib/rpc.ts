@@ -1,4 +1,4 @@
-import type { APIAppType } from './server/api/router';
+import type { APIAppType } from './server/router';
 import { PUBLIC_BASE_API_URL } from '$env/static/public';
 import { hc } from 'hono/client';
 

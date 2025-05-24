@@ -1,14 +1,19 @@
 <script lang="ts">
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { z } from 'zod';
-	import { toast } from 'svelte-sonner';
-	import { Input } from '$lib/components/ui/input';
-	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+
+	import { billboardFormSchema } from '$features/billboards/schema';
+
 	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
-	import { billboardFormSchema } from '$features/billboards/schema';
+
+	import { Input } from '$lib/components/ui/input';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof billboardFormSchema>, any>;

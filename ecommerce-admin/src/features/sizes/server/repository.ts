@@ -1,15 +1,30 @@
 import prisma from '$lib/server/prisma';
 
-export async function getSize(storeId: string, sizeId: string) {
+interface Params {
+	id: string;
+	storeId: string;
+}
+
+interface Data {
+	name: string;
+	value: string;
+}
+
+type StoreIdParam = Omit<Params, 'id'>;
+
+export async function getSize(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.size.findUnique({
 		where: {
-			id: sizeId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function createSize(storeId: string, data: { name: string; value: string }) {
+export async function createSize(params: StoreIdParam, data: Data) {
+	const { storeId } = params;
 	const { name, value } = data;
 
 	return prisma.size.create({
@@ -21,7 +36,9 @@ export async function createSize(storeId: string, data: { name: string; value: s
 	});
 }
 
-export async function getSizes(storeId: string) {
+export async function getSizes(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.size.findMany({
 		where: {
 			storeId
@@ -32,16 +49,13 @@ export async function getSizes(storeId: string) {
 	});
 }
 
-export async function updateSize(
-	storeId: string,
-	sizeId: string,
-	data: { name: string; value: string }
-) {
+export async function updateSize(params: Params, data: Data) {
+	const { id, storeId } = params;
 	const { name, value } = data;
 
 	return prisma.size.update({
 		where: {
-			id: sizeId,
+			id,
 			storeId
 		},
 		data: {
@@ -51,16 +65,20 @@ export async function updateSize(
 	});
 }
 
-export async function deleteSize(storeId: string, sizeId: string) {
+export async function deleteSize(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.size.delete({
 		where: {
-			id: sizeId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function getSizesSelection(storeId: string) {
+export async function getSizesSelection(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.size.findMany({
 		where: {
 			storeId

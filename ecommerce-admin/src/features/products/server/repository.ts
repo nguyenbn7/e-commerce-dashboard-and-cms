@@ -1,9 +1,33 @@
 import prisma from '$lib/server/prisma';
 
-export async function getProduct(storeId: string, productId: string) {
+interface Params {
+	id: string;
+	storeId: string;
+}
+
+interface Data {
+	name: string;
+	price: number;
+	categoryId: string;
+	colorId: string;
+	sizeId: string;
+	images: {
+		url: string;
+	}[];
+	isFeatured?: boolean;
+	isArchived?: boolean;
+}
+
+interface InsertData extends Data {
+	storeId: string;
+}
+
+export async function getProduct(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.product.findUnique({
 		where: {
-			id: productId,
+			id,
 			storeId
 		},
 		include: {
@@ -15,22 +39,9 @@ export async function getProduct(storeId: string, productId: string) {
 	});
 }
 
-export async function createProduct(
-	storeId: string,
-	data: {
-		name: string;
-		price: number;
-		categoryId: string;
-		colorId: string;
-		sizeId: string;
-		images: {
-			url: string;
-		}[];
-		isFeatured?: boolean;
-		isArchived?: boolean;
-	}
-) {
-	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = data;
+export async function createProduct(data: InsertData) {
+	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived, storeId } =
+		data;
 
 	return prisma.product.create({
 		data: {
@@ -51,13 +62,15 @@ export async function createProduct(
 	});
 }
 
-export async function getProducts(
-	storeId: string,
-	categoryId?: string,
-	isFeatured?: boolean,
-	colorId?: string,
-	sizeId?: string
-) {
+export async function getProducts(params: {
+	storeId: string;
+	categoryId?: string;
+	isFeatured?: boolean;
+	colorId?: string;
+	sizeId?: string;
+}) {
+	const { storeId, categoryId, isFeatured, colorId, sizeId } = params;
+
 	return prisma.product.findMany({
 		where: {
 			storeId,
@@ -79,27 +92,13 @@ export async function getProducts(
 	});
 }
 
-export async function updateProduct(
-	storeId: string,
-	productId: string,
-	data: {
-		name: string;
-		price: number;
-		categoryId: string;
-		colorId: string;
-		sizeId: string;
-		images: {
-			url: string;
-		}[];
-		isFeatured?: boolean;
-		isArchived?: boolean;
-	}
-) {
+export async function updateProduct(params: Params, data: Data) {
+	const { id, storeId } = params;
 	const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = data;
 
 	await prisma.product.update({
 		where: {
-			id: productId,
+			id,
 			storeId
 		},
 		data: {
@@ -118,7 +117,7 @@ export async function updateProduct(
 
 	return prisma.product.update({
 		where: {
-			id: productId,
+			id,
 			storeId
 		},
 		include: {
@@ -137,10 +136,12 @@ export async function updateProduct(
 	});
 }
 
-export async function deleteProduct(storeId: string, productId: string) {
+export async function deleteProduct(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.product.delete({
 		where: {
-			id: productId,
+			id,
 			storeId
 		}
 	});

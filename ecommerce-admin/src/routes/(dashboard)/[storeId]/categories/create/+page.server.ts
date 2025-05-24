@@ -9,7 +9,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { storeIdSchema } from '$features/stores/schema';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
-import { categoryFormSchema } from '$features/categories/schemas';
+import { categoryFormSchema } from '$features/categories/schema';
 import { createCategory } from '$features/categories/server/repository';
 
 export const load = (async ({ parent }) => {

@@ -1,13 +1,17 @@
 <script lang="ts">
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { z } from 'zod';
-	import { toast } from 'svelte-sonner';
+
+	import { colorFormSchema } from '$features/colors/schema';
+
+	import { Form } from '$lib/components/form';
+
 	import { Input } from '$lib/components/ui/input';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+
+	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Form } from '$lib/components/form';
-	import { colorFormSchema } from '$features/colors/schemas';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof colorFormSchema>, any>;

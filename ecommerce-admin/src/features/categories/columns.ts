@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getCategories } from '$features/categories/server/repository';
-import { renderComponent } from '$lib/components/ui/data-table';
+
 import { CellAction } from '$features/categories/components';
+
+import { renderComponent } from '$lib/components/ui/data-table';
 
 export type CategoryColumn = ArrayElement<Awaited<ReturnType<typeof getCategories>>>;
 

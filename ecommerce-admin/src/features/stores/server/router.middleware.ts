@@ -1,6 +1,6 @@
 import type { Input } from 'hono';
 import type { MiddlewareHandler } from 'hono';
-import type { AuthenticatedClerkEnv } from '$features/stores/server/api/internal/middleware';
+import type { AuthenticatedClerkEnv } from '$lib/server/router.middleware';
 
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
@@ -9,22 +9,22 @@ import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 interface StoreIdParam extends Input {
 	in: {
 		param: {
-			storeId: string;
+			id: string;
 		};
 	};
 	out: {
 		param: {
-			storeId: string;
+			id: string;
 		};
 	};
 }
 
-export const validateUserHaveRightWithStore =
+export const storeCreatedByUserValidator =
 	(): MiddlewareHandler<AuthenticatedClerkEnv, string, StoreIdParam> => async (c, next) => {
-		const { storeId } = c.req.valid('param');
+		const { id } = c.req.valid('param');
 		const { userId } = c.var;
 
-		const store = await findStoreByUserIdAndStoreId({ id: storeId, userId });
+		const store = await findStoreByUserIdAndStoreId({ id, userId });
 
 		if (!store)
 			return c.json(

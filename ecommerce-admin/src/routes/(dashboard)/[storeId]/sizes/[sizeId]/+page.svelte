@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
-	import { Metadata } from '$lib/components/metadata';
-	import { DeleteButton } from '$lib/components/button';
+
+	import { deleteSize as deleteSizeApi } from '$features/sizes/api/delete-size';
 	import { SizeForm } from '$features/sizes/components';
-	import { deleteSizeMutation } from '$features/sizes/api';
+
+	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
+	import { DeleteButton } from '$lib/components/button';
+
+	import { Separator } from '$lib/components/ui/separator';
 
 	interface PageProps {
 		data: PageData;
@@ -13,7 +16,7 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteMutation = deleteSizeMutation({
+	const deleteSizeClient = deleteSizeApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -27,10 +30,10 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({
+			$deleteSizeClient.mutate({
 				param: {
-					storeId: data.store.id.toString(),
-					sizeId: data.size.id.toString()
+					id: data.size.id,
+					storeId: data.store.id
 				}
 			});
 		}}
@@ -39,6 +42,6 @@
 
 <Separator />
 
-<SizeForm form={data.form} disabled={$deleteMutation.isPending} />
+<SizeForm form={data.form} disabled={$deleteSizeClient.isPending} />
 
 <Separator />

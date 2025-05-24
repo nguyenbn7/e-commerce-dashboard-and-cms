@@ -1,38 +1,32 @@
 import type { InferRequestType, InferResponseType } from 'hono';
-import { toast } from 'svelte-sonner';
-import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+
 import { client } from '$lib/rpc';
 
-type Response = InferResponseType<(typeof client.api.stores)[':storeId']['$delete']>;
-type Request = InferRequestType<(typeof client.api.stores)[':storeId']['$delete']>;
-type ResponseError = { error: { code: number; message: string } };
+import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+import { toast } from 'svelte-sonner';
 
-type Options = {
+type Response = InferResponseType<(typeof client.api.stores)[':id']['$delete']>;
+type Request = InferRequestType<(typeof client.api.stores)[':id']['$delete']>;
+
+interface Options {
 	onSuccess?: (data: Response, variables: Request, context: unknown) => Promise<unknown> | unknown;
 	onError?: (error: Error, variables: Request, context: unknown) => Promise<unknown> | unknown;
-};
+}
 
-export default function deleteStoreMutation(
-	options: Options = { onSuccess: undefined, onError: undefined }
-) {
+export function deleteStore(options: Options = {}) {
 	const { onSuccess, onError } = options;
 
 	const queryClient = useQueryClient();
 
 	const mutation = createMutation<Response, Error, Request>({
 		mutationFn: async ({ param }) => {
-			const response = await client.api.stores[':storeId'].$delete({ param });
-
-			if (!response.ok) {
-				const { error } = (await response.json()) as unknown as ResponseError;
-
-				throw new Error(error.message);
-			}
+			const response = await client.api.stores[':id'].$delete({ param });
 
 			return response.json();
 		},
 		async onSuccess(data, variables, context) {
 			toast.success('Store deleted');
+			
 			await queryClient.invalidateQueries({ queryKey: ['stores'] });
 
 			window.location.reload();

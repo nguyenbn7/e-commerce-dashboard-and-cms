@@ -1,22 +1,23 @@
 import type { LayoutServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
-import { findStoreById } from '$features/stores/server/repository';
+
 import { storeIdSchema } from '$features/stores/schema';
+import { findStoreById } from '$features/stores/server/repository';
+
+import { redirect } from '@sveltejs/kit';
+
+import { StatusCodes } from 'http-status-codes';
 
 export const load = (async ({ locals, params }) => {
 	const { userId } = locals.auth();
+	if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
-	if (!userId) redirect(307, '/sign-in');
+	const result = storeIdSchema.safeParse({ id: params.storeId });
+	if (!result.success) redirect(StatusCodes.TEMPORARY_REDIRECT, '/');
 
-	const result = storeIdSchema.safeParse({ storeId: params.storeId });
+	const { id } = result.data;
 
-	if (!result.success) redirect(307, '/');
-
-	const { storeId } = result.data;
-
-	const store = await findStoreById(userId, storeId);
-
-	if (!store) redirect(307, '/');
+	const store = await findStoreById({ userId, id });
+	if (!store) redirect(StatusCodes.TEMPORARY_REDIRECT, '/');
 
 	return {
 		store

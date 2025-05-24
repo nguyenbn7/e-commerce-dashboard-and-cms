@@ -9,6 +9,10 @@ interface Params {
 	userId: string;
 }
 
+interface InsertData extends Data {
+	userId: string;
+}
+
 type UserIdParam = Omit<Params, 'id'>;
 type StoreIdParam = Omit<Params, 'userId'>;
 
@@ -22,9 +26,8 @@ export async function getStores(params: UserIdParam) {
 	});
 }
 
-export async function createStore(params: UserIdParam, data: Data) {
-	const { userId } = params;
-	const { name } = data;
+export async function createStore(data: InsertData) {
+	const { name, userId } = data;
 
 	return prisma.store.create({
 		data: {

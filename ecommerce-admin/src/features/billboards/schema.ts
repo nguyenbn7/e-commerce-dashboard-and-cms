@@ -6,9 +6,9 @@ export const billboardFormSchema = z.object({
 });
 
 export const billboardIdSchema = z.object({
-	id: z.string().trim().min(1, 'id contains spaces or empty')
+	id: z.string().trim()
 });
 
 export const storeIdSchema = z.object({
-	storeId: z.string().trim().min(1, 'storeId contains spaces or empty')
+	storeId: z.string().trim()
 });

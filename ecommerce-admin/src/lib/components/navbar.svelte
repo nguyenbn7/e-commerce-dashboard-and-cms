@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Store } from '$features/stores/api/get-stores-query';
+	import type { Store } from '$features/stores/api/get-stores';
 	import Loader from '@lucide/svelte/icons/loader';
 	import { ThemeToggle } from './button';
 	import { ClerkLoaded, ClerkLoading, UserButton } from 'svelte-clerk';

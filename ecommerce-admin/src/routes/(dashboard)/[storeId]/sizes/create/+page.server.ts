@@ -7,7 +7,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { sizeFormSchema } from '$features/sizes/schemas';
+import { sizeFormSchema } from '$features/sizes/schema';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
 import { storeIdSchema } from '$features/stores/schema';

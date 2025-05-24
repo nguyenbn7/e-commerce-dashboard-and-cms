@@ -3,13 +3,15 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import { settingsFormSchema } from '$features/stores/schema';
-	
-	import { toast } from 'svelte-sonner';
+
+	import { Form } from '$lib/components/form';
+
 	import { Input } from '$lib/components/ui/input';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+
+	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Form } from '$lib/components/form';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof settingsFormSchema>, any>;

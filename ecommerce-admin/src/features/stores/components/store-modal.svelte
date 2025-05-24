@@ -1,13 +1,17 @@
 <script lang="ts">
+	import Loader from '@lucide/svelte/icons/loader';
+
+	import { setupSchema } from '$features/stores/schema';
+	import { createStore as createStoreApi } from '$features/stores/api/create-store';
+
+	import { Modal } from '$lib/components/modal';
+	
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
-	import { Modal } from '$lib/components/modal';
-	import { setupSchema } from '$features/stores/schemas';
-	import { createStoreMutation } from '$features/stores/api';
-	import Loader from '@lucide/svelte/icons/loader';
 
 	interface Props {
 		open?: boolean;
@@ -16,7 +20,7 @@
 
 	let { open = $bindable(false), onSuccess }: Props = $props();
 
-	const createMutation = createStoreMutation({
+	const createStoreClient = createStoreApi({
 		onSuccess: async (data) => {
 			const { id } = data.store;
 			await onSuccess?.(id);
@@ -30,7 +34,7 @@
 		validators: zod(setupSchema),
 		onUpdate({ form }) {
 			if (form.valid) {
-				$createMutation.mutate(form.data);
+				$createStoreClient.mutate(form.data);
 			}
 		}
 	});
@@ -53,7 +57,7 @@
 							{...props}
 							class="mt-5"
 							placeholder="E-commerce"
-							disabled={$createMutation.isPending}
+							disabled={$createStoreClient.isPending}
 							bind:value={$formData.name}
 						/>
 					{/snippet}
@@ -67,14 +71,14 @@
 					type="button"
 					variant="outline"
 					onclick={() => (open = false)}
-					disabled={$createMutation.isPending}
+					disabled={$createStoreClient.isPending}
 				>
 					Cancel
 				</Button>
 
-				<Button type="submit" disabled={$createMutation.isPending}>
+				<Button type="submit" disabled={$createStoreClient.isPending}>
 					Continue
-					{#if $createMutation.isPending}
+					{#if $createStoreClient.isPending}
 						<Loader size={16} class="animate-spin ml-1 text-primary-foreground" />
 					{/if}
 				</Button>

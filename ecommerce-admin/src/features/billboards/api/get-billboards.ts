@@ -1,16 +1,13 @@
 import type { InferResponseType } from 'hono';
-import { createQuery } from '@tanstack/svelte-query';
+
 import { client } from '$lib/rpc';
 
-type Response = InferResponseType<
-	(typeof client.api.stores)[':storeId']['billboards']['$get'],
-	200
->;
+import { createQuery } from '@tanstack/svelte-query';
 
-type ResponseError = { error: { code: number; message: string } };
+type Response = InferResponseType<(typeof client.api.stores)[':storeId']['billboards']['$get']>;
 
-export default function getBillboards(param: { storeId: string }) {
-	const { storeId } = param;
+export function getBillboards(params: { storeId: string }) {
+	const { storeId } = params;
 
 	const queryClient = createQuery({
 		queryKey: ['stores', storeId, 'billboards'],
@@ -20,12 +17,6 @@ export default function getBillboards(param: { storeId: string }) {
 					storeId
 				}
 			});
-
-			if (!response.ok) {
-				const { error } = (await response.json()) as unknown as ResponseError;
-
-				throw new Error(error.message);
-			}
 
 			return response.json();
 		}

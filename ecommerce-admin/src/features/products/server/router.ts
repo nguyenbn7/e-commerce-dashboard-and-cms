@@ -1,22 +1,9 @@
-import { CLERK_SECRET_KEY } from '$env/static/private';
-import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
-
-import { StatusCodes } from 'http-status-codes';
-
-import { Hono } from 'hono';
-import { clerkMiddleware } from '@hono/clerk-auth';
-import { zValidator } from '@hono/zod-validator';
-
-import { clerkMiddlewareAuthenticated } from '$lib/server/api/middleware';
-
-import { storeIdSchema } from '$features/stores/schema';
-import { checkStoreBelongsToUser } from '$features/stores/server/api/middleware';
-
 import {
 	productFormSchema,
 	productIdSchema,
-	productsSearchParamsSchema
-} from '$features/products/schemas';
+	productsSearchParamsSchema,
+	storeIdSchema
+} from '$features/products/schema';
 import {
 	createProduct,
 	deleteProduct,
@@ -25,7 +12,18 @@ import {
 	updateProduct
 } from '$features/products/server/repository';
 
-const publicRoute = new Hono()
+import {
+	clerkMiddleware,
+	clerkMiddlewareAuthenticated,
+	storeCreatedByUserValidator
+} from '$lib/server/router.middleware';
+
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
+
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+
+const publicRoutes = new Hono()
 	.get(
 		'/',
 		zValidator('param', storeIdSchema),
@@ -34,57 +32,48 @@ const publicRoute = new Hono()
 			const { storeId } = c.req.valid('param');
 			const { categoryId, colorId, isFeatured, sizeId } = c.req.valid('query');
 
-			const products = await getProducts(storeId, categoryId, isFeatured, colorId, sizeId);
+			const products = await getProducts({ storeId, categoryId, isFeatured, colorId, sizeId });
 
 			return c.json({
 				products
 			});
 		}
 	)
-	.get(
-		'/:productId',
-		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
-		async (c) => {
-			const { storeId, productId } = c.req.valid('param');
+	.get('/:id', zValidator('param', storeIdSchema.extend(productIdSchema.shape)), async (c) => {
+		const { storeId, id } = c.req.valid('param');
 
-			const product = await getProduct(storeId, productId);
+		const product = await getProduct({ id, storeId });
 
-			if (!product)
-				return c.json(
-					{
-						error: {
-							code: StatusCodes.NOT_FOUND,
-							message: 'Product not found'
-						}
-					},
-					StatusCodes.NOT_FOUND
-				);
+		if (!product)
+			return c.json(
+				{
+					title: ReasonPhrases.NOT_FOUND,
+					status: StatusCodes.NOT_FOUND,
+					detail: `Product not found`
+				},
+				StatusCodes.NOT_FOUND
+			);
 
-			return c.json({
-				product
-			});
-		}
-	);
+		return c.json({
+			product
+		});
+	});
 
-const app = publicRoute
-	.use(
-		clerkMiddleware({
-			secretKey: CLERK_SECRET_KEY,
-			publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
-		})
-	)
+const app = publicRoutes
+	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
 	.post(
 		'/',
 		zValidator('param', storeIdSchema),
-		checkStoreBelongsToUser(),
+		storeCreatedByUserValidator(),
 		zValidator('json', productFormSchema),
 		async (c) => {
 			const { storeId } = c.req.valid('param');
 			const { name, price, categoryId, colorId, images, sizeId, isArchived, isFeatured } =
 				c.req.valid('json');
 
-			const product = await createProduct(storeId, {
+			const product = await createProduct({
+				storeId,
 				name,
 				price,
 				categoryId,
@@ -101,38 +90,40 @@ const app = publicRoute
 		}
 	)
 	.put(
-		'/:productId',
+		'/:id',
 		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
-		checkStoreBelongsToUser(),
+		storeCreatedByUserValidator(),
 		zValidator('json', productFormSchema),
 		async (c) => {
-			const { storeId, productId } = c.req.valid('param');
+			const { storeId, id } = c.req.valid('param');
 			const { name, price, categoryId, colorId, images, sizeId, isArchived, isFeatured } =
 				c.req.valid('json');
 
-			const existedProduct = await getProduct(storeId, productId);
+			const existedProduct = await getProduct({ id, storeId });
 
 			if (!existedProduct)
 				return c.json(
 					{
-						error: {
-							code: StatusCodes.NOT_FOUND,
-							message: 'Product not found'
-						}
+						title: ReasonPhrases.NOT_FOUND,
+						status: StatusCodes.NOT_FOUND,
+						detail: `Product not found`
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			const product = await updateProduct(storeId, productId, {
-				name,
-				price,
-				categoryId,
-				colorId,
-				images,
-				sizeId,
-				isArchived,
-				isFeatured
-			});
+			const product = await updateProduct(
+				{ id, storeId },
+				{
+					name,
+					price,
+					categoryId,
+					colorId,
+					images,
+					sizeId,
+					isArchived,
+					isFeatured
+				}
+			);
 
 			return c.json({
 				product
@@ -140,26 +131,25 @@ const app = publicRoute
 		}
 	)
 	.delete(
-		'/:productId',
+		'/:id',
 		zValidator('param', storeIdSchema.extend(productIdSchema.shape)),
-		checkStoreBelongsToUser(),
+		storeCreatedByUserValidator(),
 		async (c) => {
-			const { storeId, productId } = c.req.valid('param');
+			const { storeId, id } = c.req.valid('param');
 
-			const product = await getProduct(storeId, productId);
+			const product = await getProduct({ id, storeId });
 
 			if (!product)
 				return c.json(
 					{
-						error: {
-							code: StatusCodes.NOT_FOUND,
-							message: 'Product not found'
-						}
+						title: ReasonPhrases.NOT_FOUND,
+						status: StatusCodes.NOT_FOUND,
+						detail: `Product not found`
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			const deletedProduct = await deleteProduct(storeId, productId);
+			const deletedProduct = await deleteProduct({ id, storeId });
 
 			return c.json({
 				product: deletedProduct

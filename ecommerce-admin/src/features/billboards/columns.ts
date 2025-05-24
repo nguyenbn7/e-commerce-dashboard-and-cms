@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import type { getBillboards } from '$features/billboards/server/repository';
-import { renderComponent } from '$lib/components/ui/data-table';
+
 import { CellAction } from '$features/billboards/components';
+
+import { renderComponent } from '$lib/components/ui/data-table';
 
 export type BillboardColumn = ArrayElement<Awaited<ReturnType<typeof getBillboards>>>;
 

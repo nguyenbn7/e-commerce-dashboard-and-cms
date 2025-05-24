@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { SizeColumn } from '$features/sizes/columns';
-	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
+
+	import { deleteSize as deleteSizeApi } from '$features/sizes/api/delete-size';
+
 	import { CellAction } from '$lib/components/data-table';
-	import { deleteSizeMutation } from '$features/sizes/api';
+
+	import { toast } from 'svelte-sonner';
+
+	import { page } from '$app/state';
 
 	interface Props {
 		data: SizeColumn;
@@ -11,7 +15,7 @@
 
 	let { data }: Props = $props();
 
-	const deleteClient = deleteSizeMutation({
+	const deleteSizeClient = deleteSizeApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -21,14 +25,14 @@
 <CellAction
 	updateHref={`/${page.params.storeId}/sizes/${data.id}`}
 	onCopy={async () => {
-		await navigator.clipboard.writeText(data.id.toString());
+		await navigator.clipboard.writeText(data.id);
 		toast.success('Size Id copied to the clipboard');
 	}}
 	onDelete={() => {
-		$deleteClient.mutate({
+		$deleteSizeClient.mutate({
 			param: {
-				storeId: page.params.storeId,
-				sizeId: data.id.toString()
+				id: data.id,
+				storeId: page.params.storeId
 			}
 		});
 	}}
