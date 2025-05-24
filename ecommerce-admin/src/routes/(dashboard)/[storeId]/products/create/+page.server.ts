@@ -7,9 +7,9 @@ import { getColorsSelection } from '$features/colors/server/repository';
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
 
-	const categories = await getCategoriesSelection(store.id);
-	const sizes = await getSizesSelection(store.id);
-	const colors = await getColorsSelection(store.id);
+	const categories = await getCategoriesSelection({ storeId: store.id });
+	const sizes = await getSizesSelection({ storeId: store.id });
+	const colors = await getColorsSelection({ storeId: store.id });
 
 	return { categories, sizes, colors };
 }) satisfies PageServerLoad;

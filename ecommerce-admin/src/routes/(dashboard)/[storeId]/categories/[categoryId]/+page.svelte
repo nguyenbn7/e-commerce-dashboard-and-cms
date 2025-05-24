@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+
+	import { deleteCategory as deleteCategoryApi } from '$features/categories/api/delete-category';
+	import { CategoryForm } from '$features/categories/components';
+
+	import { getBillboards as getBillboardsApi } from '$features/billboards/api/get-billboards';
+
 	import { Separator } from '$lib/components/ui/separator';
 	import { Heading } from '$lib/components';
 	import { Metadata } from '$lib/components/metadata';
 	import { DeleteButton } from '$lib/components/button';
-	import { getBillboardsQuery } from '$features/billboards/api';
-	import { CategoryForm } from '$features/categories/components';
-	import { deleteCategoryMutation } from '$features/categories/api';
 
 	interface PageProps {
 		data: PageData;
@@ -14,9 +17,9 @@
 
 	let { data }: PageProps = $props();
 
-	const getBillboards = getBillboardsQuery({ storeId: data.store.id });
+	const getBillboardsClient = getBillboardsApi({ storeId: data.store.id });
 
-	const deleteMutation = deleteCategoryMutation({
+	const deleteCategoryClient = deleteCategoryApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -30,10 +33,10 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({
+			$deleteCategoryClient.mutate({
 				param: {
-					storeId: data.store.id.toString(),
-					categoryId: data.category.id.toString()
+					storeId: data.store.id,
+					id: data.category.id
 				}
 			});
 		}}
@@ -44,8 +47,8 @@
 
 <CategoryForm
 	form={data.form}
-	disabled={$getBillboards.isPending || $deleteMutation.isPending}
-	billboards={$getBillboards.data?.billboards}
+	disabled={$getBillboardsClient.isPending || $deleteCategoryClient.isPending}
+	billboards={$getBillboardsClient.data?.billboards}
 />
 
 <Separator />

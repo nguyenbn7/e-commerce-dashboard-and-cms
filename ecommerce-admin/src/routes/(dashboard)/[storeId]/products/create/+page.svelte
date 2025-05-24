@@ -1,10 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
-	import { Metadata } from '$lib/components/metadata';
+
+	import { createProduct as createProductApi } from '$features/products/api/create-product';
 	import { ProductForm } from '$features/products/components';
-	import { createProductMutation } from '$features/products/api';
+
+	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
+
+	import { Separator } from '$lib/components/ui/separator';
 
 	interface PageProps {
 		data: PageData;
@@ -12,7 +15,7 @@
 
 	let { data }: PageProps = $props();
 
-	const createMutation = createProductMutation();
+	const createProductClient = createProductApi();
 </script>
 
 <Metadata title="Create product" />
@@ -26,9 +29,9 @@
 	categories={data.categories}
 	sizes={data.sizes}
 	colors={data.colors}
-	disabled={$createMutation.isPending}
+	disabled={$createProductClient.isPending}
 	onSubmit={(values) => {
-		$createMutation.mutate({
+		$createProductClient.mutate({
 			param: {
 				storeId: data.store.id.toString()
 			},

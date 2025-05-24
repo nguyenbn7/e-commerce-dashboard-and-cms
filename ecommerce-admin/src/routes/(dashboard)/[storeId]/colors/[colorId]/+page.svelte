@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Heading } from '$lib/components';
-	import { Metadata } from '$lib/components/metadata';
-	import { DeleteButton } from '$lib/components/button';
+
 	import { ColorForm } from '$features/colors/components';
-	import { deleteColorMutation } from '$features/colors/api';
+	import { deleteColor as deleteColorApi } from '$features/colors/api/delete-color';
+
+	import { Metadata } from '$lib/components/metadata';
+	import { Heading } from '$lib/components';
+	import { DeleteButton } from '$lib/components/button';
+
+	import { Separator } from '$lib/components/ui/separator';
 
 	interface PageProps {
 		data: PageData;
@@ -13,7 +16,7 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteMutation = deleteColorMutation({
+	const deleteColorClient = deleteColorApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -27,10 +30,10 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({
+			$deleteColorClient.mutate({
 				param: {
-					storeId: data.store.id.toString(),
-					colorId: data.color.id.toString()
+					storeId: data.store.id,
+					id: data.color.id
 				}
 			});
 		}}
@@ -39,6 +42,6 @@
 
 <Separator />
 
-<ColorForm form={data.form} disabled={$deleteMutation.isPending} />
+<ColorForm form={data.form} disabled={$deleteColorClient.isPending} />
 
 <Separator />

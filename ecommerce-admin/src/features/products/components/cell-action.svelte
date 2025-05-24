@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { ProductColumn } from '$features/products/columns';
-	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
+
+	import { deleteProduct as deleteProductApi } from '$features/products/api/delete-product';
+
 	import { CellAction } from '$lib/components/data-table';
-	import { deleteProductMutation } from '$features/products/api';
+
+	import { toast } from 'svelte-sonner';
+
+	import { page } from '$app/state';
 
 	interface Props {
 		data: ProductColumn;
@@ -11,7 +15,7 @@
 
 	let { data }: Props = $props();
 
-	const deleteClient = deleteProductMutation({
+	const deleteProductClient = deleteProductApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -21,14 +25,14 @@
 <CellAction
 	updateHref={`/${page.params.storeId}/products/${data.id}`}
 	onCopy={async () => {
-		await navigator.clipboard.writeText(data.id.toString());
+		await navigator.clipboard.writeText(data.id);
 		toast.success('Product Id copied to the clipboard');
 	}}
 	onDelete={() => {
-		$deleteClient.mutate({
+		$deleteProductClient.mutate({
 			param: {
-				storeId: page.params.storeId,
-				productId: data.id.toString()
+				id: data.id,
+				storeId: page.params.storeId
 			}
 		});
 	}}

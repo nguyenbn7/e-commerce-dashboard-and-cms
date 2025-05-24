@@ -2,6 +2,15 @@
 	import type { getProduct } from '$features/products/server/repository';
 	import type { z } from 'zod';
 
+	import { productFormSchema } from '$features/products/schema';
+
+	import { ColorDisplay } from '$features/colors/components';
+
+	import { Form } from '$lib/components/form';
+	import { ImageUpload } from '$lib/components/image';
+
+	import { locales, options } from '$lib/currency';
+
 	import { Input } from '$lib/components/ui/input';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import {
@@ -15,14 +24,6 @@
 
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
-
-	import { Form } from '$lib/components/form';
-	import { ImageUpload } from '$lib/components/image';
-
-	import { locales, options } from '$lib/currency';
-
-	import { ColorDisplay } from '$features/colors/components';
-	import { productFormSchema } from '$features/products/schema';
 
 	interface Props {
 		disabled?: boolean;

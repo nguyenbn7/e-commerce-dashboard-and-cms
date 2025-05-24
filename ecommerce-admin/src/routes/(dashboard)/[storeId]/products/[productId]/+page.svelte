@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	import { deleteProductMutation, updateProductMutation } from '$features/products/api';
+	import { deleteProduct as deleteProductApi } from '$features/products/api/delete-product';
+	import { updateProduct as updateProductApi } from '$features/products/api/update-product';
 	import { ProductForm } from '$features/products/components';
 
 	import { Metadata } from '$lib/components/metadata';
@@ -16,7 +17,7 @@
 
 	let { data }: PageProps = $props();
 
-	const deleteMutation = deleteProductMutation({
+	const deleteProductClient = deleteProductApi({
 		onSuccess: () => {
 			window.location.reload();
 		}
@@ -24,7 +25,7 @@
 
 	let initData = $state(data.product);
 
-	const updateMutation = updateProductMutation({
+	const updateProductClient = updateProductApi({
 		onSuccess: (data) => {
 			const { product } = data;
 			initData = {
@@ -63,10 +64,10 @@
 
 	<DeleteButton
 		onDelete={() => {
-			$deleteMutation.mutate({
+			$deleteProductClient.mutate({
 				param: {
-					id: data.store.id,
-					productId: data.product.id
+					id: data.product.id,
+					storeId: data.store.id
 				}
 			});
 		}}
@@ -80,12 +81,12 @@
 	categories={data.categories}
 	sizes={data.sizes}
 	colors={data.colors}
-	disabled={$deleteMutation.isPending || $updateMutation.isPending}
+	disabled={$deleteProductClient.isPending || $updateProductClient.isPending}
 	onSubmit={(values) => {
-		$updateMutation.mutate({
+		$updateProductClient.mutate({
 			param: {
-				id: data.store.id,
-				productId: data.product.id
+				storeId: data.store.id,
+				id: data.product.id
 			},
 			json: values
 		});

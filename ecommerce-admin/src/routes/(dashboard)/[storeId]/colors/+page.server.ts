@@ -4,7 +4,7 @@ import { getColors } from '$features/colors/server/repository';
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
 
-	const colors = await getColors(store.id);
+	const colors = await getColors({ storeId: store.id });
 
 	return { colors };
 }) satisfies PageServerLoad;

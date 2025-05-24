@@ -46,7 +46,7 @@ const app = publicRoutes
 
 		const { name } = c.req.valid('json');
 
-		const store = await createStore({ userId }, { name });
+		const store = await createStore({ userId, name });
 
 		return c.json({
 			store
