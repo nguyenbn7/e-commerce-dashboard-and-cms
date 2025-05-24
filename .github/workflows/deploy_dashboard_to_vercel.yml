@@ -21,7 +21,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Prisma generate
         run: |
-          bun install
+          PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,rhel-openssl-3.0.x bun install
           bun run db:gen
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
