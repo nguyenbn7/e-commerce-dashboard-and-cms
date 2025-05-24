@@ -1,27 +1,26 @@
 import type { Actions, PageServerLoad } from './$types';
 
-import { StatusCodes } from 'http-status-codes';
+import { colorFormSchema, colorIdSchema, storeIdSchema } from '$features/colors/schema';
+import { getColor, updateColor } from '$features/colors/server/repository';
 
-import { fail, redirect } from '@sveltejs/kit';
+import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { storeIdSchema } from '$features/stores/schema';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { fail, redirect } from '@sveltejs/kit';
 
-import { colorFormSchema, colorIdSchema } from '$features/colors/schema';
-import { getColor, updateColor } from '$features/colors/server/repository';
+import { StatusCodes } from 'http-status-codes';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
-	const result = colorIdSchema.safeParse({ colorId: params.colorId });
+	const result = colorIdSchema.safeParse({ id: params.colorId });
 	if (!result.success) redirect(307, `/${store.id}/colors`);
 
-	const { colorId } = result.data;
+	const { id } = result.data;
 
-	const color = await getColor(store.id, colorId);
+	const color = await getColor({ id, storeId: store.id });
 	if (!color) redirect(307, `/${store.id}/colors`);
 
 	const form = await superValidate(zod(colorFormSchema), {
@@ -47,17 +46,17 @@ export const actions: Actions = {
 
 		const { storeId } = checkStoreIdResult.data;
 
-		const store = await findStoreByUserIdAndStoreId(userId, storeId);
+		const store = await findStoreByUserIdAndStoreId({ userId, id: storeId });
 		if (!store)
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkColorIdResult = colorIdSchema.safeParse({ colorId: params.colorId });
 		if (!checkColorIdResult.success) redirect(308, `/${storeId}/colors`);
 
-		const { colorId } = checkColorIdResult.data;
+		const { id } = checkColorIdResult.data;
 		const { name, value } = form.data;
 
-		const color = await updateColor(storeId, colorId, { name, value });
+		const color = await updateColor({ storeId, id }, { name, value });
 
 		form.data = {
 			name: color.name,

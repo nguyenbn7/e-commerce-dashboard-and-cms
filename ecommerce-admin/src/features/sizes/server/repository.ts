@@ -10,6 +10,10 @@ interface Data {
 	value: string;
 }
 
+interface InsertData extends Data {
+	storeId: string;
+}
+
 type StoreIdParam = Omit<Params, 'id'>;
 
 export async function getSize(params: Params) {
@@ -23,9 +27,8 @@ export async function getSize(params: Params) {
 	});
 }
 
-export async function createSize(params: StoreIdParam, data: Data) {
-	const { storeId } = params;
-	const { name, value } = data;
+export async function createSize(data: InsertData) {
+	const { name, value, storeId } = data;
 
 	return prisma.size.create({
 		data: {

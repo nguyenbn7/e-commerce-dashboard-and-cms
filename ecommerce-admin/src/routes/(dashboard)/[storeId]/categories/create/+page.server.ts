@@ -1,16 +1,16 @@
 import type { Actions, PageServerLoad } from './$types';
-import { StatusCodes } from 'http-status-codes';
 
-import { fail, redirect } from '@sveltejs/kit';
+import { categoryFormSchema, storeIdSchema } from '$features/categories/schema';
+import { createCategory } from '$features/categories/server/repository';
+
+import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { storeIdSchema } from '$features/stores/schema';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { fail, redirect } from '@sveltejs/kit';
 
-import { categoryFormSchema } from '$features/categories/schema';
-import { createCategory } from '$features/categories/server/repository';
+import { StatusCodes } from 'http-status-codes';
 
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
@@ -33,13 +33,13 @@ export const actions: Actions = {
 
 		const { storeId } = result.data;
 
-		const store = await findStoreByUserIdAndStoreId(userId, storeId);
+		const store = await findStoreByUserIdAndStoreId({ userId, id: storeId });
 		if (!store)
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const { name, billboardId } = form.data;
 
-		await createCategory(storeId, { name, billboardId });
+		await createCategory({ name, billboardId, storeId });
 
 		return { form };
 	}

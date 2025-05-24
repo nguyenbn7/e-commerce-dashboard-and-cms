@@ -1,27 +1,26 @@
 import type { Actions, PageServerLoad } from './$types';
 
-import { StatusCodes } from 'http-status-codes';
+import { categoryFormSchema, categoryIdSchema, storeIdSchema } from '$features/categories/schema';
+import { getCategory, updateCategory } from '$features/categories/server/repository';
 
-import { fail, redirect } from '@sveltejs/kit';
+import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { storeIdSchema } from '$features/stores/schema';
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { fail, redirect } from '@sveltejs/kit';
 
-import { categoryFormSchema, categoryIdSchema } from '$features/categories/schema';
-import { getCategory, updateCategory } from '$features/categories/server/repository';
+import { StatusCodes } from 'http-status-codes';
 
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
-	const result = categoryIdSchema.safeParse({ categoryId: params.categoryId });
+	const result = categoryIdSchema.safeParse({ id: params.categoryId });
 	if (!result.success) redirect(307, `/${store.id}/categories`);
 
-	const { categoryId } = result.data;
+	const { id } = result.data;
 
-	const category = await getCategory(store.id, categoryId);
+	const category = await getCategory({ storeId: store.id, id });
 	if (!category) redirect(307, `/${store.id}/categories`);
 
 	const form = await superValidate(zod(categoryFormSchema), {
@@ -47,17 +46,17 @@ export const actions: Actions = {
 
 		const { storeId } = checkStoreIdResult.data;
 
-		const store = await findStoreByUserIdAndStoreId(userId, storeId);
+		const store = await findStoreByUserIdAndStoreId({ userId, id: storeId });
 		if (!store)
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkCategoryIdResult = categoryIdSchema.safeParse({ categoryId: params.categoryId });
 		if (!checkCategoryIdResult.success) redirect(308, `/${storeId}/categories`);
 
-		const { categoryId } = checkCategoryIdResult.data;
+		const { id } = checkCategoryIdResult.data;
 		const { name, billboardId } = form.data;
 
-		const category = await updateCategory(storeId, categoryId, { name, billboardId });
+		const category = await updateCategory({ storeId, id }, { name, billboardId });
 
 		form.data = {
 			name: category.name,
