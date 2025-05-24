@@ -7,10 +7,10 @@ import { fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { storeIdSchema } from '$features/stores/schemas';
+import { storeIdSchema } from '$features/stores/schema';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
-import { billboardFormSchema } from '$features/billboards/schemas';
+import { billboardFormSchema } from '$features/billboards/schema';
 import { createBillboard } from '$features/billboards/server/repository';
 
 export const load = (async ({ parent }) => {

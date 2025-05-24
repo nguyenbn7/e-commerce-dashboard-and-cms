@@ -1,15 +1,30 @@
 import prisma from '$lib/server/prisma';
 
-export async function getBillboard(storeId: string, billboardId: string) {
+interface Params {
+	id: string;
+	storeId: string;
+}
+
+interface Data {
+	label: string;
+	imageUrl: string;
+}
+
+type StoreIdParam = Omit<Params, 'id'>;
+
+export async function getBillboard(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.billboard.findUnique({
 		where: {
-			id: billboardId,
+			id,
 			storeId
 		}
 	});
 }
 
-export async function createBillboard(storeId: string, data: { label: string; imageUrl: string }) {
+export async function createBillboard(params: StoreIdParam, data: Data) {
+	const { storeId } = params;
 	const { label, imageUrl } = data;
 
 	return prisma.billboard.create({
@@ -21,7 +36,9 @@ export async function createBillboard(storeId: string, data: { label: string; im
 	});
 }
 
-export async function getBillboards(storeId: string) {
+export async function getBillboards(params: StoreIdParam) {
+	const { storeId } = params;
+
 	return prisma.billboard.findMany({
 		where: {
 			storeId
@@ -32,16 +49,13 @@ export async function getBillboards(storeId: string) {
 	});
 }
 
-export async function updateBillboard(
-	storeId: string,
-	billboardId: string,
-	data: { label: string; imageUrl: string }
-) {
+export async function updateBillboard(params: Params, data: Data) {
+	const { id, storeId } = params;
 	const { label, imageUrl } = data;
 
 	return prisma.billboard.update({
 		where: {
-			id: billboardId,
+			id,
 			storeId
 		},
 		data: {
@@ -51,10 +65,12 @@ export async function updateBillboard(
 	});
 }
 
-export async function deleteBillboard(storeId: string, billboardId: string) {
+export async function deleteBillboard(params: Params) {
+	const { id, storeId } = params;
+
 	return prisma.billboard.delete({
 		where: {
-			id: billboardId,
+			id,
 			storeId
 		}
 	});

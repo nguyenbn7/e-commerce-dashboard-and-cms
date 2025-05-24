@@ -1,12 +1,14 @@
 <script lang="ts">
 	import type { z } from 'zod';
 	import type { SuperValidated } from 'sveltekit-superforms';
+
+	import { settingsFormSchema } from '$features/stores/schema';
+	
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { settingsFormSchema } from '$features/stores/schemas';
 	import { Form } from '$lib/components/form';
 
 	interface Props {
@@ -17,7 +19,7 @@
 		onSuccess?: () => void;
 	}
 
-	let {
+	const {
 		form: _form,
 		action,
 		disabled: _disabled = false,

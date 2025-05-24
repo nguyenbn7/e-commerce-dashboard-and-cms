@@ -9,7 +9,6 @@ export const validateStore = () =>
 			return c.json({
 				title: ReasonPhrases.BAD_REQUEST,
 				status_code: StatusCodes.BAD_REQUEST,
-				code: 'validation_error',
 				detail: 'Invalid store id'
 			});
 	});

@@ -6,9 +6,10 @@ type Response = InferResponseType<
 	(typeof client.api.stores)[':storeId']['billboards']['$get'],
 	200
 >;
+
 type ResponseError = { error: { code: number; message: string } };
 
-export default function getBillboardsQuery(param: { storeId: string }) {
+export default function getBillboards(param: { storeId: string }) {
 	const { storeId } = param;
 
 	const queryClient = createQuery({

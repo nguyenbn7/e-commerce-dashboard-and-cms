@@ -7,10 +7,10 @@ import { Hono } from 'hono';
 import { clerkMiddleware } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
 
-import { clerkMiddlewareAuthenticated } from '$lib/server/route.middleware';
+import { clerkMiddlewareAuthenticated } from '$lib/server/api/middleware';
 
-import { storeIdSchema } from '$features/stores/schemas';
-import { checkStoreBelongsToUser } from '$features/stores/server/route.middleware';
+import { storeIdSchema } from '$features/stores/schema';
+import { checkStoreBelongsToUser } from '$features/stores/server/api/middleware';
 
 import { colorIdSchema } from '$features/colors/schemas';
 import { deleteColor, getColor, getColors } from '$features/colors/server/repository';

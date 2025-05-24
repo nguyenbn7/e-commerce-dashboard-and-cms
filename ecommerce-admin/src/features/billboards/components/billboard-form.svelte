@@ -8,7 +8,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Form } from '$lib/components/form';
 	import { ImageUpload } from '$lib/components/image';
-	import { billboardFormSchema } from '$features/billboards/schemas';
+	import { billboardFormSchema } from '$features/billboards/schema';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof billboardFormSchema>, any>;

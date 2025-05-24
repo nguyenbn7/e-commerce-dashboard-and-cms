@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sizeFormSchema } from '$features/sizes/schemas';
 import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
 
-import { storeIdSchema } from '$features/stores/schemas';
+import { storeIdSchema } from '$features/stores/schema';
 import { createSize } from '$features/sizes/server/repository';
 
 export const load = (async ({ parent }) => {

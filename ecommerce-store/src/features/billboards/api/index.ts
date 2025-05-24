@@ -1,1 +1,1 @@
-export { default as getBillboardQuery } from './get-billboard-query';
+export { default as getBillboardQuery } from './get-billboard';

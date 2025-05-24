@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import stores from '$features/stores/server/router';
-import billboards from '$features/billboards/server/router';
+import stores from '$features/stores/server/api/router';
+import billboards from '$features/billboards/server/api/router';
 import categories from '$features/categories/server/router';
 import sizes from '$features/sizes/server/router';
 import colors from '$features/colors/server/router';

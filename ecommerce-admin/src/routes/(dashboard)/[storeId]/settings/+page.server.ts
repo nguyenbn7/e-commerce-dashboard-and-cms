@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { settingsFormSchema } from '$features/stores/schemas';
+import { settingsFormSchema } from '$features/stores/schema';
 import { updateStore } from '$features/stores/server/repository';
 
 export const load = (async ({ parent }) => {

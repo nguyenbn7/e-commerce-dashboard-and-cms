@@ -1,6 +1,20 @@
 import prisma from '$lib/server/prisma';
 
-export async function getStores(userId: string) {
+interface Data {
+	name: string;
+}
+
+interface Params {
+	id: string;
+	userId: string;
+}
+
+type UserIdParam = Omit<Params, 'id'>;
+type StoreIdParam = Omit<Params, 'userId'>;
+
+export async function getStores(params: UserIdParam) {
+	const { userId } = params;
+
 	return prisma.store.findMany({
 		where: {
 			userId
@@ -8,16 +22,21 @@ export async function getStores(userId: string) {
 	});
 }
 
-export async function createStore(userId: string, data: { name: string }) {
+export async function createStore(params: UserIdParam, data: Data) {
+	const { userId } = params;
+	const { name } = data;
+
 	return prisma.store.create({
 		data: {
-			name: data.name,
+			name,
 			userId
 		}
 	});
 }
 
-export async function getFirstStore(userId: string) {
+export async function getFirstStore(params: UserIdParam) {
+	const { userId } = params;
+
 	return prisma.store.findFirst({
 		where: {
 			userId
@@ -25,46 +44,57 @@ export async function getFirstStore(userId: string) {
 	});
 }
 
-export async function findStoreById(userId: string, storeId: string) {
+export async function findStoreById(params: Params) {
+	const { id, userId } = params;
+
 	return prisma.store.findFirst({
 		where: {
-			id: storeId,
+			id,
 			userId
 		}
 	});
 }
 
-export async function updateStore(userId: string, storeId: string, data: { name: string }) {
+export async function updateStore(params: Params, data: Data) {
+	const { id, userId } = params;
+	const { name } = data;
+
 	return prisma.store.update({
 		where: {
-			id: storeId,
+			id,
 			userId
 		},
 		data: {
-			name: data.name
+			name
 		}
 	});
 }
 
-export async function deleteStore(userId: string, storeId: string) {
+export async function deleteStore(params: Params) {
+	const { id, userId } = params;
+
 	return prisma.store.delete({
 		where: {
-			id: storeId,
+			id,
 			userId
 		}
 	});
 }
 
-export async function findStoreByUserIdAndStoreId(userId: string, storeId: string) {
+export async function findStoreByUserIdAndStoreId(params: Params) {
+	const { id, userId } = params;
+
 	return prisma.store.findFirst({
 		where: {
-			id: storeId,
+			id,
 			userId
 		}
 	});
 }
 
-export async function getStore(id: string) {
+export async function getStore(params: StoreIdParam) {
+	const { id } = params;
+
 	return prisma.store.findUnique({
 		where: {
 			id

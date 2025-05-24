@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
 export const setupSchema = z.object({
-	name: z.string().trim().min(1, 'Required')
+	name: z.string().trim().min(1, 'name contains spaces or empty')
 });
 
 export const storeIdSchema = z.object({
-	storeId: z.string().trim().min(1, 'Required')
+	id: z.string().trim().min(1, 'id contains spaces or empty')
 });
 
 export const settingsFormSchema = z.object({
-	name: z.string().trim().min(1, 'Required')
+	name: z.string().trim().min(1, 'name contains spaces or empty')
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;

@@ -17,7 +17,7 @@ type Options = {
 	onError?: (error: Error, variables: Request, context: unknown) => Promise<unknown> | unknown;
 };
 
-export default function deleteBillboardMutation(
+export default function deleteBillboard(
 	options: Options = { onSuccess: undefined, onError: undefined }
 ) {
 	const { onSuccess, onError } = options;
