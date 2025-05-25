@@ -1,8 +1,8 @@
 export class ClientError extends Error {
-	code: number;
-  
-	constructor(detail?: string, code?: number, options?: ErrorOptions) {
+	status: number;
+
+	constructor(detail?: string, status?: number, options?: ErrorOptions) {
 		super(detail, options);
-		this.code = code ?? 500;
+		this.status = status ?? 500;
 	}
 }

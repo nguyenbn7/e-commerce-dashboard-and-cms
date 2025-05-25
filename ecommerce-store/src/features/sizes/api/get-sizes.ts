@@ -1,21 +1,19 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 
-interface Options {
+interface Params {
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/sizes`;
+type GetSizesResponseType = Promise<{ sizes: Size[] }>;
 
-export default async function getSizes(options: Options = {}): Promise<{ sizes: Size[] }> {
-	const { fetch: ssrFetch } = options;
+export async function getSizes(params: Params = {}): GetSizesResponseType {
+	const { fetch: ssrFetch } = params;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 
-	try {
-		const response = await _fetch(URL);
+	const response = await _fetch(
+		new URL('/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/sizes', PUBLIC_API_URL)
+	);
 
-		return response.json();
-	} catch (error) {
-		return { sizes: [] };
-	}
+	return response.json();
 }

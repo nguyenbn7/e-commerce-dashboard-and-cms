@@ -1,23 +1,19 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 
-interface Options {
+interface Params {
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/categories`;
+export type GetCategoriesResponseType = { categories: Category[] };
 
-export default async function getCategories(
-	params: Options = {}
-): Promise<{ categories: Category[] }> {
+export async function getCategories(params: Params = {}): Promise<GetCategoriesResponseType> {
 	const { fetch: ssrFetch } = params;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 
-	try {
-		const response = await _fetch(URL);
+	const response = await _fetch(
+		new URL('/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/categories', PUBLIC_API_URL)
+	);
 
-		return response.json();
-	} catch (error) {
-		return { categories: [] };
-	}
+	return response.json();
 }

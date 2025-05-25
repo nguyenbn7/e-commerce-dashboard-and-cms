@@ -1,17 +1,17 @@
 interface Billboard {
-	id: number;
+	id: string;
 	label: string;
 	imageUrl: string;
 }
 
 interface Category {
-	id: number;
+	id: string;
 	name: string;
 	billboard: Billboard;
 }
 
 interface Product {
-	id: number;
+	id: string;
 	category: Category;
 	name: string;
 	price: number;
@@ -27,13 +27,13 @@ interface Image {
 }
 
 interface Size {
-	id: number;
+	id: string;
 	name: string;
 	value: string;
 }
 
 interface Color {
-	id: number;
+	id: string;
 	name: string;
 	value: string;
 }

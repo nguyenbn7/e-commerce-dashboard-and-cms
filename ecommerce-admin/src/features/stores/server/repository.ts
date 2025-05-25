@@ -26,6 +26,15 @@ export async function getStores(params: UserIdParam) {
 	});
 }
 
+export async function getAvailableStores() {
+	return prisma.store.findMany({
+		select: {
+			id: true,
+			name: true
+		}
+	});
+}
+
 export async function createStore(data: InsertData) {
 	const { name, userId } = data;
 

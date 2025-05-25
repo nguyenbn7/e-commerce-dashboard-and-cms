@@ -3,18 +3,20 @@
 	import type { LayoutData } from './$types';
 
 	import '../app.css';
-	import { browser } from '$app/environment';
 	import { Footer, Navbar } from '$lib/components';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+
 	import { PreviewModal } from '$lib/components/preview-modal';
+
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { Toaster } from 'svelte-sonner';
+	import { browser } from '$app/environment';
 
 	interface LayoutProps {
 		data: LayoutData;
 		children: Snippet;
 	}
 
-	let { data, children }: LayoutProps = $props();
+	const { data, children }: LayoutProps = $props();
 
 	const queryClient = new QueryClient({
 		defaultOptions: {
@@ -30,9 +32,9 @@
 <Toaster closeButton position="top-center" />
 
 <QueryClientProvider client={queryClient}>
-	<Navbar />
+	<Navbar shopName={data.stores[0].name} />
 
 	{@render children()}
 
-	<Footer />
+	<Footer shopName={data.stores[0].name} />
 </QueryClientProvider>

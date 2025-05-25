@@ -1,38 +1,54 @@
 import { PUBLIC_API_URL } from '$env/static/public';
+
+import { ClientError } from '$lib/error';
+
 import queryString from 'query-string';
 
-interface ProductsQuery {
-	categoryId?: number | string;
-	colorId?: number | string;
-	sizeId?: number | string;
+export interface Params {
+	categoryId?: string;
+	colorId?: string;
+	sizeId?: string;
 	isFeatured?: boolean;
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/products`;
+export type GetProductsResponseType = { products: Product[] };
 
-export default async function getProducts(
-	params: ProductsQuery = {}
-): Promise<{ products: Product[] }> {
+export async function getProducts(params: Params): Promise<GetProductsResponseType> {
 	const { categoryId, colorId, sizeId, isFeatured, fetch: ssrFetch } = params;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 
-	const url = queryString.stringifyUrl({
-		url: URL,
-		query: {
-			categoryId,
-			colorId,
-			sizeId,
-			isFeatured
+	const url = queryString.stringifyUrl(
+		{
+			url: new URL(
+				'/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/products',
+				PUBLIC_API_URL
+			).toString(),
+			query: {
+				categoryId,
+				colorId,
+				sizeId,
+				isFeatured
+			}
+		},
+		{
+			skipEmptyString: true,
+			skipNull: true
 		}
-	});
+	);
 
-	try {
-		const response = await _fetch(url);
+	const response = await _fetch(url);
 
-		return response.json();
-	} catch (error) {
-		return { products: [] };
+	if (!ssrFetch) {
+		if (!response.ok) {
+			const error = await response.json();
+
+			const clientError = new ClientError(error.detail, response.status);
+
+			throw clientError;
+		}
 	}
+
+	return response.json();
 }

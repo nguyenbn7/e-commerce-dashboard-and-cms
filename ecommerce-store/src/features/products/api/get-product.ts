@@ -1,24 +1,30 @@
 import { PUBLIC_API_URL } from '$env/static/public';
-import { throwHttpError } from '$lib';
+import { ClientError } from '$lib/error';
 
-interface Options {
+export interface Params {
+	id: string;
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/products`;
+export type GetProductResponseType = { product: Product };
 
-export default async function getProduct(
-	id: number,
-	options: Options = {}
-): Promise<{ product: Product }> {
-	const { fetch: ssrFetch } = options;
+export async function getProduct(params: Params): Promise<GetProductResponseType> {
+	const { fetch: ssrFetch, id } = params;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 
-	const response = await _fetch(`${URL}/${id}`);
+	const response = await _fetch(
+		new URL(`/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/products/${id}`, PUBLIC_API_URL)
+	);
 
-	if (!response.ok) {
-		await throwHttpError(response);
+	if (!ssrFetch) {
+		if (!response.ok) {
+			const error = await response.json();
+
+			const clientError = new ClientError(error.detail, response.status);
+
+			throw clientError;
+		}
 	}
 
 	return response.json();

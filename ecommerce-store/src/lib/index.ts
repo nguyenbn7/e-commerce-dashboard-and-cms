@@ -12,10 +12,3 @@ export function createCurrencyFormatter(
 }
 
 export const currencyFormatter = createCurrencyFormatter();
-
-export const throwHttpError = async (response: Response) => {
-	const data = (await response.json()) as ResponseError;
-	const error = new Error(data.error.message) as HttpError;
-	error.status = response.status;
-	throw error;
-};

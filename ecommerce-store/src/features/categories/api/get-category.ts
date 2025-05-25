@@ -1,24 +1,29 @@
 import { PUBLIC_API_URL } from '$env/static/public';
-import { throwHttpError } from '$lib';
 
-interface Options {
+import { ClientError } from '$lib/error';
+
+export interface Params {
+	id: string;
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-const URL = `${PUBLIC_API_URL}/categories`;
+export type GetCategoryResponseType = { category: Category };
 
-export default async function getCategory(
-	id: number | string,
-	options: Options = {}
-): Promise<{ category: Category }> {
-	const { fetch: ssrFetch } = options;
+export async function getCategory(params: Params): Promise<GetCategoryResponseType> {
+	const { fetch: ssrFetch, id } = params;
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 
-	const response = await _fetch(`${URL}/${id}`);
+	const response = await _fetch(
+		new URL(`/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/categories/${id}`, PUBLIC_API_URL)
+	);
 
 	if (!response.ok) {
-		await throwHttpError(response);
+		const error = await response.json();
+
+		const clientError = new ClientError(error.detail, response.status);
+
+		throw clientError;
 	}
 
 	return response.json();

@@ -50,7 +50,7 @@ export default function useCart() {
 
 			toast.success('Item added to cart.');
 		},
-		removeItem: (id: number) => {
+		removeItem: (id: string) => {
 			cartStore.update((currentCart) => [...currentCart.filter((item) => item.id !== id)]);
 
 			saveCartToStorage(name, get(cartStore));

@@ -1,6 +1,12 @@
 import { setupSchema, storeIdSchema } from '$features/stores/schema';
 import { storeCreatedByUserValidator } from '$features/stores/server/router.middleware';
-import { createStore, deleteStore, getStore, getStores } from '$features/stores/server/repository';
+import {
+	createStore,
+	deleteStore,
+	getAvailableStores,
+	getStore,
+	getStores
+} from '$features/stores/server/repository';
 
 import { clerkMiddleware, clerkMiddlewareAuthenticated } from '$lib/server/router.middleware';
 
@@ -9,25 +15,33 @@ import { zValidator } from '@hono/zod-validator';
 
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
-const publicRoutes = new Hono().get('/:id', zValidator('param', storeIdSchema), async (c) => {
-	const { id } = c.req.valid('param');
+const publicRoutes = new Hono()
+	.get('/available', async (c) => {
+		const stores = await getAvailableStores();
 
-	const store = await getStore({ id });
+		return c.json({
+			stores
+		});
+	})
+	.get('/:id', zValidator('param', storeIdSchema), async (c) => {
+		const { id } = c.req.valid('param');
 
-	if (!store)
-		return c.json(
-			{
-				title: ReasonPhrases.NOT_FOUND,
-				status: StatusCodes.NOT_FOUND,
-				detail: `Store with id "${id}" not found`
-			},
-			StatusCodes.NOT_FOUND
-		);
+		const store = await getStore({ id });
 
-	return c.json({
-		store
+		if (!store)
+			return c.json(
+				{
+					title: ReasonPhrases.NOT_FOUND,
+					status: StatusCodes.NOT_FOUND,
+					detail: `Store with id "${id}" not found`
+				},
+				StatusCodes.NOT_FOUND
+			);
+
+		return c.json({
+			store
+		});
 	});
-});
 
 const app = publicRoutes
 	.use(clerkMiddleware())

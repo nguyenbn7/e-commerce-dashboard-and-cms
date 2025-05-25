@@ -1,32 +1,53 @@
 import { PUBLIC_API_URL } from '$env/static/public';
+
 import { ClientError } from '$lib/error';
+
 import { createQuery } from '@tanstack/svelte-query';
 
-type Response = { billboard: Billboard };
+import { derived, writable } from 'svelte/store';
 
 interface Params {
 	id: string;
 }
 
-export default function getBillboard(params: Params) {
-	const { id } = params;
+const billboardParamsStore = writable<Params>({ id: '' });
 
-	const query = createQuery<Response, Error>({
-		queryKey: ['billboards', id],
-		queryFn: async () => {
-			const response = await fetch(`${PUBLIC_API_URL}/billboards/${id}`);
+export function setBillboardParams(params: Params) {
+	billboardParamsStore.set(params);
+}
 
-			if (!response.ok) {
-				const error = await response.json();
+interface Response {
+	billboard: Billboard;
+}
 
-				const clientError = new ClientError(error.detail, response.status);
+export function getBillboard(params: Params | undefined = undefined) {
+	if (params) setBillboardParams(params);
 
-				throw clientError;
+	const query = createQuery<Response, Error>(
+		derived(billboardParamsStore, ($params) => ({
+			queryKey: ['billboards', $params.id],
+			queryFn: async () => {
+				const { id } = $params;
+
+				const response = await fetch(
+					new URL(
+						`/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/billboards/${id}`,
+						PUBLIC_API_URL
+					)
+				);
+
+				if (!response.ok) {
+					const error = await response.json();
+
+					const clientError = new ClientError(error.detail, response.status);
+
+					throw clientError;
+				}
+
+				return response.json();
 			}
-
-			return response.json();
-		}
-	});
+		}))
+	);
 
 	return query;
 }
