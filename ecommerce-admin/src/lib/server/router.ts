@@ -7,9 +7,19 @@ import products from '$features/products/server/router';
 import checkout from '$features/checkout/server/router';
 import webhook from '$lib/server/webhook';
 
+import { API_ORIGINS } from '$env/static/private';
+
 import { Hono } from 'hono';
+import { requestId } from 'hono/request-id';
+import { cors } from 'hono/cors';
 
 const app = new Hono()
+	.use(requestId())
+	.use(
+		cors({
+			origin: import.meta.env.DEV ? '*' : API_ORIGINS.split(',').map((origin) => origin.trim())
+		})
+	)
 	.basePath('/api')
 	.route('/webhook', webhook)
 	.route('/stores/:storeId/billboards', billboards)
