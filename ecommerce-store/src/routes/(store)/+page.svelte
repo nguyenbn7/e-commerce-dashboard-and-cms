@@ -3,12 +3,25 @@
 
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
-	import { getBillboard as getBillboardApi } from '$features/billboards/api/get-billboard';
-	import { getProducts as getProductsApi } from '$features/products/api/client/get-products';
+	import {
+		getBillboard as getBillboardApi,
+		setBillboardParams
+	} from '$features/billboards/api/get-billboard';
+	import {
+		getProducts as getProductsApi,
+		setProductsParams
+	} from '$features/products/api/client/get-products';
+	import { getStores as getStoresApi } from '$features/stores/api/client/get-stores';
+	import {
+		getCurrentStoreFromStorage,
+		useGetCurrentStore
+	} from '$features/stores/hooks/use-get-current-store';
 
 	import { Metadata } from '$lib/components/metadata';
 	import { Container } from '$lib/components/ui/container';
 	import { Billboard as BillboardComponent, ProductList } from '$lib/components';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	interface PageProps {
 		data: PageData;
@@ -16,13 +29,36 @@
 
 	const { data }: PageProps = $props();
 
-	const getBillboardClient = getBillboardApi({ id: '73783560-02ad-4cd3-917d-34097297e56e' });
-	const getProductsClient = getProductsApi({ isFeatured: true });
+	let loading = $state(true);
 
-	const isLoading = $derived($getBillboardClient.isLoading || $getProductsClient.isLoading);
+	const getStoresClient = getStoresApi();
+	const getBillboardClient = getBillboardApi();
+	const getProductsClient = getProductsApi({ storeId: '', isFeatured: true });
+
+	const { store } = useGetCurrentStore();
+
+	const stores = $derived($getStoresClient.data?.stores ?? []);
+
+	onMount(async () => {
+		getCurrentStoreFromStorage(stores);
+
+		if (!$store.id) return goto('/stores', { replaceState: true, invalidateAll: true });
+
+		if ($store.billboards.length > 0) {
+			setBillboardParams({ id: $store.billboards[0].id, storeId: $store.id });
+		}
+
+		setProductsParams({ storeId: $store.id, isFeatured: true });
+
+		loading = false;
+	});
+
+	const isLoading = $derived(
+		$getBillboardClient.isLoading || $getProductsClient.isLoading || loading
+	);
 </script>
 
-<Metadata title={data.stores[0].name ?? 'Store'} description={data.stores[0].name ?? 'Store'} />
+<Metadata title={$store.name} description={$store.name} />
 
 <Container>
 	{#if isLoading}

@@ -9,7 +9,8 @@ export const storeIdSchema = z.object({
 });
 
 export const settingsFormSchema = z.object({
-	name: z.string().trim().min(1, 'name contains spaces or empty')
+	name: z.string().trim().min(1, 'name contains spaces or empty'),
+	isOpen: z.boolean().default(false)
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;

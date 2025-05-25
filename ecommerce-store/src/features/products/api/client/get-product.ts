@@ -12,7 +12,7 @@ import { derived, writable } from 'svelte/store';
 
 type Params = Omit<GetProductParams, 'fetch'>;
 
-const productParamsStore = writable<Params>({ id: '' });
+const productParamsStore = writable<Params>({ id: '', storeId: '' });
 
 export function setProductParams(params: Params) {
 	productParamsStore.set(params);

@@ -7,7 +7,14 @@
 	import { Form } from '$lib/components/form';
 
 	import { Input } from '$lib/components/ui/input';
-	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import {
+		FormControl,
+		FormDescription,
+		FormField,
+		FormFieldErrors,
+		FormLabel
+	} from '$lib/components/ui/form';
 
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
@@ -67,6 +74,26 @@
 							class="mt-2"
 							bind:value={$formData.name}
 						/>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField
+				{form}
+				name="isOpen"
+				class="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"
+			>
+				<FormControl>
+					{#snippet children({ props })}
+						<Checkbox {...props} bind:checked={$formData.isOpen} />
+						<div class="space-y-1 leading-none">
+							<FormLabel>Open</FormLabel>
+							<FormDescription
+								>Check this when you are ready to open your store (Display status on store list)</FormDescription
+							>
+						</div>
 					{/snippet}
 				</FormControl>
 

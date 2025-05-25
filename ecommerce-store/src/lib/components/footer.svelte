@@ -1,16 +1,16 @@
 <script lang="ts">
 	interface Props {
-		shopName?: string;
+		shopName: string;
 	}
 
-	let { shopName = 'FakeStoreNameA' }: Props = $props();
+	let { shopName }: Props = $props();
 </script>
 
 <footer class="bg-white border-t">
 	<div class="mx-auto py-10">
 		<p class="text-center text-xs text-black">
 			&copy; {new Date(Date.now()).getFullYear()}
-			{shopName}, Inc. All rights reserved.
+			{shopName || 'FakeStoreNameA'}, Inc. All rights reserved.
 		</p>
 	</div>
 </footer>

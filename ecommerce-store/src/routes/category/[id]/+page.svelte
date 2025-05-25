@@ -13,11 +13,11 @@
 	let { data }: Props = $props();
 </script>
 
-<Metadata title={`Category: ${data.category.name}`} />
+<Metadata title={`Category: ${data.category?.name ?? 'Unknown'}`} />
 
 <div class="bg-white">
 	<Container>
-		<Billboard data={data.category.billboard} />
+		<Billboard data={data.category?.billboard} />
 
 		<div class="px-4 sm:px-6 lg:px-8 pb-24">
 			<div class="lg:grid lg:grid-cols-5 lg:gap-x-8">

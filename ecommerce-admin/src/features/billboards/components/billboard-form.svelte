@@ -8,12 +8,19 @@
 	import { ImageUpload } from '$lib/components/image';
 
 	import { Input } from '$lib/components/ui/input';
-	import { FormControl, FormField, FormFieldErrors, FormLabel } from '$lib/components/ui/form';
+	import {
+		FormControl,
+		FormDescription,
+		FormField,
+		FormFieldErrors,
+		FormLabel
+	} from '$lib/components/ui/form';
 
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	import { toast } from 'svelte-sonner';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	interface Props {
 		form: SuperValidated<z.infer<typeof billboardFormSchema>, any>;
@@ -85,6 +92,24 @@
 							class="mt-2"
 							bind:value={$formData.label}
 						/>
+					{/snippet}
+				</FormControl>
+
+				<FormFieldErrors />
+			</FormField>
+
+			<FormField
+				{form}
+				name="isFeatured"
+				class="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"
+			>
+				<FormControl>
+					{#snippet children({ props })}
+						<Checkbox {...props} bind:checked={$formData.isFeatured} />
+						<div class="space-y-1 leading-none">
+							<FormLabel>Featured</FormLabel>
+							<FormDescription>This billboard will appear on the home page</FormDescription>
+						</div>
 					{/snippet}
 				</FormControl>
 

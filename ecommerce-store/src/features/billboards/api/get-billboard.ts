@@ -8,16 +8,17 @@ import { derived, writable } from 'svelte/store';
 
 interface Params {
 	id: string;
+	storeId: string;
 }
 
-const billboardParamsStore = writable<Params>({ id: '' });
+const billboardParamsStore = writable<Params>({ id: '', storeId: '' });
 
 export function setBillboardParams(params: Params) {
 	billboardParamsStore.set(params);
 }
 
 interface Response {
-	billboard: Billboard;
+	billboard: Billboard | undefined;
 }
 
 export function getBillboard(params: Params | undefined = undefined) {
@@ -25,15 +26,17 @@ export function getBillboard(params: Params | undefined = undefined) {
 
 	const query = createQuery<Response, Error>(
 		derived(billboardParamsStore, ($params) => ({
-			queryKey: ['billboards', $params.id],
+			queryKey: ['stores', $params.storeId, 'billboards', $params.id],
 			queryFn: async () => {
-				const { id } = $params;
+				const { id, storeId } = $params;
+
+				if (!id || !storeId)
+					return {
+						billboard: undefined
+					};
 
 				const response = await fetch(
-					new URL(
-						`/api/stores/650ada53-900b-43b6-a97e-bd2a9277649b/billboards/${id}`,
-						PUBLIC_API_URL
-					)
+					new URL(`/api/stores/${storeId}/billboards/${id}`, PUBLIC_API_URL)
 				);
 
 				if (!response.ok) {

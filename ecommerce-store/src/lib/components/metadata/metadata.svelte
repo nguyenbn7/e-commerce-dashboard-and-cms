@@ -8,6 +8,6 @@
 </script>
 
 <svelte:head>
-	<title>{title}</title>
-	<meta name="description" content={description} />
+	<title>{title || 'Store'}</title>
+	<meta name="description" content={description || 'Store'} />
 </svelte:head>

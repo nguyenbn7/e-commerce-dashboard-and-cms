@@ -28,9 +28,9 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form });
 
-		const { name } = form.data;
+		const { name, isOpen } = form.data;
 
-		await updateStore({ userId, id: params.storeId }, { name });
+		await updateStore({ userId, id: params.storeId }, { name, isOpen });
 
 		return { form };
 	}

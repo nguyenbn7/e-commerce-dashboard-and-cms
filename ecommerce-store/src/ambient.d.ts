@@ -48,3 +48,10 @@ interface ResponseError {
 interface HttpError extends Error {
 	status?: number;
 }
+
+interface AvailableStore {
+	id: string;
+	name: string;
+	isOpen: boolean;
+	billboards: { id: string }[];
+}

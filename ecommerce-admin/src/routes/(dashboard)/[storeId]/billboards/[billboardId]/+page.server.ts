@@ -15,7 +15,7 @@ import { StatusCodes } from 'http-status-codes';
 export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
-	const result = billboardIdSchema.safeParse({ billboardId: params.billboardId });
+	const result = billboardIdSchema.safeParse({ id: params.billboardId });
 	if (!result.success) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/billboards`);
 
 	const { id } = result.data;
@@ -26,7 +26,8 @@ export const load = (async ({ parent, params }) => {
 	const form = await superValidate(zod(billboardFormSchema), {
 		defaults: {
 			label: billboard.label,
-			imageUrl: billboard.imageUrl
+			imageUrl: billboard.imageUrl,
+			isFeatured: billboard.isFeatured
 		}
 	});
 
@@ -55,13 +56,16 @@ export const actions: Actions = {
 			redirect(StatusCodes.PERMANENT_REDIRECT, `/${storeId}/billboards`);
 
 		const { id } = checkBillboardIdResult.data;
-		const { label, imageUrl } = form.data;
+		const { label, imageUrl, isFeatured } = form.data;
 
-		const billboard = await updateBillboard({ storeId, id }, { label, imageUrl });
+		console.log(label, imageUrl, isFeatured);
+
+		const billboard = await updateBillboard({ storeId, id }, { label, imageUrl, isFeatured });
 
 		form.data = {
 			label: billboard.label,
-			imageUrl: billboard.imageUrl
+			imageUrl: billboard.imageUrl,
+			isFeatured: billboard.isFeatured
 		};
 
 		return { form };

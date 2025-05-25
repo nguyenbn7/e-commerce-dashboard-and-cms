@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -20,6 +20,7 @@ model Store {
   userId     String      @map("user_id") @db.VarChar(255)
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @updatedAt @map("updated_at")
+  isOpen     Boolean     @default(false) @map("is_open")
   billboards Billboard[] @relation("store_billboard")
   Category   Category[]  @relation("store_category")
   Size       Size[]      @relation("store_size")
@@ -32,14 +33,15 @@ model Store {
 }
 
 model Billboard {
-  id        String     @id @default(uuid())
-  label     String     @db.VarChar(255)
-  imageUrl  String     @db.VarChar(255)
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  storeId   String     @map("store_id")
-  store     Store      @relation("store_billboard", fields: [storeId], references: [id])
-  Category  Category[] @relation("category_billboard")
+  id         String     @id @default(uuid())
+  label      String     @db.VarChar(255)
+  imageUrl   String     @db.VarChar(255)
+  isFeatured Boolean    @default(false) @map("is_featured")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  storeId    String     @map("store_id")
+  store      Store      @relation("store_billboard", fields: [storeId], references: [id])
+  Category   Category[] @relation("category_billboard")
 
   @@index([storeId])
   @@map("billboard")

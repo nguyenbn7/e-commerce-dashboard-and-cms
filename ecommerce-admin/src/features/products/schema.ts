@@ -7,8 +7,8 @@ export const productFormSchema = z.object({
 	categoryId: z.string().min(1, 'Required'),
 	colorId: z.string().min(1, 'Required'),
 	sizeId: z.string().min(1, 'Required'),
-	isFeatured: z.boolean().default(false).optional(),
-	isArchived: z.boolean().default(false).optional()
+	isFeatured: z.boolean().default(false),
+	isArchived: z.boolean().default(false)
 });
 
 export const productIdSchema = z.object({

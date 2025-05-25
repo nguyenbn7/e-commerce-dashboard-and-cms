@@ -8,6 +8,7 @@ interface Params {
 interface Data {
 	label: string;
 	imageUrl: string;
+	isFeatured?: boolean;
 }
 
 interface InsertData extends Data {
@@ -28,13 +29,14 @@ export async function getBillboard(params: Params) {
 }
 
 export async function createBillboard(data: InsertData) {
-	const { label, imageUrl, storeId } = data;
+	const { label, imageUrl, storeId, isFeatured } = data;
 
 	return prisma.billboard.create({
 		data: {
 			label,
 			imageUrl,
-			storeId
+			storeId,
+			isFeatured
 		}
 	});
 }
@@ -54,7 +56,7 @@ export async function getBillboards(params: StoreIdParam) {
 
 export async function updateBillboard(params: Params, data: Data) {
 	const { id, storeId } = params;
-	const { label, imageUrl } = data;
+	const { label, imageUrl, isFeatured } = data;
 
 	return prisma.billboard.update({
 		where: {
@@ -63,7 +65,8 @@ export async function updateBillboard(params: Params, data: Data) {
 		},
 		data: {
 			label,
-			imageUrl
+			imageUrl,
+			isFeatured
 		}
 	});
 }

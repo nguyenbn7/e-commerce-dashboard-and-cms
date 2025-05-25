@@ -2,6 +2,7 @@ import prisma from '$lib/server/prisma';
 
 interface Data {
 	name: string;
+	isOpen?: boolean | undefined;
 }
 
 interface Params {
@@ -30,7 +31,16 @@ export async function getAvailableStores() {
 	return prisma.store.findMany({
 		select: {
 			id: true,
-			name: true
+			name: true,
+			isOpen: true,
+			billboards: {
+				where: {
+					isFeatured: true
+				},
+				select: {
+					id: true
+				}
+			}
 		}
 	});
 }
@@ -69,7 +79,7 @@ export async function findStoreById(params: Params) {
 
 export async function updateStore(params: Params, data: Data) {
 	const { id, userId } = params;
-	const { name } = data;
+	const { name, isOpen } = data;
 
 	return prisma.store.update({
 		where: {
@@ -77,7 +87,8 @@ export async function updateStore(params: Params, data: Data) {
 			userId
 		},
 		data: {
-			name
+			name,
+			isOpen
 		}
 	});
 }

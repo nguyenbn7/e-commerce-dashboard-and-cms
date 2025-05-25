@@ -37,9 +37,9 @@ export const actions: Actions = {
 		if (!store)
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
-		const { label, imageUrl } = form.data;
+		const { label, imageUrl, isFeatured } = form.data;
 
-		await createBillboard({ label, imageUrl, storeId });
+		await createBillboard({ label, imageUrl, storeId, isFeatured });
 
 		return { form };
 	}

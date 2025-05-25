@@ -11,14 +11,13 @@
 		open: boolean;
 		onClose: () => void;
 		children: Snippet;
-		to?: string | DocumentFragment | HTMLElement | undefined;
 	}
 
-	let { open, onClose, children, to = undefined }: Props = $props();
+	let { open, onClose, children }: Props = $props();
 </script>
 
 <Dialog.Root {open} onOpenChange={onClose}>
-	<Dialog.Portal {to}>
+	<Dialog.Portal>
 		<Dialog.Overlay
 			class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50"
 		/>

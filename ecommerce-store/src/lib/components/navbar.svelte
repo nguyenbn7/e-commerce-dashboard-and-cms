@@ -7,10 +7,10 @@
 	import { getCategories as getCategoriesApi } from '$features/categories/api/client/get-categories';
 
 	interface Props {
-		shopName?: string;
+		shopName: string;
 	}
 
-	let { shopName = 'Store' }: Props = $props();
+	let { shopName }: Props = $props();
 
 	const getCategoriesClient = getCategoriesApi();
 </script>
@@ -19,7 +19,7 @@
 	<Container>
 		<div class="relative px-4 sm:px-6 lg:px-8 flex h-16 items-center">
 			<a href="/" class="ml-4 flex lg:ml-0 gap-x-2">
-				<p class="font-bold text-xl uppercase">{shopName}</p>
+				<p class="font-bold text-xl uppercase">{shopName || 'Store'}</p>
 			</a>
 
 			<MainNav data={$getCategoriesClient.data?.categories ?? []} />

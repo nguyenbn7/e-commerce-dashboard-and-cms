@@ -8,6 +8,7 @@
 	import { PreviewModal } from '$lib/components/preview-modal';
 
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { useGetCurrentStore } from '$features/stores/hooks/use-get-current-store';
 	import { Toaster } from 'svelte-sonner';
 	import { browser } from '$app/environment';
 
@@ -21,10 +22,13 @@
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
-				enabled: browser
+				enabled: browser,
+				refetchOnWindowFocus: false
 			}
 		}
 	});
+
+	const { store } = useGetCurrentStore();
 </script>
 
 <PreviewModal />
@@ -32,9 +36,9 @@
 <Toaster closeButton position="top-center" />
 
 <QueryClientProvider client={queryClient}>
-	<Navbar shopName={data.stores[0].name} />
+	<Navbar shopName={$store.name} />
 
 	{@render children()}
 
-	<Footer shopName={data.stores[0].name} />
+	<Footer shopName={$store.name} />
 </QueryClientProvider>

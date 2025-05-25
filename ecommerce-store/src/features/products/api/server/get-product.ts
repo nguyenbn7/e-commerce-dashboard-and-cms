@@ -2,6 +2,7 @@ import { getProduct as getProductApi } from '$features/products/api/client/get-p
 
 interface Params {
 	id: string;
+	storeId: string;
 	fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 

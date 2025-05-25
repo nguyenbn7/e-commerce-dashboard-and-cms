@@ -27,6 +27,10 @@ export const columns: ColumnDef<BillboardColumn>[] = [
 		}
 	},
 	{
+		accessorKey: 'isFeatured',
+		header: 'Featured'
+	},
+	{
 		id: 'actions',
 		cell: ({ row }) => renderComponent(CellAction, { data: row.original })
 	}
