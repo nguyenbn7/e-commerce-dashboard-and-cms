@@ -4,6 +4,7 @@ import { deleteColor, getColor, getColors } from '$features/colors/server/reposi
 import {
 	clerkMiddleware,
 	clerkMiddlewareAuthenticated,
+	preventActionsWhenStoreClosed,
 	storeCreatedByUserValidator
 } from '$lib/server/router.middleware';
 
@@ -13,6 +14,7 @@ import { zValidator } from '@hono/zod-validator';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 const publicRoutes = new Hono()
+	.use(preventActionsWhenStoreClosed())
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 

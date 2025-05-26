@@ -1,10 +1,11 @@
+import type { RequestIdVariables } from 'hono/request-id';
 import type { ClerkClient } from '@clerk/backend';
 import type { Input, MiddlewareHandler } from 'hono';
 
 import { CLERK_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 
-import { findStoreByUserIdAndStoreId } from '$features/stores/server/repository';
+import { findStoreByUserIdAndStoreId, getStore } from '$features/stores/server/repository';
 
 import { getAuth, clerkMiddleware as _clerkMiddleware } from '@hono/clerk-auth';
 
@@ -74,6 +75,42 @@ export const storeCreatedByUserValidator =
 					detail: 'You do not own this store'
 				},
 				StatusCodes.FORBIDDEN
+			);
+
+		await next();
+	};
+
+interface PreventActionsWhenStoreClosedEnv {
+	Variables: RequestIdVariables;
+}
+
+export const preventActionsWhenStoreClosed =
+	(): MiddlewareHandler<PreventActionsWhenStoreClosedEnv, string> => async (c, next) => {
+		const { requestId } = c.var;
+		const storeId = c.req.param('storeId') ?? '';
+
+		const store = await getStore({ id: storeId });
+
+		if (!store) 
+			return c.json(
+				{
+					id: requestId,
+					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
+					detail: 'Store not found'
+				},
+				StatusCodes.NOT_FOUND
+			);
+
+		if (!store.isOpen)
+			return c.json(
+				{
+					id: requestId,
+					status: StatusCodes.CONFLICT,
+					title: ReasonPhrases.CONFLICT,
+					detail: 'Store is closed'
+				},
+				StatusCodes.CONFLICT
 			);
 
 		await next();

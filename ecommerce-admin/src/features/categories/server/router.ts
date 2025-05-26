@@ -9,10 +9,12 @@ import { zValidator } from '@hono/zod-validator';
 import {
 	clerkMiddlewareAuthenticated,
 	clerkMiddleware,
-	storeCreatedByUserValidator
+	storeCreatedByUserValidator,
+	preventActionsWhenStoreClosed
 } from '$lib/server/router.middleware';
 
 const publicRoutes = new Hono()
+	.use(preventActionsWhenStoreClosed())
 	.get('/', zValidator('param', storeIdSchema), async (c) => {
 		const { storeId } = c.req.valid('param');
 

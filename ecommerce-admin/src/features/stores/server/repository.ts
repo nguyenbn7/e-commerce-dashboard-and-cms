@@ -117,6 +117,7 @@ export async function getStore(params: StoreIdParam) {
 		select: {
 			id: true,
 			name: true,
+			isOpen: true,
 			billboards: {
 				where: {
 					isFeatured: true

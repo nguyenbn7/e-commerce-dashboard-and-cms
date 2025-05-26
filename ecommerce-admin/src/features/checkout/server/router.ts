@@ -8,6 +8,7 @@ import { stripe } from '$lib/server/stripe';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { FRONTEND_STORE_URL } from '$env/static/private';
+import { preventActionsWhenStoreClosed } from '$lib/server/router.middleware';
 
 const app = new Hono()
 	.use(
@@ -17,6 +18,7 @@ const app = new Hono()
 			allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 		})
 	)
+	.use(preventActionsWhenStoreClosed())
 	.options('/', async (c) => {
 		return c.json({});
 	})
