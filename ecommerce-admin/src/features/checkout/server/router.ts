@@ -55,8 +55,8 @@ const app = new Hono()
 			phone_number_collection: {
 				enabled: true
 			},
-			success_url: `${FRONTEND_STORE_URL}/cart?success=1`,
-			cancel_url: `${FRONTEND_STORE_URL}/cart?canceled=1`,
+			success_url: `${FRONTEND_STORE_URL}/${store.id}/cart?success=1`,
+			cancel_url: `${FRONTEND_STORE_URL}/${store.id}/cart?canceled=1`,
 			metadata: {
 				orderId: order.id
 			}

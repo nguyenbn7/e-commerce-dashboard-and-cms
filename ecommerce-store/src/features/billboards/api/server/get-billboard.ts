@@ -11,6 +11,7 @@ export type GetBillboardResponseType = {
 };
 
 export async function getBillboard(params: Params) {
+	// TODO: handle error
 	try {
 		return getBillboardApi(params);
 	} catch {

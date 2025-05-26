@@ -1,15 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { checkout as checkoutClient } from '$features/carts/api';
+
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+
+	import { checkout as checkoutApi } from '$features/carts/api';
+	import { useCart } from '$features/carts/hooks/use-cart';
+	import { useCurrentStore } from '$features/stores/hooks/use-current-store';
+
 	import { Currency } from '$lib/components';
 	import { Button } from '$lib/components/ui/button';
-	import { useCart } from '$features/carts/hooks/use-cart';
+
 	import { toast } from 'svelte-sonner';
 
 	const { items: cartItems, removeAll } = useCart();
+	const { store } = useCurrentStore();
 	const searchParams = $derived(page.url.searchParams);
 	const totalPrice = $derived($cartItems.reduce((total, item) => total + Number(item.price), 0));
-	const checkout = checkoutClient({
+	const checkoutClient = checkoutApi({
 		onSuccess(data, variables, context) {
 			window.location = data.url;
 		}
@@ -31,7 +38,10 @@
 	});
 
 	function onCheckout() {
-		$checkout.mutate({ json: { productIds: $cartItems.map((item) => item.id.toString()) } });
+		$checkoutClient.mutate({
+			json: { productIds: $cartItems.map((item) => item.id.toString()) },
+			param: { storeId: $store.id }
+		});
 	}
 </script>
 
@@ -46,7 +56,12 @@
 		</div>
 	</div>
 
-	<Button class="w-full mt-6" onclick={onCheckout} disabled={$cartItems.length === 0}
-		>Checkout</Button
+	<Button
+		class="w-full mt-6 flex justify-center items-center"
+		onclick={onCheckout}
+		disabled={$cartItems.length === 0 || $checkoutClient.isPending}
+		>Checkout {#if $checkoutClient.isPending}
+			<LoaderCircle size={16} class="size-4 ml-2 text-white animate-spin text-center" />
+		{/if}</Button
 	>
 </div>
