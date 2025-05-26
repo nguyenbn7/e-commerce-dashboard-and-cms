@@ -1,11 +1,12 @@
-import { colorIdSchema, storeIdSchema } from '$features/colors/schema';
+import { colorIdSchema } from '$features/colors/schema';
 import { deleteColor, getColor, getColors } from '$features/colors/server/repository';
 
 import {
 	clerkMiddleware,
 	clerkMiddlewareAuthenticated,
-	preventActionsWhenStoreClosed,
-	storeCreatedByUserValidator
+	notAllowWhenStoreClosed,
+	authorizeStoreByUser,
+	validateStoreInDatabase
 } from '$lib/server/router.middleware';
 
 import { Hono } from 'hono';
@@ -14,26 +15,28 @@ import { zValidator } from '@hono/zod-validator';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 const publicRoutes = new Hono()
-	.use(preventActionsWhenStoreClosed())
-	.get('/', zValidator('param', storeIdSchema), async (c) => {
-		const { storeId } = c.req.valid('param');
+	.use(validateStoreInDatabase())
+	.get('/', notAllowWhenStoreClosed(), async (c) => {
+		const { store } = c.var;
 
-		const colors = await getColors({ storeId });
+		const colors = await getColors({ storeId: store.id });
 
 		return c.json({
 			colors
 		});
 	})
-	.get('/:id', zValidator('param', storeIdSchema.extend(colorIdSchema.shape)), async (c) => {
-		const { storeId, id } = c.req.valid('param');
+	.get('/:id', zValidator('param', colorIdSchema), async (c) => {
+		const { store, requestId } = c.var;
+		const { id } = c.req.valid('param');
 
-		const color = await getColor({ id, storeId });
+		const color = await getColor({ id, storeId: store.id });
 
 		if (!color)
 			return c.json(
 				{
-					title: ReasonPhrases.NOT_FOUND,
+					id: requestId,
 					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
 					detail: `Color not found`
 				},
 				StatusCodes.NOT_FOUND
@@ -47,31 +50,28 @@ const publicRoutes = new Hono()
 const app = publicRoutes
 	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
-	.delete(
-		'/:id',
-		zValidator('param', storeIdSchema.extend(colorIdSchema.shape)),
-		storeCreatedByUserValidator(),
-		async (c) => {
-			const { storeId, id } = c.req.valid('param');
+	.delete('/:id', zValidator('param', colorIdSchema), authorizeStoreByUser(), async (c) => {
+		const { store, requestId } = c.var;
+		const { id } = c.req.valid('param');
 
-			const color = await getColor({ id, storeId });
+		const color = await getColor({ id, storeId: store.id });
 
-			if (!color)
-				return c.json(
-					{
-						title: ReasonPhrases.NOT_FOUND,
-						status: StatusCodes.NOT_FOUND,
-						detail: `Color not found`
-					},
-					StatusCodes.NOT_FOUND
-				);
+		if (!color)
+			return c.json(
+				{
+					id: requestId,
+					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
+					detail: `Color not found`
+				},
+				StatusCodes.NOT_FOUND
+			);
 
-			const deletedColor = await deleteColor({ id, storeId });
+		const deletedColor = await deleteColor({ id, storeId: store.id });
 
-			return c.json({
-				color: deletedColor
-			});
-		}
-	);
+		return c.json({
+			color: deletedColor
+		});
+	});
 
 export default app;

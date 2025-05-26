@@ -1,14 +1,17 @@
 import type Stripe from 'stripe';
-import { zValidator } from '@hono/zod-validator';
+
+import { FRONTEND_STORE_URL } from '$env/static/private';
+
 import { checkoutSchema } from '$features/checkout/schema';
-import { validateStore } from '$features/checkout/server/middleware';
-import { getProducts } from '$features/checkout/server/internal/repository';
 import { createOrder } from '$features/checkout/server/repository';
+import { getProducts } from '$features/checkout/server/internal/repository';
+
+import { notAllowWhenStoreClosed, validateStoreInDatabase } from '$lib/server/router.middleware';
 import { stripe } from '$lib/server/stripe';
+
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { FRONTEND_STORE_URL } from '$env/static/private';
-import { preventActionsWhenStoreClosed } from '$lib/server/router.middleware';
+import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono()
 	.use(
@@ -18,12 +21,12 @@ const app = new Hono()
 			allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 		})
 	)
-	.use(preventActionsWhenStoreClosed())
+	.use(validateStoreInDatabase())
 	.options('/', async (c) => {
 		return c.json({});
 	})
-	.post('/', validateStore(), zValidator('json', checkoutSchema), async (c) => {
-		const { storeId } = c.req.valid('param');
+	.post('/', notAllowWhenStoreClosed(), zValidator('json', checkoutSchema), async (c) => {
+		const { store } = c.var;
 		const { productIds } = c.req.valid('json');
 
 		const products = await getProducts(productIds.map((v) => v, productIds));
@@ -43,7 +46,7 @@ const app = new Hono()
 			});
 		});
 
-		const order = await createOrder({ storeId }, { productIds });
+		const order = await createOrder({ storeId: store.id }, { productIds });
 
 		const session = await stripe.checkout.sessions.create({
 			line_items,

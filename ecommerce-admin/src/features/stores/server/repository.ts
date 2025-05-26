@@ -132,3 +132,19 @@ export async function getStore(params: StoreIdParam) {
 		}
 	});
 }
+
+export async function getStoreContext(params: StoreIdParam) {
+	const { id } = params;
+
+	return prisma.store.findUnique({
+		where: {
+			id
+		},
+		select: {
+			id: true,
+			name: true,
+			isOpen: true,
+			userId: true
+		}
+	});
+}

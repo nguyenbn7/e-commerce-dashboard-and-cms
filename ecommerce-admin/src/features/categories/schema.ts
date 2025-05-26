@@ -5,10 +5,6 @@ export const categoryFormSchema = z.object({
 	billboardId: z.string().trim().min(1, 'billboard id contains spaces or empty')
 });
 
-export const storeIdSchema = z.object({
-	storeId: z.string().trim()
-});
-
 export const categoryIdSchema = z.object({
-	id: z.string().trim()
+	id: z.string()
 });

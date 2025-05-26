@@ -1,3 +1,5 @@
+import { API_ORIGINS } from '$env/static/private';
+
 import stores from '$features/stores/server/router';
 import billboards from '$features/billboards/server/router';
 import categories from '$features/categories/server/router';
@@ -6,8 +8,6 @@ import colors from '$features/colors/server/router';
 import products from '$features/products/server/router';
 import checkout from '$features/checkout/server/router';
 import webhook from '$lib/server/webhook';
-
-import { API_ORIGINS } from '$env/static/private';
 
 import { Hono } from 'hono';
 import { requestId } from 'hono/request-id';

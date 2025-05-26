@@ -8,9 +8,5 @@ export const colorFormSchema = z.object({
 });
 
 export const colorIdSchema = z.object({
-	id: z.string().min(1, 'Required')
-});
-
-export const storeIdSchema = z.object({
-	storeId: z.string().trim()
+	id: z.string()
 });

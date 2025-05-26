@@ -1,15 +1,16 @@
+import { billboardIdSchema } from '$features/billboards/schema';
 import {
 	deleteBillboard,
 	getBillboard,
 	getBillboards
 } from '$features/billboards/server/repository';
-import { billboardIdSchema, storeIdSchema } from '$features/billboards/schema';
 
 import {
 	clerkMiddleware,
 	clerkMiddlewareAuthenticated,
-	preventActionsWhenStoreClosed,
-	storeCreatedByUserValidator
+	notAllowWhenStoreClosed,
+	authorizeStoreByUser,
+	validateStoreInDatabase
 } from '$lib/server/router.middleware';
 
 import { Hono } from 'hono';
@@ -18,26 +19,28 @@ import { zValidator } from '@hono/zod-validator';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 const publicRoutes = new Hono()
-	.use(preventActionsWhenStoreClosed())
-	.get('/', zValidator('param', storeIdSchema), async (c) => {
-		const { storeId } = c.req.valid('param');
+	.use(validateStoreInDatabase())
+	.get('/', notAllowWhenStoreClosed(), async (c) => {
+		const { store } = c.var;
 
-		const billboards = await getBillboards({ storeId });
+		const billboards = await getBillboards({ storeId: store.id });
 
 		return c.json({
 			billboards
 		});
 	})
-	.get('/:id', zValidator('param', storeIdSchema.extend(billboardIdSchema.shape)), async (c) => {
-		const { storeId, id } = c.req.valid('param');
+	.get('/:id', notAllowWhenStoreClosed(), zValidator('param', billboardIdSchema), async (c) => {
+		const { store, requestId } = c.var;
+		const { id } = c.req.valid('param');
 
-		const billboard = await getBillboard({ id, storeId });
+		const billboard = await getBillboard({ id, storeId: store.id });
 
 		if (!billboard)
 			return c.json(
 				{
-					title: ReasonPhrases.NOT_FOUND,
+					id: requestId,
 					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
 					detail: `Billboard not found`
 				},
 				StatusCodes.NOT_FOUND
@@ -51,31 +54,28 @@ const publicRoutes = new Hono()
 const app = publicRoutes
 	.use(clerkMiddleware())
 	.use(clerkMiddlewareAuthenticated())
-	.delete(
-		'/:id',
-		zValidator('param', storeIdSchema.extend(billboardIdSchema.shape)),
-		storeCreatedByUserValidator(),
-		async (c) => {
-			const { storeId, id } = c.req.valid('param');
+	.delete('/:id', zValidator('param', billboardIdSchema), authorizeStoreByUser(), async (c) => {
+		const { store, requestId } = c.var;
+		const { id } = c.req.valid('param');
 
-			const billboard = await getBillboard({ storeId, id });
+		const billboard = await getBillboard({ storeId: store.id, id });
 
-			if (!billboard)
-				return c.json(
-					{
-						title: ReasonPhrases.NOT_FOUND,
-						status: StatusCodes.NOT_FOUND,
-						detail: `Billboard not found`
-					},
-					StatusCodes.NOT_FOUND
-				);
+		if (!billboard)
+			return c.json(
+				{
+					id: requestId,
+					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
+					detail: `Billboard not found`
+				},
+				StatusCodes.NOT_FOUND
+			);
 
-			const deletedBillboard = await deleteBillboard({ storeId, id });
+		const deletedBillboard = await deleteBillboard({ storeId: store.id, id });
 
-			return c.json({
-				billboard: deletedBillboard
-			});
-		}
-	);
+		return c.json({
+			billboard: deletedBillboard
+		});
+	});
 
 export default app;

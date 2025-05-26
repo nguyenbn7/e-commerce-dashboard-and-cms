@@ -1,11 +1,11 @@
 import type { RequestIdVariables } from 'hono/request-id';
 import type { ClerkClient } from '@clerk/backend';
-import type { Input, MiddlewareHandler } from 'hono';
+import type { MiddlewareHandler } from 'hono';
 
 import { CLERK_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 
-import { findStoreByUserIdAndStoreId, getStore } from '$features/stores/server/repository';
+import { getStoreContext } from '$features/stores/server/repository';
 
 import { getAuth, clerkMiddleware as _clerkMiddleware } from '@hono/clerk-auth';
 
@@ -18,7 +18,7 @@ export interface AuthenticatedClerkEnv {
 		clerk: ClerkClient;
 		clerkAuth: ClerkAuth;
 		userId: string;
-	};
+	} & RequestIdVariables;
 }
 
 export const clerkMiddleware = () =>
@@ -29,13 +29,15 @@ export const clerkMiddleware = () =>
 
 export const clerkMiddlewareAuthenticated =
 	(): MiddlewareHandler<AuthenticatedClerkEnv> => async (c, next) => {
+		const { requestId } = c.var;
 		const auth = getAuth(c);
 
 		if (!auth?.userId) {
 			return c.json(
 				{
-					title: ReasonPhrases.UNAUTHORIZED,
+					id: requestId,
 					status: StatusCodes.UNAUTHORIZED,
+					title: ReasonPhrases.UNAUTHORIZED,
 					detail: 'Login required'
 				},
 				StatusCodes.UNAUTHORIZED
@@ -47,27 +49,15 @@ export const clerkMiddlewareAuthenticated =
 		await next();
 	};
 
-interface StoreIdParam extends Input {
-	in: {
-		param: {
-			storeId: string;
-		};
-	};
-	out: {
-		param: {
-			storeId: string;
-		};
-	};
-}
+export const authorizeStoreByUser =
+	(): MiddlewareHandler<
+		{ Variables: AuthenticatedClerkEnv['Variables'] & StoreContextEnv['Variables'] },
+		string
+	> =>
+	async (c, next) => {
+		const { userId, store } = c.var;
 
-export const storeCreatedByUserValidator =
-	(): MiddlewareHandler<AuthenticatedClerkEnv, string, StoreIdParam> => async (c, next) => {
-		const { storeId } = c.req.valid('param');
-		const { userId } = c.var;
-
-		const store = await findStoreByUserIdAndStoreId({ id: storeId, userId });
-
-		if (!store)
+		if (store.userId !== userId)
 			return c.json(
 				{
 					title: ReasonPhrases.FORBIDDEN,
@@ -80,18 +70,32 @@ export const storeCreatedByUserValidator =
 		await next();
 	};
 
-interface PreventActionsWhenStoreClosedEnv {
-	Variables: RequestIdVariables;
+interface StoreContextEnv {
+	Variables: RequestIdVariables & {
+		store: NonNullable<Awaited<ReturnType<typeof getStoreContext>>>;
+	};
 }
 
-export const preventActionsWhenStoreClosed =
-	(): MiddlewareHandler<PreventActionsWhenStoreClosedEnv, string> => async (c, next) => {
+export const validateStoreInDatabase =
+	(storeIdPathname: string = 'storeId'): MiddlewareHandler<StoreContextEnv, string> =>
+	async (c, next) => {
 		const { requestId } = c.var;
-		const storeId = c.req.param('storeId') ?? '';
+		const storeId = c.req.param(storeIdPathname);
 
-		const store = await getStore({ id: storeId });
+		if (!storeId)
+			return c.json(
+				{
+					id: requestId,
+					status: StatusCodes.BAD_REQUEST,
+					title: ReasonPhrases.BAD_REQUEST,
+					detail: 'Missing "storeId" param'
+				},
+				StatusCodes.BAD_REQUEST
+			);
 
-		if (!store) 
+		const store = await getStoreContext({ id: storeId });
+
+		if (!store)
 			return c.json(
 				{
 					id: requestId,
@@ -101,6 +105,17 @@ export const preventActionsWhenStoreClosed =
 				},
 				StatusCodes.NOT_FOUND
 			);
+
+		c.set('store', store);
+
+		await next();
+	};
+
+export const notAllowWhenStoreClosed =
+	(): MiddlewareHandler<StoreContextEnv, string> => async (c, next) => {
+		const { store, requestId } = c.var;
+
+		if (!store) throw new Error('Missing c.get("store") or validateStoreInDatabase() middleware');
 
 		if (!store.isOpen)
 			return c.json(

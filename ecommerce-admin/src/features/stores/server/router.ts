@@ -1,5 +1,6 @@
+import type { RequestIdVariables } from 'hono/request-id';
+
 import { setupSchema, storeIdSchema } from '$features/stores/schema';
-import { storeCreatedByUserValidator } from '$features/stores/server/router.middleware';
 import {
 	createStore,
 	deleteStore,
@@ -8,14 +9,19 @@ import {
 	getStores
 } from '$features/stores/server/repository';
 
-import { clerkMiddleware, clerkMiddlewareAuthenticated } from '$lib/server/router.middleware';
+import {
+	authorizeStoreByUser,
+	clerkMiddleware,
+	clerkMiddlewareAuthenticated,
+	validateStoreInDatabase
+} from '$lib/server/router.middleware';
 
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
-const publicRoutes = new Hono()
+const publicRoutes = new Hono<{ Variables: RequestIdVariables }>()
 	.get('/status', async (c) => {
 		const stores = await getStoresIncludeStatus();
 
@@ -24,6 +30,7 @@ const publicRoutes = new Hono()
 		});
 	})
 	.get('/:id', zValidator('param', storeIdSchema), async (c) => {
+		const { requestId } = c.var;
 		const { id } = c.req.valid('param');
 
 		const store = await getStore({ id });
@@ -31,9 +38,10 @@ const publicRoutes = new Hono()
 		if (!store)
 			return c.json(
 				{
-					title: ReasonPhrases.NOT_FOUND,
+					id: requestId,
 					status: StatusCodes.NOT_FOUND,
-					detail: `Store with id "${id}" not found`
+					title: ReasonPhrases.NOT_FOUND,
+					detail: `Store not found`
 				},
 				StatusCodes.NOT_FOUND
 			);
@@ -66,11 +74,10 @@ const app = publicRoutes
 			store
 		});
 	})
-	.delete('/:id', zValidator('param', storeIdSchema), storeCreatedByUserValidator(), async (c) => {
-		const { id } = c.req.valid('param');
-		const { userId } = c.var;
+	.delete('/:id', validateStoreInDatabase('id'), authorizeStoreByUser(), async (c) => {
+		const { userId, store } = c.var;
 
-		const deletedStore = await deleteStore({ id, userId });
+		const deletedStore = await deleteStore({ id: store.id, userId });
 
 		return c.json({
 			store: deletedStore

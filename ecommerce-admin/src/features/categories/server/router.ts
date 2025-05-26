@@ -1,39 +1,42 @@
-import { categoryIdSchema, storeIdSchema } from '$features/categories/schema';
+import { categoryIdSchema } from '$features/categories/schema';
 import { deleteCategory, getCategories, getCategory } from '$features/categories/server/repository';
-
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
 
 import {
 	clerkMiddlewareAuthenticated,
 	clerkMiddleware,
-	storeCreatedByUserValidator,
-	preventActionsWhenStoreClosed
+	authorizeStoreByUser,
+	notAllowWhenStoreClosed,
+	validateStoreInDatabase
 } from '$lib/server/router.middleware';
 
-const publicRoutes = new Hono()
-	.use(preventActionsWhenStoreClosed())
-	.get('/', zValidator('param', storeIdSchema), async (c) => {
-		const { storeId } = c.req.valid('param');
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 
-		const categories = await getCategories({ storeId });
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+
+const publicRoutes = new Hono()
+	.use(validateStoreInDatabase())
+	.get('/', async (c) => {
+		const { store } = c.var;
+
+		const categories = await getCategories({ storeId: store.id });
 
 		return c.json({
 			categories
 		});
 	})
-	.get('/:id', zValidator('param', storeIdSchema.extend(categoryIdSchema.shape)), async (c) => {
-		const { storeId, id } = c.req.valid('param');
+	.get('/:id', zValidator('param', categoryIdSchema), async (c) => {
+		const { store, requestId } = c.var;
+		const { id } = c.req.valid('param');
 
-		const category = await getCategory({ storeId, id });
+		const category = await getCategory({ storeId: store.id, id });
 
 		if (!category)
 			return c.json(
 				{
-					title: ReasonPhrases.NOT_FOUND,
+					id: requestId,
 					status: StatusCodes.NOT_FOUND,
+					title: ReasonPhrases.NOT_FOUND,
 					detail: `Category not found`
 				},
 				StatusCodes.NOT_FOUND
@@ -49,24 +52,26 @@ const app = publicRoutes
 	.use(clerkMiddlewareAuthenticated())
 	.delete(
 		'/:categoryId',
-		zValidator('param', storeIdSchema.extend(categoryIdSchema.shape)),
-		storeCreatedByUserValidator(),
+		zValidator('param', categoryIdSchema),
+		authorizeStoreByUser(),
 		async (c) => {
-			const { storeId, id } = c.req.valid('param');
+			const { store, requestId } = c.var;
+			const { id } = c.req.valid('param');
 
-			const category = await getCategory({ id, storeId });
+			const category = await getCategory({ id, storeId: store.id });
 
 			if (!category)
 				return c.json(
 					{
-						title: ReasonPhrases.NOT_FOUND,
+						id: requestId,
 						status: StatusCodes.NOT_FOUND,
+						title: ReasonPhrases.NOT_FOUND,
 						detail: `Category not found`
 					},
 					StatusCodes.NOT_FOUND
 				);
 
-			const deletedCategory = await deleteCategory({ id, storeId });
+			const deletedCategory = await deleteCategory({ id, storeId: store.id });
 
 			return c.json({
 				category: deletedCategory
