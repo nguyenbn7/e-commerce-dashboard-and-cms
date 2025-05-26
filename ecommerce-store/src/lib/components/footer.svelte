@@ -1,16 +1,14 @@
 <script lang="ts">
-	interface Props {
-		shopName: string;
-	}
+	import { useCurrentStore } from '$features/stores/hooks/use-current-store';
 
-	let { shopName }: Props = $props();
+	const { store } = useCurrentStore();
 </script>
 
 <footer class="bg-white border-t">
 	<div class="mx-auto py-10">
 		<p class="text-center text-xs text-black">
 			&copy; {new Date(Date.now()).getFullYear()}
-			{shopName || 'FakeStoreNameA'}, Inc. All rights reserved.
+			{$store.name || 'FakeStoreNameA'}, Inc. All rights reserved.
 		</p>
 	</div>
 </footer>

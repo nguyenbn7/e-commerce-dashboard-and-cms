@@ -27,20 +27,12 @@ export async function getStores(params: UserIdParam) {
 	});
 }
 
-export async function getAvailableStores() {
+export async function getStoresIncludeStatus() {
 	return prisma.store.findMany({
 		select: {
 			id: true,
 			name: true,
-			isOpen: true,
-			billboards: {
-				where: {
-					isFeatured: true
-				},
-				select: {
-					id: true
-				}
-			}
+			isOpen: true
 		}
 	});
 }
@@ -125,7 +117,17 @@ export async function getStore(params: StoreIdParam) {
 		select: {
 			id: true,
 			name: true,
-			createdAt: true
+			billboards: {
+				where: {
+					isFeatured: true
+				},
+				select: {
+					id: true,
+					label: true,
+					imageUrl: true
+				},
+				take: 1
+			}
 		}
 	});
 }

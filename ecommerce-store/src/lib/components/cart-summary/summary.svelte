@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { checkout as checkoutClient } from '$features/shopping-cart/api';
+	import { checkout as checkoutClient } from '$features/carts/api';
 	import { Currency } from '$lib/components';
 	import { Button } from '$lib/components/ui/button';
-	import useCart from '$lib/hooks/cart';
+	import { useCart } from '$features/carts/hooks/use-cart';
 	import { toast } from 'svelte-sonner';
 
 	const { items: cartItems, removeAll } = useCart();

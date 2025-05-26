@@ -3,12 +3,11 @@
 	import type { LayoutData } from './$types';
 
 	import '../app.css';
-	import { Footer, Navbar } from '$lib/components';
 
+	import { Footer, Navbar } from '$lib/components';
 	import { PreviewModal } from '$lib/components/preview-modal';
 
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-	import { useGetCurrentStore } from '$features/stores/hooks/use-get-current-store';
 	import { Toaster } from 'svelte-sonner';
 	import { browser } from '$app/environment';
 
@@ -27,8 +26,6 @@
 			}
 		}
 	});
-
-	const { store } = useGetCurrentStore();
 </script>
 
 <PreviewModal />
@@ -36,9 +33,9 @@
 <Toaster closeButton position="top-center" />
 
 <QueryClientProvider client={queryClient}>
-	<Navbar shopName={$store.name} />
+	<Navbar />
 
 	{@render children()}
 
-	<Footer shopName={$store.name} />
+	<Footer />
 </QueryClientProvider>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	import useCart from '$lib/hooks/cart';
+	import { useCart } from '$features/carts/hooks/use-cart';
 
 	import { Metadata } from '$lib/components/metadata';
 	import { Container } from '$lib/components/ui/container';

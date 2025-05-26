@@ -7,7 +7,7 @@ export function getStores() {
 	const query = createQuery<GetStoresResponseType, Error>({
 		queryKey: ['stores', 'available'],
 		queryFn: async () => {
-			const response = await fetch(new URL('/api/stores/available', PUBLIC_API_URL));
+			const response = await fetch(new URL('/api/stores/status', PUBLIC_API_URL));
 
 			try {
 				return response.json() as Promise<GetStoresResponseType>;

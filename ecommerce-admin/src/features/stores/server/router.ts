@@ -3,7 +3,7 @@ import { storeCreatedByUserValidator } from '$features/stores/server/router.midd
 import {
 	createStore,
 	deleteStore,
-	getAvailableStores,
+	getStoresIncludeStatus,
 	getStore,
 	getStores
 } from '$features/stores/server/repository';
@@ -16,8 +16,8 @@ import { zValidator } from '@hono/zod-validator';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
 const publicRoutes = new Hono()
-	.get('/available', async (c) => {
-		const stores = await getAvailableStores();
+	.get('/status', async (c) => {
+		const stores = await getStoresIncludeStatus();
 
 		return c.json({
 			stores

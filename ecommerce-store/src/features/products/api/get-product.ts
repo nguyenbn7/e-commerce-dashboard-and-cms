@@ -7,15 +7,15 @@ export interface Params {
 	fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
-export type GetProductResponseType = { product: Product | undefined };
+export type GetProductResponseType = { product: Product };
 
 export async function getProduct(params: Params): Promise<GetProductResponseType> {
 	const { fetch: ssrFetch, id, storeId } = params;
 
-	if (!storeId || !id)
-		return {
-			product: undefined
-		};
+	// if (!storeId || !id)
+	// 	return {
+	// 		product: undefined
+	// 	};
 
 	const _fetch = ssrFetch ? ssrFetch : fetch;
 

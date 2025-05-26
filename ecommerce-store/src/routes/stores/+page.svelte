@@ -3,27 +3,24 @@
 
 	import StoreIcon from '@lucide/svelte/icons/store';
 
-	import { getStores as getStoresApi } from '$features/stores/api/client/get-stores';
+	import { useCurrentStore } from '$features/stores/hooks/use-current-store';
+	import { useCart } from '$features/carts/hooks/use-cart';
 
 	import { Metadata } from '$lib/components/metadata';
-	import { Separator } from 'bits-ui';
-	import {
-		getCurrentStoreFromStorage,
-		useGetCurrentStore
-	} from '$features/stores/hooks/use-get-current-store';
-	import { goto } from '$app/navigation';
-	import useCart from '$lib/hooks/cart';
 	import { cn } from '$lib/utils';
 
-	let { data }: { data: PageData } = $props();
+	import { Separator } from 'bits-ui';
+	import { goto } from '$app/navigation';
 
-	const getStoresClient = getStoresApi();
-	const { store: currentStore, saveStoreIdToLocalStorage } = useGetCurrentStore();
+	const { data }: { data: PageData } = $props();
+
+	const { stores } = data;
+
+	// const getStoresClient = getStoresApi();
+	const { store: currentStore, saveStoreId } = useCurrentStore();
 	const { items: cartItems, removeAll } = useCart();
 
-	const stores = $derived($getStoresClient.data?.stores ?? []);
-
-	async function onSetCurrentStore(storeId: string) {
+	async function onChangeCurrentStore(storeId: string) {
 		if ($cartItems.length > 0) {
 			const ok = confirm(
 				'Your cart is not empty. Are you sure that you want to switch to new store?'
@@ -34,16 +31,12 @@
 			removeAll();
 		}
 
-		saveStoreIdToLocalStorage(storeId);
-		return goto('/', { invalidateAll: true, replaceState: true });
+		saveStoreId(storeId);
+		return goto(`/${storeId}`, { invalidateAll: true, replaceState: true });
 	}
-
-	$effect(() => {
-		getCurrentStoreFromStorage(stores);
-	});
 </script>
 
-<Metadata title="Select Stores" />
+<Metadata title="Stores" />
 
 <div class="w-full max-w-2xl mx-auto overflow-hidden">
 	<div
@@ -64,8 +57,8 @@
 						'px-3 py-5 border border-black/35 w-full rounded-2xl hover:cursor-pointer hover:bg-sky-300/40 disabled:hover:bg-transparent disabled:hover:cursor-default flex items-center justify-between',
 						isActive && 'bg-sky-300/40 disabled:hover:bg-sky-300/40'
 					)}
-					onclick={() => onSetCurrentStore(store.id)}
-					disabled={isActive || !store.isOpen}
+					onclick={() => onChangeCurrentStore(store.id)}
+					disabled={!store.isOpen}
 				>
 					{store.name}
 					<div class="flex items-center gap-x-3">

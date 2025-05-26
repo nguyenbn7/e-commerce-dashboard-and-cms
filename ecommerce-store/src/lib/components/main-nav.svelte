@@ -4,13 +4,14 @@
 
 	interface Props {
 		data: Category[];
+		storeId: string;
 	}
 
-	let { data }: Props = $props();
+	const { data, storeId }: Props = $props();
 
 	const routes = $derived(
 		data.map((route) => ({
-			href: `/category/${route.id}`,
+			href: `/${storeId}/category/${route.id}`,
 			label: route.name
 		}))
 	);

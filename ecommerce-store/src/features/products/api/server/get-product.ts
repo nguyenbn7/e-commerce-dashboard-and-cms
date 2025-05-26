@@ -1,4 +1,4 @@
-import { getProduct as getProductApi } from '$features/products/api/client/get-product';
+import { getProduct as getProductApi } from '$features/products/api/get-product';
 
 interface Params {
 	id: string;

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 
+	import { useCart } from '$features/carts/hooks/use-cart';
+
 	import { IconButton } from '$lib/components/ui';
 	import { Currency } from '$lib/components';
-	import useCart from '$lib/hooks/cart';
 
 	interface Props {
 		data: Product;

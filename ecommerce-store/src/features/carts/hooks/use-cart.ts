@@ -33,7 +33,7 @@ function deleteCartFromStorage(name: string) {
 
 const cartStore = writable<Array<Product>>(getCartFromStorage(name));
 
-export default function useCart() {
+export function useCart() {
 	return {
 		items: { subscribe: cartStore.subscribe },
 		addItem: (data: Product) => {

@@ -2,11 +2,12 @@
 	import Expand from '@lucide/svelte/icons/expand';
 	import ShoppingCart from '@lucide/svelte/icons/shopping-cart';
 
+	import { useCurrentStore } from '$features/stores/hooks/use-current-store';
+	import { useCart } from '$features/carts/hooks/use-cart';
+
 	import { IconButton } from '$lib/components/ui';
 	import { Currency } from '$lib/components';
 	import { usePreviewModal } from '$lib/components/preview-modal';
-
-	import useCart from '$lib/hooks/cart';
 
 	interface Props {
 		data: Product;
@@ -16,10 +17,11 @@
 
 	const previewModal = usePreviewModal();
 	const cart = useCart();
+	const { store } = useCurrentStore();
 </script>
 
 <a
-	href={`/product/${product.id}`}
+	href={`/${$store.id}/product/${product.id}`}
 	class="bg-white group cursor-pointer rounded-xl border p-3 space-y-4"
 >
 	<div class="aspect-square rounded-xl bg-gray-100 relative">
