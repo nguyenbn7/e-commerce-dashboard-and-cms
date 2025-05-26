@@ -121,11 +121,11 @@ export const notAllowWhenStoreClosed =
 			return c.json(
 				{
 					id: requestId,
-					status: StatusCodes.CONFLICT,
-					title: ReasonPhrases.CONFLICT,
-					detail: 'Store is closed'
+					status: StatusCodes.FORBIDDEN,
+					title: ReasonPhrases.FORBIDDEN,
+					detail: 'Store is closed.'
 				},
-				StatusCodes.CONFLICT
+				StatusCodes.FORBIDDEN
 			);
 
 		await next();
