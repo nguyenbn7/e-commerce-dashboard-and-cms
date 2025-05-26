@@ -23,13 +23,13 @@ export const load = (async ({ parent }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
 		const { userId } = locals.auth();
-		if (!userId) redirect(307, '/sign-in');
+		if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
 		const result = storeIdSchema.safeParse({ storeId: params.storeId });
-		if (!result.success) redirect(307, '/');
+		if (!result.success) redirect(StatusCodes.PERMANENT_REDIRECT, '/');
 
 		const form = await superValidate(request, zod(colorFormSchema));
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { storeId } = result.data;
 

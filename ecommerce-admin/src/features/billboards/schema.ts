@@ -9,3 +9,7 @@ export const billboardFormSchema = z.object({
 export const billboardIdSchema = z.object({
 	id: z.string()
 });
+
+export const storeIdSchema = z.object({
+	storeId: z.string()
+});

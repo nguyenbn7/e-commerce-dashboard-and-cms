@@ -16,12 +16,12 @@ export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
 	const result = categoryIdSchema.safeParse({ id: params.categoryId });
-	if (!result.success) redirect(307, `/${store.id}/categories`);
+	if (!result.success) redirect(StatusCodes.TEMPORARY_REDIRECT, `/${store.id}/categories`);
 
 	const { id } = result.data;
 
 	const category = await getCategory({ storeId: store.id, id });
-	if (!category) redirect(307, `/${store.id}/categories`);
+	if (!category) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/categories`);
 
 	const form = await superValidate(zod(categoryFormSchema), {
 		defaults: {
@@ -36,13 +36,13 @@ export const load = (async ({ parent, params }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
 		const { userId } = locals.auth();
-		if (!userId) redirect(307, '/sign-in');
+		if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
 		const checkStoreIdResult = storeIdSchema.safeParse({ storeId: params.storeId });
-		if (!checkStoreIdResult.success) redirect(307, '/');
+		if (!checkStoreIdResult.success) redirect(StatusCodes.PERMANENT_REDIRECT, '/');
 
 		const form = await superValidate(request, zod(categoryFormSchema));
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { storeId } = checkStoreIdResult.data;
 
@@ -51,7 +51,8 @@ export const actions: Actions = {
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkCategoryIdResult = categoryIdSchema.safeParse({ categoryId: params.categoryId });
-		if (!checkCategoryIdResult.success) redirect(308, `/${storeId}/categories`);
+		if (!checkCategoryIdResult.success)
+			redirect(StatusCodes.PERMANENT_REDIRECT, `/${storeId}/categories`);
 
 		const { id } = checkCategoryIdResult.data;
 		const { name, billboardId } = form.data;

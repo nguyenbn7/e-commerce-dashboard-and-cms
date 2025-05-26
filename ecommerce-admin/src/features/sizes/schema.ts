@@ -8,3 +8,7 @@ export const sizeFormSchema = z.object({
 export const sizeIdSchema = z.object({
 	id: z.string()
 });
+
+export const storeIdSchema = z.object({
+	storeId: z.string()
+});

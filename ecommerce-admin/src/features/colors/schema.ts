@@ -10,3 +10,7 @@ export const colorFormSchema = z.object({
 export const colorIdSchema = z.object({
 	id: z.string()
 });
+
+export const storeIdSchema = z.object({
+	storeId: z.string()
+});

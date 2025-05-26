@@ -42,7 +42,7 @@ export const actions: Actions = {
 		if (!checkStoreIdResult.success) redirect(StatusCodes.PERMANENT_REDIRECT, '/');
 
 		const form = await superValidate(request, zod(sizeFormSchema));
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { storeId } = checkStoreIdResult.data;
 
@@ -51,7 +51,7 @@ export const actions: Actions = {
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkSizeIdResult = sizeIdSchema.safeParse({ sizeId: params.sizeId });
-		if (!checkSizeIdResult.success) redirect(308, `/${storeId}/sizes`);
+		if (!checkSizeIdResult.success) redirect(StatusCodes.BAD_REQUEST, `/${storeId}/sizes`);
 
 		const { id } = checkSizeIdResult.data;
 		const { name, value } = form.data;

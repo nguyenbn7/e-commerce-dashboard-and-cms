@@ -8,6 +8,8 @@ import { zod } from 'sveltekit-superforms/adapters';
 
 import { fail, redirect } from '@sveltejs/kit';
 
+import { StatusCodes } from 'http-status-codes';
+
 export const load = (async ({ parent }) => {
 	const { store } = await parent();
 
@@ -22,11 +24,11 @@ export const actions = {
 	default: async ({ locals, request, params }) => {
 		const { userId } = locals.auth();
 
-		if (!userId) redirect(307, '/sign-in');
+		if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
 		const form = await superValidate(request, zod(settingsFormSchema));
 
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { name, isOpen } = form.data;
 

@@ -8,3 +8,7 @@ export const categoryFormSchema = z.object({
 export const categoryIdSchema = z.object({
 	id: z.string()
 });
+
+export const storeIdSchema = z.object({
+	storeId: z.string()
+});

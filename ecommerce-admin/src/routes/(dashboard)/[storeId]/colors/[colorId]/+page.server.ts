@@ -16,12 +16,12 @@ export const load = (async ({ parent, params }) => {
 	const { store } = await parent();
 
 	const result = colorIdSchema.safeParse({ id: params.colorId });
-	if (!result.success) redirect(307, `/${store.id}/colors`);
+	if (!result.success) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/colors`);
 
 	const { id } = result.data;
 
 	const color = await getColor({ id, storeId: store.id });
-	if (!color) redirect(307, `/${store.id}/colors`);
+	if (!color) redirect(StatusCodes.PERMANENT_REDIRECT, `/${store.id}/colors`);
 
 	const form = await superValidate(zod(colorFormSchema), {
 		defaults: {
@@ -36,13 +36,13 @@ export const load = (async ({ parent, params }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
 		const { userId } = locals.auth();
-		if (!userId) redirect(307, '/sign-in');
+		if (!userId) redirect(StatusCodes.TEMPORARY_REDIRECT, '/sign-in');
 
 		const checkStoreIdResult = storeIdSchema.safeParse({ storeId: params.storeId });
-		if (!checkStoreIdResult.success) redirect(307, '/');
+		if (!checkStoreIdResult.success) redirect(StatusCodes.PERMANENT_REDIRECT, '/');
 
 		const form = await superValidate(request, zod(colorFormSchema));
-		if (!form.valid) return fail(400, { form });
+		if (!form.valid) return fail(StatusCodes.BAD_REQUEST, { form });
 
 		const { storeId } = checkStoreIdResult.data;
 
@@ -51,7 +51,7 @@ export const actions: Actions = {
 			return message(form, 'You do not own this store', { status: StatusCodes.FORBIDDEN });
 
 		const checkColorIdResult = colorIdSchema.safeParse({ colorId: params.colorId });
-		if (!checkColorIdResult.success) redirect(308, `/${storeId}/colors`);
+		if (!checkColorIdResult.success) redirect(StatusCodes.PERMANENT_REDIRECT, `/${storeId}/colors`);
 
 		const { id } = checkColorIdResult.data;
 		const { name, value } = form.data;
