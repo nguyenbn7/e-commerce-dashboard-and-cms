@@ -1,9 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	import { useCurrentStore } from '$features/stores/hooks/use-current-store';
-	import { useCategories } from '$features/categories/hooks/use-categories';
-
 	import { Billboard as BillboardComponent, ProductList } from '$lib/components';
 
 	import { Metadata } from '$lib/components/metadata';
@@ -15,13 +12,7 @@
 
 	const { data }: PageProps = $props();
 
-	const { store, billboard, products, categories } = data;
-
-	const { setCurrentStore } = useCurrentStore();
-	const { setCategories } = useCategories();
-
-	setCurrentStore(store);
-	setCategories(categories);
+	const { store, billboard, products } = data;
 </script>
 
 <Metadata title={store.name} description={store.name} />

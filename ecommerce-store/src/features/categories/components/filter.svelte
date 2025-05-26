@@ -35,8 +35,6 @@
 			{ skipNull: true }
 		);
 
-		console.log(url);
-
 		await goto(url, { noScroll: true });
 	}
 </script>

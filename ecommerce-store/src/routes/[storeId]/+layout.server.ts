@@ -1,13 +1,12 @@
-import type { PageServerLoad } from './$types';
+import type { LayoutServerLoad } from './$types';
 
 import { getStore } from '$features/stores/api/server/get-store';
-import { getBillboard } from '$features/billboards/api/server/get-billboard';
 import { getProducts } from '$features/products/api/server/get-products';
+import { getCategories } from '$features/categories/api/server/get-categories';
 
 import { redirect } from '@sveltejs/kit';
 
 import { StatusCodes } from 'http-status-codes';
-import { getCategories } from '$features/categories/api/server/get-categories';
 
 export const load = (async ({ params, fetch }) => {
 	const { storeId } = params;
@@ -28,4 +27,4 @@ export const load = (async ({ params, fetch }) => {
 		products,
 		categories
 	};
-}) satisfies PageServerLoad;
+}) satisfies LayoutServerLoad;
