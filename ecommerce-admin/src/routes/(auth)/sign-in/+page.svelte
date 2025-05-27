@@ -12,12 +12,14 @@
 
 	import { Metadata } from '$lib/components/metadata';
 
-	import { ClerkLoaded, ClerkLoading, SignIn } from 'svelte-clerk';
-	import { useClerkContext } from 'svelte-clerk/client';
+	import { Button } from '$lib/components/ui/button';
 
 	import { dark } from '@clerk/themes';
 	import { mode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button';
+
+	import { SignIn } from 'svelte-clerk';
+	
+	import { useClerkContext } from 'svelte-clerk/client';
 	import { page } from '$app/state';
 
 	const { data }: { data: PageData } = $props();
@@ -71,25 +73,19 @@
 
 <Metadata title="Sign In" />
 
-<ClerkLoading>
-	<Loader size={16} class="size-28 animate-spin ml-1" />
-</ClerkLoading>
+<div class="flex flex-col">
+	<SignIn appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }} />
 
-<ClerkLoaded>
-	<div class="flex flex-col">
-		<SignIn appearance={{ baseTheme: mode.current === 'dark' ? dark : undefined }} />
-
-		{#if !userId}
-			<Button
-				variant="link"
-				class="mt-3 hover:cursor-pointer"
-				onclick={signInAsDemoUser}
-				disabled={disabledSignInAsDemoUser}
-				hidden={!!page.url.hash}
-				>Sign in as Demo User {#if disabledSignInAsDemoUser}
-					<Loader size={16} class="animate-spin" />
-				{/if}</Button
-			>
-		{/if}
-	</div>
-</ClerkLoaded>
+	{#if !userId}
+		<Button
+			variant="link"
+			class="mt-3 hover:cursor-pointer"
+			onclick={signInAsDemoUser}
+			disabled={disabledSignInAsDemoUser}
+			hidden={!!page.url.hash}
+			>Sign in as Demo User {#if disabledSignInAsDemoUser}
+				<Loader size={16} class="animate-spin" />
+			{/if}</Button
+		>
+	{/if}
+</div>
