@@ -18,7 +18,7 @@
 	const totalPrice = $derived($cartItems.reduce((total, item) => total + Number(item.price), 0));
 	const checkoutClient = checkoutApi({
 		onSuccess(data, variables, context) {
-			window.location = data.url;
+			(window as Window).location = data.url;
 		}
 	});
 

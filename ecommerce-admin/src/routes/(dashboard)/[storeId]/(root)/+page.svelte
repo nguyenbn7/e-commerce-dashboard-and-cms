@@ -19,7 +19,8 @@
 
 	const { data }: PageProps = $props();
 
-	const { totalRevenue, salesCount, stockCount } = data;
+	const { totalRevenue, salesCount, stockCount, graphRevenue } = data;
+
 </script>
 
 <Metadata title="Dashboard" />
@@ -76,7 +77,7 @@
 			</CardHeader>
 
 			<CardContent class="pl-2">
-				<Overview data={[]} />
+				<Overview data={graphRevenue} />
 			</CardContent>
 		</Card>
 	</div>

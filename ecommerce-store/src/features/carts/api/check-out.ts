@@ -3,7 +3,7 @@ import { createMutation } from '@tanstack/svelte-query';
 
 type Request = { json: { productIds: string[] }; param: { storeId: string } };
 
-type Response = any;
+type Response = { url: string };
 
 interface Options {
 	onSuccess?: (data: Response, variables: Request, context: unknown) => Promise<unknown> | unknown;
