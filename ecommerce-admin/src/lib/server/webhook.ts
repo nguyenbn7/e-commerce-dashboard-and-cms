@@ -37,6 +37,8 @@ const app = new Hono().post('/', async (c) => {
 			},
 			data: {
 				isPaid: true,
+				buyer: session.customer_details?.name || '',
+				email: session.customer_details?.email || '',
 				address: addressString,
 				phone: session?.customer_details?.phone || ''
 			},

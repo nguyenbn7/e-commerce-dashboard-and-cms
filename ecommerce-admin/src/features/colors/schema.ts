@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
 export const colorFormSchema = z.object({
-	name: z.string().min(1, 'Required'),
+	name: z
+		.string()
+		.trim()
+		.min(1, 'Name contains spaces or empty')
+		.max(255, 'Name does not excceed 255 characters'),
 	value: z.string().trim().min(4).regex(/^#/, {
-		message: 'String must be a valid hex code'
+		message: 'String must be a valid hex code (#xxx, #xxxxxx)'
 	})
 });
 

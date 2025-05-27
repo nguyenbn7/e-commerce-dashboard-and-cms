@@ -1,8 +1,16 @@
 import { z } from 'zod';
 
 export const sizeFormSchema = z.object({
-	name: z.string().trim().min(1, 'name contains spaces or empty'),
-	value: z.string().trim().min(1, 'value contains spaces or empty')
+	name: z
+		.string()
+		.trim()
+		.min(1, 'Name contains spaces or empty')
+		.max(255, 'Name does not excceed 255 characters'),
+	value: z
+		.string()
+		.trim()
+		.min(1, 'Value contains spaces or empty')
+		.max(255, 'Value does not excceed 255 characters')
 });
 
 export const sizeIdSchema = z.object({

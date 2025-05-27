@@ -13,6 +13,14 @@ export const columns: ColumnDef<OrderColumn>[] = [
 		}
 	},
 	{
+		accessorKey: 'buyer',
+		header: 'Buyer'
+	},
+	{
+		accessorKey: 'email',
+		header: 'Email'
+	},
+	{
 		accessorKey: 'phone',
 		header: 'Phone'
 	},

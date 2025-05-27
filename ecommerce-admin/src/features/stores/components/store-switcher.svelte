@@ -20,6 +20,8 @@
 		CommandSeparator
 	} from '$lib/components/ui/command';
 
+	import truncate from 'lodash/truncate';
+
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 
@@ -59,9 +61,12 @@
 				aria-expanded={open}
 				aria-label="Select a store"
 				class={cn('w-[200px] justify-between', className)}
+				title={currentStore?.label ?? ''}
 			>
 				<StoreIcon size={16} class="mr-2" />
-				{currentStore?.label}
+				{truncate(currentStore?.label, {
+					length: 20
+				})}
 				<ChevronsUpDown size={16} class="ml-auto shrink-0 opacity-50" />
 			</Button>
 		{/snippet}
@@ -76,9 +81,11 @@
 
 				<CommandGroup heading="Stores">
 					{#each storeOptions as store (store.value)}
-						<CommandItem onSelect={() => onStoreSelect(store)} class="text-sm">
+						<CommandItem onSelect={() => onStoreSelect(store)} class="text-sm" title={store.label}>
 							<StoreIcon size={16} class="mr-2" />
-							{store.label}
+							{truncate(store.label, {
+								length: 30
+							})}
 							<Check
 								size={16}
 								class={cn(

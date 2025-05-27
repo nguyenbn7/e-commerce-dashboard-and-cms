@@ -1,8 +1,12 @@
 import { z } from 'zod';
 
 export const billboardFormSchema = z.object({
-	label: z.string().trim().min(1, 'label contains spaces or empty'),
-	imageUrl: z.string().trim().min(1, 'imageUrl contains spaces or empty'),
+	label: z
+		.string()
+		.trim()
+		.min(1, 'Label contains spaces or empty')
+		.max(255, 'Label does not excceed 255 characters'),
+	imageUrl: z.string().trim().min(1, 'Required'),
 	isFeatured: z.boolean().default(false)
 });
 

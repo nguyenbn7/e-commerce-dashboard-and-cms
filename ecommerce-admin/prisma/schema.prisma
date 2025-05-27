@@ -134,6 +134,8 @@ model Order {
   storeId    String      @map("store_id")
   store      Store       @relation("store_order", fields: [storeId], references: [id])
   isPaid     Boolean     @default(false) @map("is_paid")
+  buyer      String      @default("") @db.VarChar(255)
+  email      String      @default("") @db.VarChar(255)
   phone      String      @default("") @db.VarChar(16)
   address    String      @default("") @db.VarChar(511)
   createdAt  DateTime    @default(now()) @map("created_at")

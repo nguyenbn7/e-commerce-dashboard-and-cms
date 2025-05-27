@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const productFormSchema = z.object({
-	name: z.string().min(1, 'Required'),
+	name: z.string().min(1, 'Required').max(255, 'Name does not excceed 255 characters'),
 	images: z.object({ url: z.string() }).array().min(1, 'Required'),
-	price: z.coerce.number().min(1, 'Must greater than 0.00'),
+	price: z.coerce.number().min(1, 'Must greater than 0'),
 	categoryId: z.string().min(1, 'Required'),
 	colorId: z.string().min(1, 'Required'),
 	sizeId: z.string().min(1, 'Required'),
@@ -12,11 +12,11 @@ export const productFormSchema = z.object({
 });
 
 export const productIdSchema = z.object({
-	id: z.string().trim()
+	id: z.string()
 });
 
 export const storeIdSchema = z.object({
-	storeId: z.string().trim()
+	storeId: z.string()
 });
 
 export const productsSearchParamsSchema = z.object({
